@@ -1,0 +1,179 @@
+# Lucid Vision - AI-Powered Meditation App
+
+## Overview
+Lucid Vision is a mobile-first meditation platform that generates personalized guided meditations using AI. The app helps users clarify and embody their vision across 9 life categories through custom meditation experiences.
+
+## Current State
+Backend API infrastructure is set up and running. The project is structured for React Native mobile development with a Node.js/Express backend serving API endpoints and a web player for gift meditations.
+
+## Recent Changes (October 2, 2025)
+- Initial project setup with Node.js/Express backend
+- Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
+- Created services for AI (OpenAI), audio (ElevenLabs + FFmpeg), meditation generation, vision tracking, and quota management
+- Built web player for public gift meditation sharing
+- Defined complete database schema with RLS policies for Supabase PostgreSQL
+- Configured workflow to run backend server on port 5000
+
+## Project Architecture
+
+### Backend (Node.js + Express)
+- **Server**: `server/index.js` - Main Express server
+- **Routes**: API endpoints in `server/routes/`
+  - `auth.js` - Magic link authentication
+  - `meditation.js` - Meditation CRUD and generation
+  - `vision.js` - Living Vision Statement management
+  - `gift.js` - Gift meditation creation and sharing
+  - `subscription.js` - Tier management and quota
+  - `player.js` - Audio playback and previews
+
+- **Services**: Business logic in `server/services/`
+  - `aiService.js` - OpenAI script generation, titles, prompts, taglines
+  - `audioService.js` - ElevenLabs TTS + FFmpeg audio mixing
+  - `meditationService.js` - Meditation generation pipeline
+  - `visionService.js` - Category vision and prompt flow
+  - `giftService.js` - Gift creation and saving
+  - `quotaService.js` - Weekly quota tracking (Basic: 3/week, Advanced: unlimited)
+  - `subscriptionService.js` - Tier features and limits
+
+- **Config**: `server/config/supabase.js` - Supabase client initialization
+
+### Frontend (To Be Implemented)
+- React Native with Expo for mobile app
+- Web player for gift meditations (HTML in `public/gift-player.html`)
+
+### Database (Supabase PostgreSQL)
+Schema defined in `database-schema.sql`:
+- `users` - User profiles with subscription tier and trial info
+- `meditations` - Generated meditations with audio, scripts, metadata
+- `vision_statements` - Living Vision Statements per category
+- `vision_responses` - User responses to vision prompts
+- `gifts` - Gift meditation sharing records
+- `quota_tracking` - Weekly usage tracking
+
+All tables have Row Level Security (RLS) enabled.
+
+## Key Features
+
+### Authentication
+- Email magic link (Supabase Auth)
+- Full name collection for new users
+- Trial period tracking (3-5 days)
+
+### Meditation Generation
+1. User provides responses to prompts (text or voice via Whisper STT)
+2. OpenAI generates personalized script (135 WPM, 2nd person, mindful tone)
+3. ElevenLabs converts script to speech
+4. FFmpeg mixes voice with background audio
+5. Audio uploaded to Supabase Storage
+6. Auto-generated title (2-5 words, Title Case)
+
+### Living Vision System
+- 9 categories: freeform, health, wealth, relationships, play, love, purpose, spirit, healing
+- 2 fixed prompts per category + unlimited AI follow-ups
+- Auto-generated taglines (8-12 words) from vision statements
+- Version history (active statement shown by default)
+
+### Gift Meditations
+- Maximum 15 minutes for gifts
+- Public web player (no login required)
+- Permanent shareable links
+- Recipients can save to library via signup flow
+- Quota: 3/week (Basic), unlimited (Advanced)
+
+### Subscription Tiers
+**Basic:**
+- 3 personal meditations/week
+- 3 gift meditations/week
+- Max 15 min duration
+- 3 voices (Neutral Calm, Female Calm, Male Calm)
+- No background playback or offline
+
+**Advanced:**
+- Unlimited personal/gift meditations
+- Max 60 min duration
+- 5 voices (+ Female Assertive, Male Calm 2)
+- Background playback
+- Offline downloads
+
+Weekly reset: Monday 00:00 local time
+
+### Voice Options
+- Basic: HzVnxqtdk9eqrcwfxD57, voice_female_calm, voice_male_calm1
+- Advanced adds: voice_female_assert, voice_male_calm2
+- Settings: stability 0.7, similarity 0.8, speed 0.9
+
+### Background Audio
+- Ocean Waves
+- Deep Ambient
+- Crystal Bowls
+- Theta Beats
+- Silence
+
+All backgrounds are 12-20s seamless loops (Silence is 5s preview).
+
+## Third-Party Services Required
+
+### Supabase (Database, Auth, Storage)
+- `SUPABASE_URL` - Project URL
+- `SUPABASE_ANON_KEY` - Public anon key
+
+### OpenAI (Script Generation)
+- `OPENAI_API_KEY` - API key for GPT-4o-mini
+
+### ElevenLabs (Text-to-Speech)
+- `ELEVENLABS_API_KEY` - API key for TTS
+
+### Superwall (Paywall - Mobile Integration)
+- To be configured in React Native app
+
+## API Endpoints
+
+### Auth
+- `POST /api/auth/send-magic-link` - Send magic link email
+- `POST /api/auth/verify-otp` - Verify OTP and get session
+- `POST /api/auth/update-profile` - Update user profile with full name
+
+### Meditation
+- `POST /api/meditation/generate` - Generate new meditation
+- `GET /api/meditation/list` - Get user's meditations (with filters)
+- `POST /api/meditation/pin/:meditationId` - Pin meditation (max 3)
+- `POST /api/meditation/favorite/:meditationId` - Toggle favorite
+- `PUT /api/meditation/:meditationId/title` - Update title
+
+### Vision
+- `GET /api/vision/categories` - Get all categories with status
+- `GET /api/vision/category/:category` - Get category vision and responses
+- `POST /api/vision/update-statement` - Manually update vision statement
+- `POST /api/vision/prompt-flow` - Process prompt responses and synthesize statement
+- `GET /api/vision/next-prompt/:category` - Get next prompt (fixed or AI-generated)
+
+### Gift
+- `POST /api/gift/create` - Create gift meditation
+- `GET /api/gift/:giftId` - Get gift details (public)
+- `POST /api/gift/:giftId/save` - Save gift to library (requires auth)
+
+### Subscription
+- `GET /api/subscription/status` - Get subscription status and features
+- `GET /api/subscription/quota` - Get weekly quota usage
+- `POST /api/subscription/upgrade` - Upgrade subscription tier
+
+### Player
+- `GET /api/player/preview/:type/:id` - Get preview audio URL (voice/background)
+- `GET /api/player/audio/:meditationId` - Get meditation audio URL (requires auth)
+
+## User Preferences
+- Mobile-first design approach
+- Unlimited AI follow-up prompts for vision deepening (no artificial limits)
+- Living Vision Statements evolve over time per category
+
+## Next Steps
+1. Configure Supabase project and add credentials
+2. Set up OpenAI API key
+3. Configure ElevenLabs API key
+4. Create background audio asset files
+5. Implement React Native mobile app
+6. Integrate Superwall paywall in mobile app
+7. Add Whisper STT endpoint for voice input
+8. Implement streak tracking system
+9. Add push notification system (Expo Push)
+10. Build shareable content generation (audiogram, quote cards)
