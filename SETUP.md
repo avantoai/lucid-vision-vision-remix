@@ -39,11 +39,11 @@ Create the following storage buckets in Supabase Storage:
 You'll need to create and upload preview audio files to `audio-assets`:
 
 **Voice Previews** (`previews/voices/`):
-- `HzVnxqtdk9eqrcwfxD57.mp3` - Neutral Calm voice sample
-- `voice_female_calm.mp3` - Female Calm voice sample
-- `voice_male_calm1.mp3` - Male Calm voice sample
-- `voice_female_assert.mp3` - Female Assertive voice sample (Advanced)
-- `voice_male_calm2.mp3` - Male Calm 2 voice sample (Advanced)
+- `nathaniel.mp3` - Voice preview sample
+- `jen.mp3` - Voice preview sample
+- `nora.mp3` - Voice preview sample
+- `ella.mp3` - Voice preview sample (Advanced tier)
+- `grant.mp3` - Voice preview sample (Advanced tier)
 
 **Background Previews** (`previews/backgrounds/`):
 - `ocean-waves.mp3` - Ocean waves loop (12-20s)
@@ -119,16 +119,31 @@ Authorization: Bearer <access_token>
 #### Whisper (STT)
 - `POST /api/whisper/transcribe` - Transcribe audio file to text (multipart/form-data, field: `audio`)
 
-## Voice IDs (ElevenLabs)
+## Voice Configuration
 
-### Basic Tier (3 voices)
-- `HzVnxqtdk9eqrcwfxD57` - Neutral Calm
-- `voice_female_calm` - Female Calm
-- `voice_male_calm1` - Male Calm
+### Voice Previews (for user selection)
+The mobile app can preview voices using these IDs via `/api/player/preview/voice/{id}`:
 
-### Advanced Tier (adds 2 more)
-- `voice_female_assert` - Female Assertive
-- `voice_male_calm2` - Male Calm 2
+**Basic Tier (3 voices):**
+- `nathaniel` - Preview sample (maps to ElevenLabs voice for TTS)
+- `jen` - Preview sample (maps to ElevenLabs voice for TTS)
+- `nora` - Preview sample (maps to ElevenLabs voice for TTS)
+
+**Advanced Tier (adds 2 more):**
+- `ella` - Preview sample (maps to ElevenLabs voice for TTS)
+- `grant` - Preview sample (maps to ElevenLabs voice for TTS)
+
+### Voice ID Mapping (for meditation generation)
+When calling `/api/meditation/generate`, use the ElevenLabs voice ID in the `voiceId` field:
+
+**Basic Tier:**
+- `HzVnxqtdk9eqrcwfxD57` - Neutral Calm (use for ElevenLabs TTS)
+- `voice_female_calm` - Female Calm (use for ElevenLabs TTS)
+- `voice_male_calm1` - Male Calm (use for ElevenLabs TTS)
+
+**Advanced Tier:**
+- `voice_female_assert` - Female Assertive (use for ElevenLabs TTS)
+- `voice_male_calm2` - Male Calm 2 (use for ElevenLabs TTS)
 
 Voice settings: stability 0.7, similarity 0.8, speed 0.9
 

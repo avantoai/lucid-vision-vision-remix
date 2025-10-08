@@ -6,13 +6,15 @@ Lucid Vision is a mobile-first meditation platform that generates personalized g
 ## Current State
 Backend API infrastructure is set up and running. The project is structured for React Native mobile development with a Node.js/Express backend serving API endpoints and a web player for gift meditations.
 
-## Recent Changes (October 2, 2025)
+## Recent Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
 - Created services for AI (OpenAI), audio (ElevenLabs + FFmpeg), meditation generation, vision tracking, and quota management
 - Built web player for public gift meditation sharing
 - Defined complete database schema with RLS policies for Supabase PostgreSQL
 - Configured workflow to run backend server on port 5000
+- Voice preview files uploaded to Supabase Storage (nathaniel, jen, nora, ella, grant)
+- Configured deployment for VM with npm start command
 
 ## Project Architecture
 
@@ -98,6 +100,11 @@ All tables have Row Level Security (RLS) enabled.
 Weekly reset: Monday 00:00 local time
 
 ### Voice Options
+**Preview IDs (uploaded to Supabase Storage at previews/voices/):**
+- Basic: nathaniel.mp3, jen.mp3, nora.mp3
+- Advanced adds: ella.mp3, grant.mp3
+
+**ElevenLabs Voice IDs (for TTS generation):**
 - Basic: HzVnxqtdk9eqrcwfxD57, voice_female_calm, voice_male_calm1
 - Advanced adds: voice_female_assert, voice_male_calm2
 - Settings: stability 0.7, similarity 0.8, speed 0.9
