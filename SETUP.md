@@ -137,13 +137,13 @@ The mobile app can preview voices using these IDs via `/api/player/preview/voice
 When calling `/api/meditation/generate`, use the ElevenLabs voice ID in the `voiceId` field:
 
 **Basic Tier:**
-- `HzVnxqtdk9eqrcwfxD57` - Neutral Calm (use for ElevenLabs TTS)
-- `voice_female_calm` - Female Calm (use for ElevenLabs TTS)
-- `voice_male_calm1` - Male Calm (use for ElevenLabs TTS)
+- `HzVnxqtdk9eqrcwfxD57` - Jen (Female voice)
+- `AeRdCCKzvd23BpJoofzx` - Nathaniel (Male voice)
+- `RxDql9IVj8LjC1obxK7z` - Nora (Female voice)
 
-**Advanced Tier:**
-- `voice_female_assert` - Female Assertive (use for ElevenLabs TTS)
-- `voice_male_calm2` - Male Calm 2 (use for ElevenLabs TTS)
+**Advanced Tier (adds 2 more):**
+- `ItH39nl7BrnB34569EL1` - Ella (Female voice)
+- `1TmWQEtqNZdO4bVt9Xo1` - Grant (Male voice)
 
 Voice settings: stability 0.7, similarity 0.8, speed 0.9
 
@@ -207,6 +207,7 @@ curl -X POST http://localhost:5000/api/meditation/generate \
     ],
     "isGift": false
   }'
+# Note: voiceId HzVnxqtdk9eqrcwfxD57 is Jen's voice
 ```
 
 ## Mobile App Integration
@@ -255,13 +256,12 @@ The mobile app should:
 - Test with unauthenticated requests
 
 ## Next Steps
-1. Create and upload background audio files
-2. Create and upload voice preview samples
-3. Test authentication flow end-to-end
-4. Test meditation generation with real API keys
-5. Build React Native mobile app
-6. Integrate Superwall paywall
-7. Test gift meditation sharing flow
-8. Implement push notifications (Expo Push)
-9. Add streak tracking system
-10. Build shareable content generation (audiograms, quote cards)
+1. Create and upload background audio files to Supabase Storage (`previews/backgrounds/` and `server/assets/backgrounds/`)
+2. Test authentication flow end-to-end
+3. Test meditation generation with real API keys
+4. Build React Native mobile app with Expo
+5. Integrate Superwall paywall
+6. Test gift meditation sharing flow
+7. Implement push notifications (Expo Push)
+8. Add streak tracking system
+9. Build shareable content generation (audiograms, quote cards)

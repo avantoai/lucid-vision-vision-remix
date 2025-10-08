@@ -459,7 +459,7 @@ async function completeOnboarding() {
   const meditation = await generateMeditation({
     category: 'freeform',
     duration: 5,
-    voiceId: 'HzVnxqtdk9eqrcwfxD57',
+    voiceId: 'HzVnxqtdk9eqrcwfxD57', // Jen voice
     background: 'ocean-waves',
     responses,
     authToken: session.access_token

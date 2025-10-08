@@ -105,8 +105,8 @@ Weekly reset: Monday 00:00 local time
 - Advanced adds: ella.mp3, grant.mp3
 
 **ElevenLabs Voice IDs (for TTS generation):**
-- Basic: HzVnxqtdk9eqrcwfxD57, voice_female_calm, voice_male_calm1
-- Advanced adds: voice_female_assert, voice_male_calm2
+- Basic Tier: Jen (HzVnxqtdk9eqrcwfxD57), Nathaniel (AeRdCCKzvd23BpJoofzx), Nora (RxDql9IVj8LjC1obxK7z)
+- Advanced Tier adds: Ella (ItH39nl7BrnB34569EL1), Grant (1TmWQEtqNZdO4bVt9Xo1)
 - Settings: stability 0.7, similarity 0.8, speed 0.9
 
 ### Background Audio
