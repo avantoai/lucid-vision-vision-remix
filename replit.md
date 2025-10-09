@@ -128,7 +128,7 @@ Weekly reset: Monday 00:00 local time
 
 **File Structure:**
 - Full tracks: `ambient.mp3`, `bowls.mp3`, `stream.mp3`, `silence.mp3`
-- Preview samples: `ambient-sample.m4a`, `bowls-sample.m4a`, `stream-sample.m4a`, `silence-sample.m4a`
+- Preview samples: `ambient-sample.mp3`, `bowls-sample.mp3`, `stream-sample.mp3`, `silence-sample.mp3`
 
 All backgrounds are seamless loops for meditation mixing.
 

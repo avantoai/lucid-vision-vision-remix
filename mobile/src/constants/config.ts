@@ -13,10 +13,10 @@ export const VOICE_OPTIONS = {
 };
 
 export const BACKGROUND_OPTIONS = [
-  { id: 'ambient', name: 'Ethereal Harmony', fileName: 'ambient.mp3', previewFileName: 'ambient-sample.m4a' },
-  { id: 'bowls', name: 'Healing Bowls', fileName: 'bowls.mp3', previewFileName: 'bowls-sample.m4a' },
-  { id: 'stream', name: 'Nature Stream', fileName: 'stream.mp3', previewFileName: 'stream-sample.m4a' },
-  { id: 'silence', name: 'Silence', fileName: 'silence.mp3', previewFileName: 'silence-sample.m4a' },
+  { id: 'ambient', name: 'Ethereal Harmony', fileName: 'ambient.mp3', previewFileName: 'ambient-sample.mp3' },
+  { id: 'bowls', name: 'Healing Bowls', fileName: 'bowls.mp3', previewFileName: 'bowls-sample.mp3' },
+  { id: 'stream', name: 'Nature Stream', fileName: 'stream.mp3', previewFileName: 'stream-sample.mp3' },
+  { id: 'silence', name: 'Silence', fileName: 'silence.mp3', previewFileName: 'silence-sample.mp3' },
 ];
 
 export const CATEGORIES = [
