@@ -28,7 +28,9 @@ export default function EmailInputScreen() {
       setOtpSent(true);
       Alert.alert('Success', 'Check your email for the magic link!');
     } catch (error) {
-      Alert.alert('Error', 'Failed to send magic link');
+      console.error('Magic link error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send magic link';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
