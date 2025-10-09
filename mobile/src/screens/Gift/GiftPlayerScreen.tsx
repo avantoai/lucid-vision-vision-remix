@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
@@ -15,23 +15,21 @@ export default function GiftPlayerScreen() {
   const route = useRoute<GiftPlayerRouteProp>();
   const { isAuthenticated } = useAuth();
   const [gift, setGift] = useState<any>(null);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const player = useAudioPlayer(audioUrl || '');
 
   useEffect(() => {
     loadGift();
-    return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
-    };
   }, []);
 
   const loadGift = async () => {
     try {
       const giftData = await api.getGift(route.params.giftId);
       setGift(giftData);
+      const url = await api.getMeditationAudioUrl(giftData.meditation.id);
+      setAudioUrl(url);
     } catch (error) {
       Alert.alert('Error', 'Failed to load gift meditation');
     } finally {
@@ -39,28 +37,11 @@ export default function GiftPlayerScreen() {
     }
   };
 
-  const handlePlayPause = async () => {
-    if (!gift) return;
-
-    try {
-      if (sound) {
-        if (isPlaying) {
-          await sound.pauseAsync();
-        } else {
-          await sound.playAsync();
-        }
-        setIsPlaying(!isPlaying);
-      } else {
-        const audioUrl = await api.getMeditationAudioUrl(gift.meditation.id);
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: audioUrl },
-          { shouldPlay: true }
-        );
-        setSound(newSound);
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to play meditation');
+  const handlePlayPause = () => {
+    if (player.playing) {
+      player.pause();
+    } else {
+      player.play();
     }
   };
 
@@ -103,7 +84,7 @@ export default function GiftPlayerScreen() {
         <Text style={styles.duration}>{gift.meditation.duration} minutes</Text>
 
         <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
-          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+          <Text style={styles.playButtonText}>{player.playing ? '⏸' : '▶'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveToLibrary}>
