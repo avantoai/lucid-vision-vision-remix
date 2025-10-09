@@ -121,13 +121,16 @@ Weekly reset: Monday 00:00 local time
 - Settings: stability 0.7, similarity 0.8, speed 0.9
 
 ### Background Audio
-- Ocean Waves
-- Deep Ambient
-- Crystal Bowls
-- Theta Beats
-- Silence
+- Ethereal Harmony (ambient.mp3)
+- Healing Bowls (bowls.mp3)
+- Nature Stream (stream.mp3)
+- Silence (silence.mp3)
 
-All backgrounds are 12-20s seamless loops (Silence is 5s preview).
+**File Structure:**
+- Full tracks: `ambient.mp3`, `bowls.mp3`, `stream.mp3`, `silence.mp3`
+- Preview samples: `ambient-sample.m4a`, `bowls-sample.m4a`, `stream-sample.m4a`, `silence-sample.m4a`
+
+All backgrounds are seamless loops for meditation mixing.
 
 ## Third-Party Services Required
 
