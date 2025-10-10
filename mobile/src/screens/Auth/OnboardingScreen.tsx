@@ -27,7 +27,10 @@ export default function OnboardingScreen() {
       if (isNewUser) {
         await updateUser(fullName);
       }
+      // Note: Don't set loading to false here - the component will unmount
+      // when needsOnboarding becomes false and navigation changes automatically
     } catch (error) {
+      console.error('Onboarding error:', error);
       Alert.alert('Error', 'Failed to update profile');
       setIsLoading(false);
     }

@@ -143,7 +143,23 @@ router.post('/update-profile', async (req, res) => {
       console.error('Profile update error:', profileError);
     }
 
-    res.json({ success: true, user: data.user });
+    // Fetch the complete user record to return
+    const { data: dbUser } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    res.json({ 
+      success: true, 
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        full_name: fullName,
+        subscription_tier: dbUser?.subscription_tier || 'basic',
+        trial_ends_at: dbUser?.trial_ends_at || null,
+      }
+    });
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ error: 'Failed to update profile' });

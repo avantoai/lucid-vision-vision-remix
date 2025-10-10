@@ -37,6 +37,13 @@ Backend API infrastructure is set up and running. The project is structured for 
   - Fixed quota service to use supabaseAdmin for RLS-bypassing system operations
   - Navigation flow now: Auth → Onboarding (if new) → MainTabs
 
+- **Fixed onboarding navigation and user update bugs**
+  - Issue: Onboarding Continue button stuck in "Loading..." state
+  - Root cause: `/auth/update-profile` returned raw Supabase auth user (with user_metadata.full_name)
+  - Frontend expected User object with direct full_name property
+  - Fixed backend to return properly formatted User object matching frontend interface
+  - State-driven navigation now works: user update → needsOnboarding false → auto-navigate to MainTabs
+
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
