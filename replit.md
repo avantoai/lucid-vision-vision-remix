@@ -60,6 +60,13 @@ Backend API infrastructure is set up and running. The project is structured for 
     - visionService.js - vision statements and responses
   - Meditation generation now works end-to-end without RLS errors
 
+- **Fixed navigation error after magic link sign-in**
+  - Issue: Navigation error when returning user signs in: "action 'REPLACE' with payload Onboarding was not handled"
+  - Root cause: EmailInputScreen manually navigating to Onboarding, but screen only exists when needsOnboarding is true
+  - Fixed by removing manual navigation from EmailInputScreen
+  - RootNavigator now handles all auth-state-based navigation automatically
+  - Flow: Auth state changes → RootNavigator re-renders with correct screen (Onboarding or MainTabs)
+
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player

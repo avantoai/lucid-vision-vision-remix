@@ -10,17 +10,13 @@ type EmailInputNavigationProp = StackNavigationProp<RootStackParamList, 'EmailIn
 
 export default function EmailInputScreen() {
   const navigation = useNavigation<EmailInputNavigationProp>();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const isNewUser = !user.full_name;
-      navigation.replace('Onboarding', { isNewUser });
-    }
-  }, [isAuthenticated, user, navigation]);
+  // Note: Navigation happens automatically via RootNavigator based on auth state
+  // No manual navigation needed here
 
   const handleSendMagicLink = async () => {
     if (!email) {
