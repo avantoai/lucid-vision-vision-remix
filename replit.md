@@ -8,13 +8,26 @@ Backend API infrastructure is set up and running. The project is structured for 
 
 ## Recent Changes (October 10, 2025)
 - **Implemented deep link authentication with Expo AuthSession**
-  - Configured custom URL scheme `lucidvision://` for magic link deep linking
+  - Configured custom URL scheme `lucidvision://` for magic link deep linking (production)
+  - Configured `exp://` scheme for Expo Go development testing  
   - Created deep link handler service to parse Supabase auth tokens from URLs
   - Updated AuthContext to handle both cold-start and foreground deep links
   - Added `/auth/me` backend endpoint to fetch user info from auth tokens
   - Updated EmailInputScreen with waiting state UI after sending magic link
   - Fixed hash parameter parsing for Supabase URL format (#access_token=...)
   - Auth flow now works seamlessly: email → magic link → deep link → auto-login
+
+- **Completed meditation generation flow**
+  - Created MeditationSetupScreen for selecting duration, voice, and background
+  - Updated VisionFlowScreen to navigate to MeditationSetup after vision completion
+  - Wired generate button to call `api.generateMeditation()` with proper error/quota handling
+  - Navigation flow: Vision Flow → Meditation Setup → Generate → Player
+  - Fixed issue where "Generate" button did nothing after vision flow completion
+  
+- **Updated AI prompt system**
+  - Modified `generateNextPrompt` in aiService.js to prevent combining multiple questions
+  - AI now generates single, focused questions without using "and" to join prompts
+  - Reduces cognitive overhead for users during vision-evoking process
 
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
@@ -204,13 +217,14 @@ All backgrounds are seamless loops for meditation mixing.
 - Living Vision Statements evolve over time per category
 
 ## Next Steps
-1. Configure Supabase project and add credentials
-2. Set up OpenAI API key
-3. Configure ElevenLabs API key
-4. Create background audio asset files
-5. Implement React Native mobile app
-6. Integrate Superwall paywall in mobile app
-7. Add Whisper STT endpoint for voice input
-8. Implement streak tracking system
-9. Add push notification system (Expo Push)
-10. Build shareable content generation (audiogram, quote cards)
+1. ~~Configure Supabase project and add credentials~~ ✅ Complete
+2. ~~Set up OpenAI API key~~ ✅ Complete
+3. ~~Configure ElevenLabs API key~~ ✅ Complete
+4. Create background audio asset files (full tracks in server/assets/backgrounds/)
+5. ~~Implement React Native mobile app~~ ✅ Complete
+6. Add voice/background audio previews to MeditationSetupScreen
+7. Integrate Superwall paywall in mobile app
+8. Add Whisper STT endpoint for voice input
+9. Implement streak tracking system
+10. Add push notification system (Expo Push)
+11. Build shareable content generation (audiogram, quote cards)
