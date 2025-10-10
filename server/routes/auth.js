@@ -12,11 +12,13 @@ router.post('/send-magic-link', async (req, res) => {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    console.log('🔐 Calling Supabase signInWithOtp...');
+    const redirectUrl = process.env.REDIRECT_URL || 'lucidvision://auth/callback';
+    console.log('🔐 Calling Supabase signInWithOtp with redirect:', redirectUrl);
+    
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: process.env.REDIRECT_URL || 'lucidvision://auth/callback'
+        emailRedirectTo: redirectUrl
       }
     });
 
