@@ -16,7 +16,7 @@ import GiftPlayerScreen from '../screens/Gift/GiftPlayerScreen';
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function RootNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
 
   if (isLoading) {
     return null;
@@ -29,8 +29,9 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="Auth" component={AuthScreen} />
             <Stack.Screen name="EmailInput" component={EmailInputScreen} />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           </>
+        ) : needsOnboarding ? (
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} initialParams={{ isNewUser: true }} />
         ) : (
           <>
             <Stack.Screen name="MainTabs" component={MainTabNavigator} />

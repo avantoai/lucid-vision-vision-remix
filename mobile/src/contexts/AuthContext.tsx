@@ -9,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  needsOnboarding: boolean;
   login: (email: string, token: string) => Promise<{ isNewUser: boolean; user: User }>;
   handleDeepLink: (url: string) => Promise<{ success: boolean; isNewUser?: boolean; user?: User }>;
   logout: () => Promise<void>;
@@ -115,12 +116,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(updatedUser);
   };
 
+  const needsOnboarding = !!user && !user.full_name;
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
         isAuthenticated: !!user,
+        needsOnboarding,
         login,
         handleDeepLink,
         logout,

@@ -29,6 +29,14 @@ Backend API infrastructure is set up and running. The project is structured for 
   - AI now generates single, focused questions without using "and" to join prompts
   - Reduces cognitive overhead for users during vision-evoking process
 
+- **Fixed critical onboarding bypass bug**
+  - Issue: Deep link authentication was skipping onboarding screen entirely
+  - Added `needsOnboarding` flag to AuthContext (checks if user has full_name)
+  - Updated RootNavigator to show onboarding for authenticated users without full_name
+  - Updated `/auth/me` endpoint to auto-create user records with default trial settings
+  - Fixed quota service to use supabaseAdmin for RLS-bypassing system operations
+  - Navigation flow now: Auth → Onboarding (if new) → MainTabs
+
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
