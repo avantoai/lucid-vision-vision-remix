@@ -27,13 +27,8 @@ export default function OnboardingScreen() {
       if (isNewUser) {
         await updateUser(fullName);
       }
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');
-    } finally {
       setIsLoading(false);
     }
   };
