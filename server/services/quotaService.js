@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 function getWeekStart() {
   const now = new Date();
@@ -13,7 +13,7 @@ function getWeekStart() {
 async function getQuotaRecord(userId) {
   const weekStart = getWeekStart();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('quota_tracking')
     .select('*')
     .eq('user_id', userId)
@@ -25,7 +25,7 @@ async function getQuotaRecord(userId) {
   }
 
   if (!data) {
-    const { data: newQuota, error: insertError } = await supabase
+    const { data: newQuota, error: insertError } = await supabaseAdmin
       .from('quota_tracking')
       .insert({
         user_id: userId,
@@ -82,7 +82,7 @@ async function incrementPersonalCount(userId) {
   const weekStart = getWeekStart();
   const quota = await getQuotaRecord(userId);
   
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('quota_tracking')
     .update({ personal_count: quota.personal_count + 1 })
     .eq('user_id', userId)
@@ -97,7 +97,7 @@ async function incrementGiftCount(userId) {
   const weekStart = getWeekStart();
   const quota = await getQuotaRecord(userId);
   
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('quota_tracking')
     .update({ gift_count: quota.gift_count + 1 })
     .eq('user_id', userId)
