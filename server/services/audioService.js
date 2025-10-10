@@ -2,7 +2,7 @@ const axios = require('axios');
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs').promises;
 const path = require('path');
-const { supabase } = require('../config/supabase');
+const { supabaseAdmin } = require('../config/supabase');
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
@@ -91,7 +91,7 @@ async function generateMeditationAudio({ script, voiceId, background, duration }
   const mixedBuffer = await mixAudioWithBackground(voiceBuffer, background, duration);
 
   const fileName = `meditation-${Date.now()}.mp3`;
-  const { data, error } = await supabase.storage
+  const { data, error } = await supabaseAdmin.storage
     .from('meditations')
     .upload(fileName, mixedBuffer, {
       contentType: 'audio/mpeg',

@@ -50,6 +50,16 @@ Backend API infrastructure is set up and running. The project is structured for 
   - Fixed by adding `getSubscriptionTier` to module.exports in quotaService.js
   - Profile screen now loads quota usage correctly
 
+- **Fixed RLS policy violations in meditation generation**
+  - Issue: "Failed to upload audio: new row violates row-level security policy" error when generating meditations
+  - Root cause: Backend services using anon supabase client for insert operations, but RLS policies require auth.uid()
+  - Fixed by updating all backend services to use supabaseAdmin for insert operations:
+    - meditationService.js - meditation records
+    - audioService.js - storage uploads
+    - giftService.js - gift records and meditation copies
+    - visionService.js - vision statements and responses
+  - Meditation generation now works end-to-end without RLS errors
+
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player

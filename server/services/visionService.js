@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
 
 const CATEGORIES = [
@@ -96,7 +96,7 @@ async function updateVisionStatement(userId, category, statement) {
     .eq('user_id', userId)
     .eq('category', category);
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await supabaseAdmin
     .from('vision_statements')
     .insert({
       user_id: userId,
@@ -124,7 +124,7 @@ async function processPromptFlow(userId, category, responses) {
     .eq('user_id', userId)
     .eq('category', category);
 
-  await supabase
+  await supabaseAdmin
     .from('vision_statements')
     .insert({
       user_id: userId,
@@ -136,7 +136,7 @@ async function processPromptFlow(userId, category, responses) {
     });
 
   for (const response of allResponses) {
-    await supabase
+    await supabaseAdmin
       .from('vision_responses')
       .insert({
         user_id: userId,

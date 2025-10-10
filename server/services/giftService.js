@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const meditationService = require('./meditationService');
 const quotaService = require('./quotaService');
 
@@ -28,7 +28,7 @@ async function createGiftMeditation({ userId, duration, voiceId, background, res
     .eq('id', userId)
     .single();
 
-  const { data: gift, error } = await supabase
+  const { data: gift, error } = await supabaseAdmin
     .from('gifts')
     .insert({
       meditation_id: meditation.id,
@@ -86,7 +86,7 @@ async function saveGiftToLibrary(userId, giftId) {
     .eq('id', gift.meditation_id)
     .single();
 
-  const { data: newMeditation, error } = await supabase
+  const { data: newMeditation, error } = await supabaseAdmin
     .from('meditations')
     .insert({
       user_id: userId,

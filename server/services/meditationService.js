@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
 const audioService = require('./audioService');
 const quotaService = require('./quotaService');
@@ -27,7 +27,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
 
   const title = await aiService.generateTitle(script, category);
 
-  const { data: meditation, error } = await supabase
+  const { data: meditation, error } = await supabaseAdmin
     .from('meditations')
     .insert({
       user_id: userId,
