@@ -66,7 +66,13 @@ export default function VisionFlowScreen() {
       await api.submitVisionFlow(route.params.category, finalResponses);
       Alert.alert('Success', 'Vision statement created! Ready to generate meditation?', [
         { text: 'Not Now', onPress: () => navigation.goBack() },
-        { text: 'Generate', onPress: () => navigation.goBack() },
+        { 
+          text: 'Generate', 
+          onPress: () => navigation.navigate('MeditationSetup', { 
+            category: route.params.category, 
+            responses: finalResponses 
+          }) 
+        },
       ]);
     } catch (error) {
       Alert.alert('Error', 'Failed to create vision statement');

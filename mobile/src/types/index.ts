@@ -76,6 +76,7 @@ export type RootStackParamList = {
   Onboarding: { isNewUser: boolean };
   MainTabs: undefined;
   VisionFlow: { category: string };
+  MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }> };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;
   GiftPlayer: { giftId: string };
