@@ -110,6 +110,7 @@ async function incrementGiftCount(userId) {
 
 module.exports = {
   getQuotaRecord,
+  getSubscriptionTier,
   canCreatePersonalMeditation,
   canCreateGiftMeditation,
   incrementPersonalCount,

@@ -44,6 +44,12 @@ Backend API infrastructure is set up and running. The project is structured for 
   - Fixed backend to return properly formatted User object matching frontend interface
   - State-driven navigation now works: user update → needsOnboarding false → auto-navigate to MainTabs
 
+- **Fixed quota service export error**
+  - Issue: Profile screen failed to load with "Failed to fetch quota" error
+  - Root cause: `getSubscriptionTier` function existed in quotaService but was not exported
+  - Fixed by adding `getSubscriptionTier` to module.exports in quotaService.js
+  - Profile screen now loads quota usage correctly
+
 ## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
