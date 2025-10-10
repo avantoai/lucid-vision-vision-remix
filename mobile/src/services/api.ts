@@ -58,6 +58,12 @@ class ApiService {
     return data;
   }
 
+  async getUserInfo(): Promise<{ user: User; isNewUser: boolean }> {
+    const data = await this.request<{ user: User; isNewUser: boolean }>('/auth/me');
+    await AsyncStorage.setItem('user_id', data.user.id);
+    return data;
+  }
+
   async updateProfile(userId: string, fullName: string): Promise<User> {
     const data = await this.request<{ user: User }>('/auth/update-profile', {
       method: 'POST',

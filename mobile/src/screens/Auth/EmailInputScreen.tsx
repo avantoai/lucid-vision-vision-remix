@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
@@ -10,11 +10,17 @@ type EmailInputNavigationProp = StackNavigationProp<RootStackParamList, 'EmailIn
 
 export default function EmailInputScreen() {
   const navigation = useNavigation<EmailInputNavigationProp>();
-  const { login } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [linkSent, setLinkSent] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const isNewUser = !user.full_name;
+      navigation.replace('Onboarding', { isNewUser });
+    }
+  }, [isAuthenticated, user, navigation]);
 
   const handleSendMagicLink = async () => {
     if (!email) {
@@ -25,8 +31,7 @@ export default function EmailInputScreen() {
     setIsLoading(true);
     try {
       await api.sendMagicLink(email);
-      setOtpSent(true);
-      Alert.alert('Success', 'Check your email for the magic link!');
+      setLinkSent(true);
     } catch (error) {
       console.error('Magic link error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to send magic link';
@@ -36,28 +41,11 @@ export default function EmailInputScreen() {
     }
   };
 
-  const handleVerifyOTP = async () => {
-    if (!otp) {
-      Alert.alert('Error', 'Please enter the code from your email');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { isNewUser } = await login(email, otp);
-      navigation.navigate('Onboarding', { isNewUser });
-    } catch (error) {
-      Alert.alert('Error', 'Invalid code. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome</Text>
       
-      {!otpSent ? (
+      {!linkSent ? (
         <>
           <TextInput
             style={styles.input}
@@ -79,26 +67,15 @@ export default function EmailInputScreen() {
           </TouchableOpacity>
         </>
       ) : (
-        <>
-          <Text style={styles.subtitle}>Enter the code from your email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter code"
-            value={otp}
-            onChangeText={setOtp}
-            keyboardType="number-pad"
-            editable={!isLoading}
-          />
-          <TouchableOpacity 
-            style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleVerifyOTP}
-            disabled={isLoading}
-          >
-            <Text style={styles.buttonText}>
-              {isLoading ? 'Verifying...' : 'Verify'}
-            </Text>
-          </TouchableOpacity>
-        </>
+        <View style={styles.successContainer}>
+          <Text style={styles.successTitle}>Check Your Email</Text>
+          <Text style={styles.successMessage}>
+            We've sent a magic link to {email}.{'\n\n'}
+            Click the link in the email to sign in.
+          </Text>
+          <ActivityIndicator size="large" color="#6366F1" style={styles.spinner} />
+          <Text style={styles.waitingText}>Waiting for you to click the link...</Text>
+        </View>
       )}
     </View>
   );
@@ -116,12 +93,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 24,
     color: '#111827',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginBottom: 16,
     textAlign: 'center',
   },
   input: {
@@ -146,5 +117,31 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+  },
+  successContainer: {
+    alignItems: 'center',
+  },
+  successTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#111827',
+    textAlign: 'center',
+  },
+  successMessage: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  spinner: {
+    marginVertical: 24,
+  },
+  waitingText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

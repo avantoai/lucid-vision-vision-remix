@@ -1,13 +1,16 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 import { User } from '../types';
 import api from '../services/api';
+import { parseAuthCallback, saveAuthTokens, clearAuthTokens } from '../services/deepLinkHandler';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, token: string) => Promise<{ isNewUser: boolean; user: User }>;
+  handleDeepLink: (url: string) => Promise<{ success: boolean; isNewUser?: boolean; user?: User }>;
   logout: () => Promise<void>;
   updateUser: (fullName: string) => Promise<void>;
 }
@@ -20,7 +23,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     checkAuth();
+    checkInitialURL();
+    const subscription = setupDeepLinkListener();
+    
+    return () => {
+      subscription?.remove();
+    };
   }, []);
+
+  const checkInitialURL = async () => {
+    try {
+      const initialUrl = await Linking.getInitialURL();
+      if (initialUrl) {
+        console.log('Initial URL on app launch:', initialUrl);
+        await handleDeepLink(initialUrl);
+      }
+    } catch (error) {
+      console.error('Error checking initial URL:', error);
+    }
+  };
+
+  const setupDeepLinkListener = () => {
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      console.log('Deep link received while app running:', url);
+      handleDeepLink(url);
+    });
+
+    return subscription;
+  };
 
   const checkAuth = async () => {
     try {
@@ -45,6 +75,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const handleDeepLink = async (url: string): Promise<{ success: boolean; isNewUser?: boolean; user?: User }> => {
+    try {
+      console.log('Parsing auth callback from deep link');
+      const tokens = parseAuthCallback(url);
+      
+      if (!tokens) {
+        console.log('No valid tokens found in deep link');
+        return { success: false };
+      }
+
+      console.log('Tokens parsed successfully, saving...');
+      await saveAuthTokens(tokens);
+
+      const { user: userData, isNewUser } = await api.getUserInfo();
+      setUser(userData);
+
+      return { success: true, isNewUser, user: userData };
+    } catch (error) {
+      console.error('Error handling deep link:', error);
+      return { success: false };
+    }
+  };
+
   const login = async (email: string, token: string) => {
     const response = await api.verifyOTP(email, token);
     setUser(response.user);
@@ -52,8 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem('auth_token');
-    await AsyncStorage.removeItem('user_id');
+    await clearAuthTokens();
     setUser(null);
   };
 
@@ -70,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         isAuthenticated: !!user,
         login,
+        handleDeepLink,
         logout,
         updateUser,
       }}

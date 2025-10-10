@@ -59,6 +59,44 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
+router.get('/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
+
+    const token = authHeader.substring(7);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const { data: dbUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || dbUser?.full_name || null,
+        subscription_tier: dbUser?.subscription_tier || 'basic',
+        trial_ends_at: dbUser?.trial_ends_at || null,
+      },
+      isNewUser: !user.user_metadata?.full_name && !dbUser?.full_name
+    });
+  } catch (error) {
+    console.error('Get user info error:', error);
+    res.status(500).json({ error: 'Failed to get user info' });
+  }
+});
+
 router.post('/update-profile', async (req, res) => {
   try {
     const { userId, fullName } = req.body;
