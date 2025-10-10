@@ -6,7 +6,17 @@ Lucid Vision is a mobile-first meditation platform that generates personalized g
 ## Current State
 Backend API infrastructure is set up and running. The project is structured for React Native mobile development with a Node.js/Express backend serving API endpoints and a web player for gift meditations.
 
-## Recent Changes (October 8, 2025)
+## Recent Changes (October 10, 2025)
+- **Implemented deep link authentication with Expo AuthSession**
+  - Configured custom URL scheme `lucidvision://` for magic link deep linking
+  - Created deep link handler service to parse Supabase auth tokens from URLs
+  - Updated AuthContext to handle both cold-start and foreground deep links
+  - Added `/auth/me` backend endpoint to fetch user info from auth tokens
+  - Updated EmailInputScreen with waiting state UI after sending magic link
+  - Fixed hash parameter parsing for Supabase URL format (#access_token=...)
+  - Auth flow now works seamlessly: email → magic link → deep link → auto-login
+
+## Previous Changes (October 8, 2025)
 - Initial project setup with Node.js/Express backend
 - Implemented core API structure with routes for auth, meditation, vision, gift, subscription, and player
 - Created services for AI (OpenAI), audio (ElevenLabs + FFmpeg), meditation generation, vision tracking, and quota management
@@ -68,9 +78,15 @@ All tables have Row Level Security (RLS) enabled.
 ## Key Features
 
 ### Authentication
-- Email magic link (Supabase Auth)
+- **Email magic link with deep linking** (Supabase Auth)
+  - User enters email and receives magic link
+  - Clicking link opens app via `lucidvision://` custom URL scheme
+  - Tokens parsed from URL hash and saved to AsyncStorage
+  - App automatically fetches user info and navigates to onboarding
+  - Works for both cold-start (app closed) and foreground scenarios
 - Full name collection for new users
 - Trial period tracking (3-5 days)
+- Backend endpoint `/auth/me` for token-based user info retrieval
 
 ### Meditation Generation
 1. User provides responses to prompts (text or voice via Whisper STT)
