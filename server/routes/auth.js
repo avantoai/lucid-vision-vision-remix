@@ -76,11 +76,30 @@ router.get('/me', async (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    const { data: dbUser } = await supabase
+    let { data: dbUser } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('id', user.id)
       .single();
+
+    if (!dbUser) {
+      const { data: newUser, error: insertError } = await supabaseAdmin
+        .from('users')
+        .insert({
+          id: user.id,
+          full_name: user.user_metadata?.full_name || '',
+          subscription_tier: 'basic',
+          trial_ends_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Failed to create user record:', insertError);
+      } else {
+        dbUser = newUser;
+      }
+    }
 
     res.json({
       success: true,
