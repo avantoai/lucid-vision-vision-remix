@@ -72,9 +72,11 @@ async function generateNextPrompt(category, previousResponses) {
 Previous conversation:
 ${responseHistory}
 
-Generate ONE follow-up question that either:
+Generate ONE single follow-up question that either:
 - Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
 - Expands context (30% probability): Explores related life areas or future possibilities
+
+IMPORTANT: Ask only ONE question. Do NOT combine multiple questions or use "and" to join questions. Keep it simple and focused.
 
 Return only the question, nothing else. Make it personal and evocative.`;
 
