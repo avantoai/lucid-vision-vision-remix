@@ -59,10 +59,12 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
 }
 
 async function getUserMeditations(userId, filter, category) {
+  console.log(`📚 Fetching meditations for user: ${userId}, filter: ${filter || 'all'}, category: ${category || 'none'}`);
+  
   let query = supabase
     .from('meditations')
     .select('*')
-    .or(`user_id.eq.${userId},received_from.not.is.null`)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
   if (filter === 'gift') {
@@ -78,9 +80,11 @@ async function getUserMeditations(userId, filter, category) {
   const { data, error } = await query;
 
   if (error) {
+    console.error('❌ Failed to fetch meditations:', error.message);
     throw new Error('Failed to fetch meditations: ' + error.message);
   }
 
+  console.log(`✅ Found ${data?.length || 0} meditations for user ${userId}`);
   return data;
 }
 
