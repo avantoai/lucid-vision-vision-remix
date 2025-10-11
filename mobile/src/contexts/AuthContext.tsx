@@ -59,14 +59,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userId = await AsyncStorage.getItem('user_id');
       
       if (token && userId) {
-        const status = await api.getSubscriptionStatus();
-        setUser({
-          id: userId,
-          email: '',
-          full_name: null,
-          subscription_tier: status.tier,
-          trial_ends_at: status.trialEndsAt,
-        });
+        console.log('🔍 Checking auth, fetching user info...');
+        const { user: userData } = await api.getUserInfo();
+        console.log('✅ User info loaded:', { id: userData.id, full_name: userData.full_name });
+        setUser(userData);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
