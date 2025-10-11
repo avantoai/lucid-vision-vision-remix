@@ -101,13 +101,17 @@ Create a transformative meditation that helps ${userName} *see, feel, and become
   return completion.choices[0].message.content;
 }
 
-async function generateTitle(script, category) {
-  const prompt = `Generate a meditation title (2-5 words, Title Case) for this script. Don't reference background audio.
+async function generateTitle(script, category, userResponses = []) {
+  // Use user responses for context since the script opening is generic settling/grounding
+  const visionContext = userResponses.length > 0 
+    ? `\nUser's Vision Focus:\n${userResponses.map(r => `- ${r.answer}`).join('\n')}`
+    : `\nScript excerpt: ${script.substring(0, 500)}...`;
 
-Category: ${category}
-Script excerpt: ${script.substring(0, 500)}...
+  const prompt = `Generate a meditation title (2-5 words, Title Case) that captures the essence of this personalized meditation.
 
-Return only the title, nothing else.`;
+Category: ${category}${visionContext}
+
+The title should reflect the specific vision and themes, not generic meditation concepts. Return only the title, nothing else.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',

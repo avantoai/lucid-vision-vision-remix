@@ -58,7 +58,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
       duration
     });
 
-    const title = await aiService.generateTitle(script, category);
+    const title = await aiService.generateTitle(script, category, responses);
 
     const { error } = await supabaseAdmin
       .from('meditations')
@@ -114,7 +114,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
     duration
   });
 
-  const title = await aiService.generateTitle(script, category);
+  const title = await aiService.generateTitle(script, category, responses);
 
   const { data: meditation, error } = await supabaseAdmin
     .from('meditations')
