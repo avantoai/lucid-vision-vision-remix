@@ -16,7 +16,7 @@ router.get('/preview/:type/:id', async (req, res) => {
       return res.status(400).json({ error: 'Invalid preview type' });
     }
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('audio-assets')
       .createSignedUrl(audioPath, 3600);
 
@@ -85,7 +85,7 @@ router.get('/audio/:meditationId', async (req, res) => {
     console.log(`🔊 Creating signed URL for audio_url: ${meditation.audio_url}`);
     console.log(`📦 Bucket: meditations, Path: ${meditation.audio_url}`);
     
-    const { data: urlData, error: urlError } = await supabase.storage
+    const { data: urlData, error: urlError } = await supabaseAdmin.storage
       .from('meditations')
       .createSignedUrl(meditation.audio_url, 3600);
 
@@ -95,7 +95,7 @@ router.get('/audio/:meditationId', async (req, res) => {
       console.error('❌ Full error object:', JSON.stringify(urlError, null, 2));
       
       // Try listing files to debug
-      const { data: files } = await supabase.storage
+      const { data: files } = await supabaseAdmin.storage
         .from('meditations')
         .list();
       console.log('📂 Files in bucket root:', files?.map(f => f.name).join(', '));
