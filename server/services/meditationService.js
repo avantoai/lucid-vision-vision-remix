@@ -189,6 +189,29 @@ async function getUserMeditations(userId, filter, category) {
 }
 
 async function pinMeditation(userId, meditationId) {
+  // First get the current pin state
+  const { data: meditation } = await supabaseAdmin
+    .from('meditations')
+    .select('is_pinned')
+    .eq('id', meditationId)
+    .eq('user_id', userId)
+    .single();
+
+  // If unpinning, just do it
+  if (meditation?.is_pinned) {
+    const { error } = await supabaseAdmin
+      .from('meditations')
+      .update({ is_pinned: false })
+      .eq('id', meditationId)
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new Error('Failed to unpin meditation: ' + error.message);
+    }
+    return;
+  }
+
+  // If pinning, check the limit
   const { data: pinnedCount } = await supabaseAdmin
     .from('meditations')
     .select('id')
