@@ -59,9 +59,9 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
       .input(voicePath)
       .input(backgroundPath)
       .complexFilter([
-        // Delay voice by 4 seconds (4000ms), set background to 60% volume
+        // Delay voice by 4 seconds (4000ms), set background to 40% volume
         '[0:a]adelay=4000|4000[voice]',
-        '[1:a]volume=0.60[bg]',
+        '[1:a]volume=0.40[bg]',
         '[voice][bg]amix=inputs=2:duration=longest'
       ])
       .duration(duration * 60)
