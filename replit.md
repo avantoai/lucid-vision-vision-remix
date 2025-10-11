@@ -14,6 +14,7 @@ Backend API infrastructure is set up and running. The project is structured for 
   - Added "Create Meditation" button at bottom of LibraryScreen
   - Flow: Library → Create Meditation → Category Selection → Vision Flow → Meditation Setup → Generate
   - Cleaned up unused Home screen files
+  - Added tab bar icons: house (Library), 3 stars (Vision), person (Profile)
 
 ## Previous Changes (October 10, 2025)
 - **Implemented deep link authentication with Expo AuthSession**
