@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
@@ -13,10 +13,81 @@ export default function LibraryScreen() {
   const [filter, setFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const previousGeneratingIds = useRef<Set<string>>(new Set());
+  const pollingInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     loadMeditations();
   }, [filter]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadMeditations();
+      startPolling();
+      
+      return () => {
+        stopPolling();
+      };
+    }, [filter])
+  );
+
+  const startPolling = () => {
+    stopPolling();
+    pollingInterval.current = setInterval(() => {
+      checkForCompletedMeditations();
+    }, 5000);
+  };
+
+  const stopPolling = () => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current);
+      pollingInterval.current = null;
+    }
+  };
+
+  const checkForCompletedMeditations = async () => {
+    try {
+      const data = await api.getMeditations(filter === 'all' ? undefined : filter);
+      const currentGeneratingIds = new Set(
+        data.filter(m => m.status === 'generating').map(m => m.id)
+      );
+      
+      const previousIds = Array.from(previousGeneratingIds.current);
+      const nowFinishedIds = previousIds.filter(id => !currentGeneratingIds.has(id));
+      
+      if (nowFinishedIds.length > 0) {
+        nowFinishedIds.forEach(id => {
+          const meditation = data.find(m => m.id === id);
+          if (meditation) {
+            if (meditation.status === 'completed') {
+              Alert.alert(
+                '✨ Meditation Ready!',
+                `"${meditation.title}" is ready to play`,
+                [
+                  { text: 'Later', style: 'cancel' },
+                  { 
+                    text: 'Play Now', 
+                    onPress: () => navigation.navigate('MeditationPlayer', { meditationId: meditation.id })
+                  }
+                ]
+              );
+            } else if (meditation.status === 'failed') {
+              Alert.alert(
+                '❌ Generation Failed',
+                `Failed to create "${meditation.title}". Please try creating a new meditation.`,
+                [{ text: 'OK' }]
+              );
+            }
+          }
+        });
+      }
+      
+      previousGeneratingIds.current = currentGeneratingIds;
+      setMeditations(data || []);
+    } catch (error) {
+      console.error('Polling error:', error);
+    }
+  };
 
   const loadMeditations = async () => {
     setIsLoading(true);
@@ -25,6 +96,12 @@ export default function LibraryScreen() {
       console.log('📚 Loading meditations with filter:', filter === 'all' ? undefined : filter);
       const data = await api.getMeditations(filter === 'all' ? undefined : filter);
       console.log('✅ Loaded meditations:', data?.length || 0);
+      
+      const generatingIds = new Set(
+        data.filter(m => m.status === 'generating').map(m => m.id)
+      );
+      previousGeneratingIds.current = generatingIds;
+      
       setMeditations(data || []);
     } catch (error) {
       console.error('❌ Failed to load meditations:', error);
@@ -37,13 +114,33 @@ export default function LibraryScreen() {
   const renderMeditation = ({ item }: { item: Meditation }) => (
     <TouchableOpacity
       style={styles.meditationCard}
-      onPress={() => navigation.navigate('MeditationPlayer', { meditationId: item.id })}
+      onPress={() => {
+        if (item.status === 'generating') {
+          Alert.alert('Still Generating', 'This meditation is still being created. You\'ll be notified when it\'s ready!');
+        } else if (item.status === 'failed') {
+          Alert.alert('Generation Failed', 'This meditation failed to generate. Please create a new one.');
+        } else {
+          navigation.navigate('MeditationPlayer', { meditationId: item.id });
+        }
+      }}
+      disabled={item.status !== 'completed'}
     >
       <View style={styles.meditationHeader}>
         <Text style={styles.meditationTitle}>{item.title}</Text>
         <Text style={styles.meditationDuration}>{item.duration} min</Text>
       </View>
       <Text style={styles.meditationCategory}>{item.category}</Text>
+      {item.status === 'generating' && (
+        <View style={styles.generatingBadge}>
+          <ActivityIndicator size="small" color="#6366F1" />
+          <Text style={styles.generatingText}>Generating...</Text>
+        </View>
+      )}
+      {item.status === 'failed' && (
+        <View style={styles.failedBadge}>
+          <Text style={styles.failedText}>❌ Generation failed</Text>
+        </View>
+      )}
       {item.is_pinned && <Text style={styles.pinnedBadge}>📌 Pinned</Text>}
       {item.is_favorite && <Text style={styles.favoriteBadge}>❤️</Text>}
     </TouchableOpacity>
@@ -193,6 +290,30 @@ const styles = StyleSheet.create({
   favoriteBadge: {
     fontSize: 12,
     marginTop: 4,
+  },
+  generatingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 8,
+  },
+  generatingText: {
+    fontSize: 14,
+    color: '#6366F1',
+    fontWeight: '500',
+  },
+  failedBadge: {
+    backgroundColor: '#FEE2E2',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignSelf: 'flex-start',
+  },
+  failedText: {
+    fontSize: 12,
+    color: '#DC2626',
+    fontWeight: '500',
   },
   emptyText: {
     textAlign: 'center',

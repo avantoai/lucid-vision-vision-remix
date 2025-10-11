@@ -3,6 +3,95 @@ const aiService = require('./aiService');
 const audioService = require('./audioService');
 const quotaService = require('./quotaService');
 
+async function createMeditationPlaceholder({ userId, category, duration, voiceId, background, isGift }) {
+  console.log(`🎨 Creating meditation placeholder for user: ${userId}`);
+  
+  const { data: meditation, error } = await supabaseAdmin
+    .from('meditations')
+    .insert({
+      user_id: userId,
+      category,
+      duration,
+      voice_id: voiceId,
+      background,
+      script: '',
+      audio_url: '',
+      title_auto: 'Generating...',
+      title: 'Generating...',
+      status: 'generating',
+      is_gift: isGift || false,
+      created_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error('Failed to create meditation placeholder: ' + error.message);
+  }
+
+  console.log(`✅ Created meditation placeholder: ${meditation.id}`);
+  return meditation;
+}
+
+async function completeMeditationGeneration({ meditationId, userId, category, duration, voiceId, background, responses, isGift }) {
+  console.log(`🎵 Starting background generation for meditation: ${meditationId}`);
+  
+  try {
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('full_name')
+      .eq('id', userId)
+      .single();
+
+    const script = await aiService.generateScript({
+      category,
+      duration,
+      background,
+      responses,
+      userName: user?.full_name || 'friend'
+    });
+
+    const audioUrl = await audioService.generateMeditationAudio({
+      script,
+      voiceId,
+      background,
+      duration
+    });
+
+    const title = await aiService.generateTitle(script, category);
+
+    const { error } = await supabaseAdmin
+      .from('meditations')
+      .update({
+        script,
+        audio_url: audioUrl,
+        title_auto: title,
+        title: title,
+        status: 'completed'
+      })
+      .eq('id', meditationId);
+
+    if (error) {
+      throw new Error('Failed to update meditation: ' + error.message);
+    }
+
+    if (!isGift) {
+      await quotaService.incrementPersonalCount(userId);
+    } else {
+      await quotaService.incrementGiftCount(userId);
+    }
+
+    console.log(`✅ Completed meditation generation: ${meditationId}`);
+  } catch (error) {
+    console.error(`❌ Failed to generate meditation ${meditationId}:`, error);
+    
+    await supabaseAdmin
+      .from('meditations')
+      .update({ status: 'failed' })
+      .eq('id', meditationId);
+  }
+}
+
 async function generateMeditation({ userId, category, duration, voiceId, background, responses, isGift }) {
   const { data: user } = await supabase
     .from('users')
@@ -39,6 +128,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
       audio_url: audioUrl,
       title_auto: title,
       title: title,
+      status: 'completed',
       is_gift: isGift || false,
       created_at: new Date().toISOString()
     })
@@ -145,6 +235,8 @@ async function updateTitle(userId, meditationId, title) {
 
 module.exports = {
   generateMeditation,
+  createMeditationPlaceholder,
+  completeMeditationGeneration,
   getUserMeditations,
   pinMeditation,
   toggleFavorite,

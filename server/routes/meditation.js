@@ -20,7 +20,17 @@ router.post('/generate', authenticateUser, async (req, res) => {
       }
     }
 
-    const meditation = await meditationService.generateMeditation({
+    const meditation = await meditationService.createMeditationPlaceholder({
+      userId: req.user.id,
+      category,
+      duration,
+      voiceId,
+      background,
+      isGift
+    });
+
+    meditationService.completeMeditationGeneration({
+      meditationId: meditation.id,
       userId: req.user.id,
       category,
       duration,
@@ -28,6 +38,8 @@ router.post('/generate', authenticateUser, async (req, res) => {
       background,
       responses,
       isGift
+    }).catch(error => {
+      console.error('Background generation error:', error);
     });
 
     res.json({ success: true, meditation });

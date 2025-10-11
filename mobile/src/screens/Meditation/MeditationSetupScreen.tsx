@@ -33,20 +33,10 @@ export default function MeditationSetupScreen() {
         isGift: false,
       });
 
-      Alert.alert('Success!', 'Your meditation has been created', [
-        {
-          text: 'Play Now',
-          onPress: () => {
-            navigation.reset({
-              index: 1,
-              routes: [
-                { name: 'MainTabs' },
-                { name: 'MeditationPlayer', params: { meditationId: meditation.id } },
-              ],
-            });
-          },
-        },
-      ]);
+      navigation.navigate('MeditationGenerating', { 
+        meditationId: meditation.id,
+        category 
+      });
     } catch (error: any) {
       if (error.message === 'QUOTA_EXCEEDED') {
         Alert.alert('Quota Exceeded', 'You\'ve reached your weekly meditation limit. Upgrade to Advanced for unlimited meditations.');
