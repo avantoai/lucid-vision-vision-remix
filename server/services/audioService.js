@@ -10,7 +10,7 @@ const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
 const VOICE_SETTINGS = {
   stability: 0.7,
   similarity_boost: 0.8,
-  speed: 0.9
+  speed: 0.65
 };
 
 async function generateSpeech(text, voiceId) {
