@@ -166,48 +166,4 @@ router.post('/update-profile', async (req, res) => {
   }
 });
 
-router.get('/callback', async (req, res) => {
-  try {
-    console.log('🔗 Auth callback hit - Query params:', req.query);
-    console.log('🔗 Auth callback hit - Full URL:', req.originalUrl);
-    
-    const expoDevUrl = process.env.EXPO_DEV_URL || 'exp://192.168.1.203:8081';
-    
-    const urlParts = req.originalUrl.split('#');
-    let params = { ...req.query };
-    
-    if (urlParts.length > 1) {
-      const hashParams = new URLSearchParams(urlParts[1]);
-      hashParams.forEach((value, key) => {
-        params[key] = value;
-      });
-    }
-    
-    const queryString = new URLSearchParams(params).toString();
-    const deepLink = `${expoDevUrl}/--/auth/callback?${queryString}`;
-    
-    console.log('📱 Redirecting to Expo:', deepLink);
-    
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta http-equiv="refresh" content="0; url=${deepLink}">
-          <title>Redirecting to Lucid Vision...</title>
-        </head>
-        <body>
-          <h2>Opening Lucid Vision...</h2>
-          <p>If the app doesn't open automatically, <a href="${deepLink}">click here</a>.</p>
-          <script>
-            window.location.href = "${deepLink}";
-          </script>
-        </body>
-      </html>
-    `);
-  } catch (error) {
-    console.error('❌ Auth callback error:', error);
-    res.status(500).send('Authentication callback failed');
-  }
-});
-
 module.exports = router;
