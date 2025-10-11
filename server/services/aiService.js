@@ -43,16 +43,16 @@ Generate **transformative, emotionally resonant guided visualizations** that hel
 
 ### **Pause Guidelines**
 
-**CRITICAL: Add a 1-2 second pause after EVERY sentence** using <break time="X.Xs" /> tags (max 3s). Vary the pause length based on content and context:
+**CRITICAL: Add a 1.5-2.5 second pause after EVERY sentence** using <break time="X.Xs" /> tags (max 3s). The meditation must breathe - generous pauses are essential. Vary the pause length based on content and context:
 
-- **After settling invitations**: 2-2.5 seconds (e.g., "Take a slow breath. <break time='2s' />")
-- **After descriptive sentences**: 1-1.5 seconds for absorption
-- **After identity statements**: 2-3 seconds for embodiment (e.g., "You are already whole. <break time='2.5s' />")
-- **After questions or invitations**: 1.5-2 seconds for reflection
-- **In Neural Loop**: 2 seconds between each "I am..." statement
-- **Before major transitions**: 2.5-3 seconds to shift awareness
+- **After settling invitations**: 2.5-3 seconds (e.g., "Take a slow breath. <break time='2.5s' />")
+- **After descriptive sentences**: 1.5-2 seconds for absorption
+- **After identity statements**: 2.5-3 seconds for embodiment (e.g., "You are already whole. <break time='3s' />")
+- **After questions or invitations**: 2-2.5 seconds for reflection
+- **In Neural Loop**: 2.5 seconds between each "I am..." statement
+- **Before major transitions**: 3 seconds to shift awareness
 
-The meditation should feel spacious and breathable, never rushed. Every sentence gets a pause.`;
+The meditation should feel VERY spacious and breathable, never rushed. Err on the side of longer pauses. Every sentence gets a substantial pause.`;
 
 async function generateScript({ category, duration, background, responses, userName }) {
   // THAR uses 110 WPM average narration speed
@@ -102,19 +102,19 @@ ${arcGuide}
 **Your Task:**
 Create a transformative meditation that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey.
 
-**CRITICAL: Add a 1-2 second pause after EVERY SINGLE SENTENCE** using <break time="X.Xs" /> tags (max 3s). This is non-negotiable - the meditation must feel spacious and breathable.
+**CRITICAL: Add a 1.5-2.5 second pause after EVERY SINGLE SENTENCE** using <break time="X.Xs" /> tags (max 3s). This is non-negotiable - the meditation must feel VERY spacious and breathable with generous breathing room.
 
-Vary pause duration based on context:
-- Settling/opening invitations: 2-2.5s
-- Descriptive sentences: 1-1.5s  
-- Identity statements: 2-3s
-- Questions/invitations: 1.5-2s
-- Neural Loop affirmations: 2s between each
-- Major transitions: 2.5-3s
+Vary pause duration based on context (err on the longer side):
+- Settling/opening invitations: 2.5-3s
+- Descriptive sentences: 1.5-2s  
+- Identity statements: 2.5-3s
+- Questions/invitations: 2-2.5s
+- Neural Loop affirmations: 2.5s between each
+- Major transitions: 3s
 
-Example: "Feel your breath moving through you. <break time='1.5s' /> Notice the space around your body. <break time='1.5s' /> You are held in this moment. <break time='2.5s' />"
+Example: "Feel your breath moving through you. <break time='2s' /> Notice the space around your body. <break time='2s' /> You are held in this moment. <break time='3s' />"
 
-Without these pauses between every sentence, the meditation feels rushed and loses its transformative power.`;
+Without these generous pauses between every sentence, the meditation feels rushed and loses its transformative power. Make it breathe.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',

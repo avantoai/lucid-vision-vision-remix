@@ -10,7 +10,7 @@ const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
 const VOICE_SETTINGS = {
   stability: 0.7,
   similarity_boost: 0.8,
-  speed: 0.74
+  speed: 0.71
 };
 
 async function generateSpeech(text, voiceId) {
@@ -59,9 +59,9 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
       .input(voicePath)
       .input(backgroundPath)
       .complexFilter([
-        // Delay voice by 4 seconds (4000ms), set background to 40% volume
+        // Delay voice by 4 seconds (4000ms), set background to 45% volume
         '[0:a]adelay=4000|4000[voice]',
-        '[1:a]volume=0.40[bg]',
+        '[1:a]volume=0.45[bg]',
         '[voice][bg]amix=inputs=2:duration=longest'
       ])
       .duration(duration * 60)
