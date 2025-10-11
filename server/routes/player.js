@@ -33,6 +33,7 @@ router.get('/preview/:type/:id', async (req, res) => {
 
 router.get('/audio/:meditationId', async (req, res) => {
   try {
+    console.log(`🎵 Fetching audio for meditation: ${req.params.meditationId}`);
     const authHeader = req.headers.authorization;
     const isAuthenticated = authHeader && authHeader.startsWith('Bearer ');
 
@@ -43,20 +44,24 @@ router.get('/audio/:meditationId', async (req, res) => {
       const token = authHeader.substring(7);
       const { data: { user: authUser } } = await supabase.auth.getUser(token);
       user = authUser;
+      console.log(`🔐 Authenticated user: ${user?.id}`);
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('meditations')
         .select('*')
         .eq('id', req.params.meditationId)
         .single();
 
       if (error || !data) {
+        console.error('❌ Meditation not found:', error?.message);
         return res.status(404).json({ error: 'Meditation not found' });
       }
 
       meditation = data;
+      console.log(`✅ Found meditation for user: ${meditation.user_id}`);
 
       if (meditation.user_id !== user.id && !meditation.received_from) {
+        console.error('❌ Unauthorized access attempt');
         return res.status(403).json({ error: 'Unauthorized access' });
       }
     } else {
