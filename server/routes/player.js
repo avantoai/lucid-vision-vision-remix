@@ -82,14 +82,17 @@ router.get('/audio/:meditationId', async (req, res) => {
       }
     }
 
+    console.log(`🔊 Creating signed URL for audio_url: ${meditation.audio_url}`);
     const { data: urlData, error: urlError } = await supabase.storage
       .from('meditations')
       .createSignedUrl(meditation.audio_url, 3600);
 
     if (urlError) {
+      console.error('❌ Failed to create signed URL:', urlError);
       return res.status(500).json({ error: 'Failed to generate audio URL' });
     }
 
+    console.log(`✅ Signed URL created successfully`);
     res.json({ success: true, url: urlData.signedUrl });
   } catch (error) {
     console.error('Get audio error:', error);

@@ -24,14 +24,23 @@ export default function MeditationPlayerScreen() {
 
   const loadMeditation = async () => {
     try {
+      console.log('🎵 Loading meditation:', route.params.meditationId);
       const meditations = await api.getMeditations();
+      console.log('📚 Fetched meditations count:', meditations.length);
       const med = meditations.find(m => m.id === route.params.meditationId);
+      
       if (med) {
+        console.log('✅ Found meditation:', med.title);
         setMeditation(med);
         const url = await api.getMeditationAudioUrl(med.id);
+        console.log('🔊 Audio URL received:', url ? 'yes' : 'no');
         setAudioUrl(url);
+      } else {
+        console.log('❌ Meditation not found in list');
+        Alert.alert('Error', 'Meditation not found');
       }
     } catch (error) {
+      console.error('❌ Player error:', error);
       Alert.alert('Error', 'Failed to load meditation');
     } finally {
       setIsLoading(false);
