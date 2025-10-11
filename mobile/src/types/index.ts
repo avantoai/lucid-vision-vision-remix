@@ -16,6 +16,7 @@ export interface Meditation {
   background: string;
   audio_url: string;
   script: string;
+  status: 'generating' | 'completed' | 'failed';
   is_favorite: boolean;
   is_pinned: boolean;
   is_gift: boolean;
@@ -78,6 +79,7 @@ export type RootStackParamList = {
   CategorySelection: undefined;
   VisionFlow: { category: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }> };
+  MeditationGenerating: { meditationId: string; category: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;
   GiftPlayer: { giftId: string };

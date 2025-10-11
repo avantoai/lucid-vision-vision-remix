@@ -24,6 +24,7 @@ CREATE TABLE meditations (
   audio_url TEXT NOT NULL,
   title_auto TEXT NOT NULL,
   title TEXT NOT NULL,
+  status TEXT DEFAULT 'completed' CHECK (status IN ('generating', 'completed', 'failed')),
   is_gift BOOLEAN DEFAULT FALSE,
   is_pinned BOOLEAN DEFAULT FALSE,
   is_favorite BOOLEAN DEFAULT FALSE,
