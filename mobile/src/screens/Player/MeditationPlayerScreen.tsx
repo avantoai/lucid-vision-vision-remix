@@ -39,9 +39,20 @@ export default function MeditationPlayerScreen() {
         console.log('❌ Meditation not found in list');
         Alert.alert('Error', 'Meditation not found');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Player error:', error);
-      Alert.alert('Error', 'Failed to load meditation');
+      const errorMessage = error?.message || 'Failed to load meditation';
+      const isAudioMissing = errorMessage.includes('Audio file not found') || errorMessage.includes('404');
+      
+      if (isAudioMissing) {
+        Alert.alert(
+          'Audio File Missing',
+          'This meditation was created during testing and the audio file is missing. Please create a new meditation to listen.',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

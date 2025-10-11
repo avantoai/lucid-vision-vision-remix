@@ -89,6 +89,12 @@ router.get('/audio/:meditationId', async (req, res) => {
 
     if (urlError) {
       console.error('❌ Failed to create signed URL:', urlError);
+      if (urlError.status === 400 || urlError.statusCode === '404') {
+        return res.status(404).json({ 
+          error: 'Audio file not found',
+          details: 'This meditation was created during testing and the audio file is missing. Please create a new meditation.'
+        });
+      }
       return res.status(500).json({ error: 'Failed to generate audio URL' });
     }
 
