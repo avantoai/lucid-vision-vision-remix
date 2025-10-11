@@ -59,7 +59,7 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
       .input(voicePath)
       .input(backgroundPath)
       .complexFilter([
-        '[1:a]volume=0.15[bg]',
+        '[1:a]volume=0.35[bg]',
         '[0:a][bg]amix=inputs=2:duration=longest'
       ])
       .duration(duration * 60)
