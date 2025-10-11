@@ -61,7 +61,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
 async function getUserMeditations(userId, filter, category) {
   console.log(`📚 Fetching meditations for user: ${userId}, filter: ${filter || 'all'}, category: ${category || 'none'}`);
   
-  let query = supabase
+  let query = supabaseAdmin
     .from('meditations')
     .select('*')
     .eq('user_id', userId)
@@ -71,6 +71,8 @@ async function getUserMeditations(userId, filter, category) {
     query = query.not('received_from', 'is', null);
   } else if (filter === 'favorites') {
     query = query.eq('is_favorite', true);
+  } else if (filter === 'pinned') {
+    query = query.eq('is_pinned', true);
   } else if (filter === 'downloaded') {
     query = query.eq('is_downloaded', true);
   } else if (category) {
@@ -89,7 +91,7 @@ async function getUserMeditations(userId, filter, category) {
 }
 
 async function pinMeditation(userId, meditationId) {
-  const { data: pinnedCount } = await supabase
+  const { data: pinnedCount } = await supabaseAdmin
     .from('meditations')
     .select('id')
     .eq('user_id', userId)
@@ -99,7 +101,7 @@ async function pinMeditation(userId, meditationId) {
     throw new Error('Maximum of 3 pinned meditations allowed');
   }
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('meditations')
     .update({ is_pinned: true })
     .eq('id', meditationId)
@@ -111,14 +113,14 @@ async function pinMeditation(userId, meditationId) {
 }
 
 async function toggleFavorite(userId, meditationId) {
-  const { data: meditation } = await supabase
+  const { data: meditation } = await supabaseAdmin
     .from('meditations')
     .select('is_favorite')
     .eq('id', meditationId)
     .eq('user_id', userId)
     .single();
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('meditations')
     .update({ is_favorite: !meditation?.is_favorite })
     .eq('id', meditationId)
@@ -130,7 +132,7 @@ async function toggleFavorite(userId, meditationId) {
 }
 
 async function updateTitle(userId, meditationId, title) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('meditations')
     .update({ title })
     .eq('id', meditationId)
