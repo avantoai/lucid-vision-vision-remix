@@ -38,7 +38,18 @@ Generate **transformative, emotionally resonant guided visualizations** that hel
 - Maintain the appropriate emotional arc for the meditation duration.
 - Hit the target **word count** with ±10% flexibility.
 - No stage directions or sound cues; pure narration.
-- End with an embodied statement of presence, clarity, and gratitude.`;
+- **Add spacious pauses** using <break time="X.Xs" /> tags (max 3 seconds) to create breathing room for integration and embodiment.
+- End with an embodied statement of presence, clarity, and gratitude.
+
+### **Pause Guidelines**
+
+Use <break time="X.Xs" /> tags strategically:
+- **After opening invitations**: 1-2 seconds (e.g., "Take a slow breath. <break time='2s' />")
+- **Between imagery sections**: 1.5-2.5 seconds for absorption
+- **After identity statements**: 2-3 seconds for embodiment (e.g., "You are already whole. <break time='2.5s' />")
+- **Before transitions**: 1-2 seconds to shift awareness
+- **In Neural Loop**: 1.5-2 seconds between "I am..." statements
+- Create spaciousness without over-pausing (every 2-4 sentences typically)`;
 
 async function generateScript({ category, duration, background, responses, userName }) {
   // THAR uses 110 WPM average narration speed
@@ -86,7 +97,16 @@ ${responseSummary}
 ${arcGuide}
 
 **Your Task:**
-Create a transformative meditation that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey. No [pause] markers - let the language breathe naturally through paragraph breaks.`;
+Create a transformative meditation that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey.
+
+**CRITICAL: Add spacious pauses** throughout the meditation using <break time="X.Xs" /> tags (max 3s each). These pauses allow the listener to digest, feel, and embody the guidance. Place them:
+- After invitations to breathe or settle
+- Between imagery sections  
+- After powerful identity statements
+- Before and after transitions
+- Between Neural Loop affirmations
+
+Without these pauses, the meditation feels rushed and loses its transformative power.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',

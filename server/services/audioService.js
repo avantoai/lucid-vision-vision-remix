@@ -59,7 +59,7 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
       .input(voicePath)
       .input(backgroundPath)
       .complexFilter([
-        '[1:a]volume=0.35[bg]',
+        '[1:a]volume=0.60[bg]',
         '[0:a][bg]amix=inputs=2:duration=longest'
       ])
       .duration(duration * 60)
@@ -80,9 +80,10 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
 }
 
 async function generateMeditationAudio({ script, voiceId, background, duration }) {
-  const scriptWithoutPauses = script.replace(/\[pause\]/gi, '... ');
+  // Keep ElevenLabs <break> tags, only remove old [pause] markers if present
+  const scriptForTTS = script.replace(/\[pause\]/gi, '');
   
-  const voiceBuffer = await generateSpeech(scriptWithoutPauses, voiceId);
+  const voiceBuffer = await generateSpeech(scriptForTTS, voiceId);
   
   if (!voiceBuffer) {
     return 'mock-audio-url';
