@@ -171,12 +171,6 @@ export default function LibraryScreen() {
           >
             <Text style={[styles.filterText, filter === 'favorites' && styles.filterTextActive]}>Favorites</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, filter === 'pinned' && styles.filterButtonActive]}
-            onPress={() => setFilter('pinned')}
-          >
-            <Text style={[styles.filterText, filter === 'pinned' && styles.filterTextActive]}>Pinned</Text>
-          </TouchableOpacity>
         </View>
       </View>
 

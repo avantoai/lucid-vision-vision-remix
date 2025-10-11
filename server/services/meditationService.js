@@ -161,8 +161,6 @@ async function getUserMeditations(userId, filter, category) {
     query = query.not('received_from', 'is', null);
   } else if (filter === 'favorites') {
     query = query.eq('is_favorite', true);
-  } else if (filter === 'pinned') {
-    query = query.eq('is_pinned', true);
   } else if (filter === 'downloaded') {
     query = query.eq('is_downloaded', true);
   } else if (category) {
@@ -176,8 +174,18 @@ async function getUserMeditations(userId, filter, category) {
     throw new Error('Failed to fetch meditations: ' + error.message);
   }
 
-  console.log(`✅ Found ${data?.length || 0} meditations for user ${userId}`);
-  return data;
+  // Sort pinned meditations to the top when showing 'all' (no filter)
+  let sortedData = data || [];
+  if (!filter && !category) {
+    sortedData = sortedData.sort((a, b) => {
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
+
+  console.log(`✅ Found ${sortedData.length} meditations for user ${userId}`);
+  return sortedData;
 }
 
 async function pinMeditation(userId, meditationId) {

@@ -22,12 +22,14 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
     - User vision responses collected through AI-guided prompt flow
     - AI (OpenAI GPT-4o-mini) using **THAR protocol** (Technological Herald of Awakening and Remembrance) for personalized script generation
     - THAR specifications: 110 WPM pacing, somatic sequencing (body → awareness → vision → embodiment), identity encoding ("I am..." statements)
+    - **Spacious Pauses:** Scripts include 1-2 second pauses between every sentence using ElevenLabs `<break time="X.Xs" />` tags, varying by context (settling: 2-2.5s, descriptive: 1-1.5s, identity: 2-3s, transitions: 2.5-3s max)
     - Emotional arcs: Short-form (≤10 min) and Full-form (>10 min with Neural Loop Reinforcement)
     - User responses directly inform meditation content for deep personalization
-    - Text-to-Speech (ElevenLabs) for audio conversion
-    - FFmpeg for mixing voice with background audio
+    - Text-to-Speech (ElevenLabs) for audio conversion with settings: stability 0.7, similarity 0.8, speed 0.74
+    - FFmpeg for mixing voice with background audio: voice delayed 4 seconds after background start, background at 60% volume
     - Supabase Storage for audio upload and hosting
-    - Auto-generated meditation titles
+    - Auto-generated meditation titles based on user vision responses
+- **Library & Organization:** Two filter tabs (All, Favorites). Pinned meditations appear at top of "All" list (max 3 pins).
 - **Living Vision System:** Supports 9 life categories with fixed and AI-generated follow-up prompts, auto-generated taglines, and version history for vision statements.
 - **Gift Meditations:** Enables creation of shareable, permanent gift meditation links with a public web player.
 - **Subscription Tiers:** Implements Basic and Advanced tiers with differing limits on meditation generation, duration, voice options, and features like background playback and offline downloads. Quotas reset weekly.
@@ -41,7 +43,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 - **Subscription Tiers:**
     - **Basic:** 3 personal/gift meditations/week, max 15 min, 3 voices, no background playback/offline.
     - **Advanced:** Unlimited personal/gift meditations, max 60 min, 5 voices, background playback, offline downloads.
-- **Voice Options:** Basic (Nathaniel, Jen, Nora), Advanced adds (Ella, Grant). ElevenLabs settings: stability 0.7, similarity 0.8, speed 0.9.
+- **Voice Options:** Basic (Nathaniel, Jen, Nora), Advanced adds (Ella, Grant). ElevenLabs settings: stability 0.7, similarity 0.8, speed 0.74.
 - **Background Audio:** Ethereal Harmony, Healing Bowls, Nature Stream, Silence (seamless loops).
 
 **4. System Design Choices:**
