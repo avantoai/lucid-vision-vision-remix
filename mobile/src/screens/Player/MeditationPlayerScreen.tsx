@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useAudioPlayer } from 'expo-audio';
+import { Audio } from 'expo-av';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, Meditation } from '../../types';
@@ -13,21 +13,49 @@ export default function MeditationPlayerScreen() {
   const navigation = useNavigation<MeditationPlayerNavigationProp>();
   const route = useRoute<MeditationPlayerRouteProp>();
   const [meditation, setMeditation] = useState<Meditation | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
-  
-  const player = useAudioPlayer(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
     loadMeditation();
+    
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
   }, []);
 
   useEffect(() => {
-    if (audioUrl && player) {
-      console.log('🎵 Loading audio into player:', audioUrl.substring(0, 50) + '...');
-      player.replace({ uri: audioUrl });
+    if (audioUrl && !audioReady) {
+      loadAudio();
     }
-  }, [audioUrl, player]);
+  }, [audioUrl]);
+
+  const loadAudio = async () => {
+    try {
+      console.log('Loading audio from URL...');
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+      });
+      
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioUrl },
+        { shouldPlay: false }
+      );
+      
+      soundRef.current = sound;
+      setAudioReady(true);
+      console.log('Audio loaded successfully');
+    } catch (error) {
+      console.error('Failed to load audio:', error);
+      Alert.alert('Error', 'Failed to load audio file');
+    }
+  };
 
   const loadMeditation = async () => {
     try {
@@ -65,20 +93,23 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  const handlePlayPause = () => {
-    console.log('🎮 Play button pressed. audioUrl:', audioUrl ? 'exists' : 'null', 'player.playing:', player.playing);
-    if (!audioUrl) {
-      console.log('❌ No audio URL available');
+  const handlePlayPause = async () => {
+    if (!soundRef.current || !audioReady) {
       Alert.alert('Error', 'Audio not loaded yet');
       return;
     }
     
-    if (player.playing) {
-      console.log('⏸ Pausing audio');
-      player.pause();
-    } else {
-      console.log('▶ Playing audio');
-      player.play();
+    try {
+      if (isPlaying) {
+        await soundRef.current.pauseAsync();
+        setIsPlaying(false);
+      } else {
+        await soundRef.current.playAsync();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Playback error:', error);
+      Alert.alert('Error', 'Failed to play audio');
     }
   };
 
@@ -122,7 +153,7 @@ export default function MeditationPlayerScreen() {
         <Text style={styles.duration}>{meditation.duration} minutes</Text>
 
         <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
-          <Text style={styles.playButtonText}>{player.playing ? '⏸' : '▶'}</Text>
+          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
         </TouchableOpacity>
 
         <View style={styles.actions}>
