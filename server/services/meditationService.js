@@ -35,14 +35,19 @@ async function createMeditationPlaceholder({ userId, category, duration, voiceId
 
 async function completeMeditationGeneration({ meditationId, userId, category, duration, voiceId, background, responses, isGift }) {
   console.log(`🎵 Starting background generation for meditation: ${meditationId}`);
+  console.log(`   Category: ${category}, Duration: ${duration}min, Voice: ${voiceId}, Background: ${background}`);
   
   try {
+    console.log(`⏳ [${meditationId}] Step 1/5: Fetching user info...`);
     const { data: user } = await supabaseAdmin
       .from('users')
       .select('full_name')
       .eq('id', userId)
       .single();
+    console.log(`✓ [${meditationId}] User: ${user?.full_name || 'friend'}`);
 
+    console.log(`⏳ [${meditationId}] Step 2/5: Generating AI script (110 WPM, ~${duration * 110} words)...`);
+    const scriptStart = Date.now();
     const script = await aiService.generateScript({
       category,
       duration,
@@ -50,16 +55,23 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
       responses,
       userName: user?.full_name || 'friend'
     });
+    console.log(`✓ [${meditationId}] Script generated in ${((Date.now() - scriptStart) / 1000).toFixed(1)}s (${script.length} chars)`);
 
+    console.log(`⏳ [${meditationId}] Step 3/5: Converting to speech (ElevenLabs) and mixing audio (FFmpeg)...`);
+    const audioStart = Date.now();
     const audioUrl = await audioService.generateMeditationAudio({
       script,
       voiceId,
       background,
       duration
     });
+    console.log(`✓ [${meditationId}] Audio generated in ${((Date.now() - audioStart) / 1000).toFixed(1)}s`);
 
+    console.log(`⏳ [${meditationId}] Step 4/5: Generating title...`);
     const title = await aiService.generateTitle(script, category, responses);
+    console.log(`✓ [${meditationId}] Title: "${title}"`);
 
+    console.log(`⏳ [${meditationId}] Step 5/5: Saving to database...`);
     const { error } = await supabaseAdmin
       .from('meditations')
       .update({
@@ -84,6 +96,8 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     console.log(`✅ Completed meditation generation: ${meditationId}`);
   } catch (error) {
     console.error(`❌ Failed to generate meditation ${meditationId}:`, error);
+    console.error(`   Error details:`, error.message);
+    console.error(`   Stack:`, error.stack);
     
     await supabaseAdmin
       .from('meditations')
