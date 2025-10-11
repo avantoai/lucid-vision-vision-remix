@@ -14,7 +14,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **1. UI/UX Decisions:**
 - **Mobile-First Design:** The application is primarily designed for mobile platforms, ensuring a responsive and intuitive user experience.
 - **Navigation:** Utilizes React Navigation with a Stack Navigator and Bottom Tab Navigator for a structured and user-friendly flow. The Library screen is the default home screen.
-- **Branding:** Tab bar icons include house (Library), 3 stars (Vision), and person (Profile).
+- **Branding:** Tab bar icons include house (Library), flower (Vision), and person (Profile).
 
 **2. Technical Implementations:**
 - **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage.
