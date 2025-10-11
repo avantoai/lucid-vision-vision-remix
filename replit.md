@@ -7,6 +7,13 @@ Lucid Vision is a mobile-first meditation platform that generates personalized g
 Backend API infrastructure is set up and running. The project is structured for React Native mobile development with a Node.js/Express backend serving API endpoints and a web player for gift meditations.
 
 ## Recent Changes (October 11, 2025)
+- **Fixed critical meditation library query bug**
+  - Issue: Library was showing no meditations for users
+  - Root cause: Incorrect `.or()` query logic returned ALL gift meditations from ALL users (privacy/security issue)
+  - Fixed to use proper `.eq('user_id', userId)` filter to only return user's own meditations
+  - Added comprehensive error handling and logging to Library screen
+  - Added visual error display with retry button for better debugging
+
 - **Restructured navigation to make Library the home screen**
   - Removed Home screen from navigation
   - Made Library the default first tab (was second after Home)

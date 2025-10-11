@@ -12,6 +12,7 @@ export default function LibraryScreen() {
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadMeditations();
@@ -19,11 +20,15 @@ export default function LibraryScreen() {
 
   const loadMeditations = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      const data = await api.getMeditations(filter);
-      setMeditations(data);
+      console.log('📚 Loading meditations with filter:', filter === 'all' ? undefined : filter);
+      const data = await api.getMeditations(filter === 'all' ? undefined : filter);
+      console.log('✅ Loaded meditations:', data?.length || 0);
+      setMeditations(data || []);
     } catch (error) {
-      console.error('Failed to load meditations:', error);
+      console.error('❌ Failed to load meditations:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load meditations');
     } finally {
       setIsLoading(false);
     }
@@ -78,13 +83,22 @@ export default function LibraryScreen() {
         </View>
       </View>
 
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>⚠️ {error}</Text>
+          <TouchableOpacity onPress={loadMeditations} style={styles.retryButton}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <FlatList
         data={meditations}
         renderItem={renderMeditation}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No meditations yet</Text>
+          !error ? <Text style={styles.emptyText}>No meditations yet</Text> : null
         }
       />
 
@@ -185,6 +199,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#9CA3AF',
     marginTop: 40,
+  },
+  errorContainer: {
+    backgroundColor: '#FEF2F2',
+    margin: 20,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  retryButton: {
+    backgroundColor: '#DC2626',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  retryText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   createButton: {
     backgroundColor: '#6366F1',
