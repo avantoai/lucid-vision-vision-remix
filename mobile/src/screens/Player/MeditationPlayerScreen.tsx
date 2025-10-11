@@ -16,11 +16,18 @@ export default function MeditationPlayerScreen() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  const player = useAudioPlayer(audioUrl || '');
+  const player = useAudioPlayer(null);
 
   useEffect(() => {
     loadMeditation();
   }, []);
+
+  useEffect(() => {
+    if (audioUrl && player) {
+      console.log('🎵 Loading audio into player:', audioUrl.substring(0, 50) + '...');
+      player.replace({ uri: audioUrl });
+    }
+  }, [audioUrl, player]);
 
   const loadMeditation = async () => {
     try {
@@ -59,9 +66,18 @@ export default function MeditationPlayerScreen() {
   };
 
   const handlePlayPause = () => {
+    console.log('🎮 Play button pressed. audioUrl:', audioUrl ? 'exists' : 'null', 'player.playing:', player.playing);
+    if (!audioUrl) {
+      console.log('❌ No audio URL available');
+      Alert.alert('Error', 'Audio not loaded yet');
+      return;
+    }
+    
     if (player.playing) {
+      console.log('⏸ Pausing audio');
       player.pause();
     } else {
+      console.log('▶ Playing audio');
       player.play();
     }
   };
