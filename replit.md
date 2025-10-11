@@ -26,7 +26,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
     - Emotional arcs: Short-form (≤10 min) and Full-form (>10 min with Neural Loop Reinforcement)
     - User responses directly inform meditation content for deep personalization
     - Text-to-Speech (ElevenLabs) for audio conversion with settings: stability 0.7, similarity 0.8, speed 0.71
-    - FFmpeg for mixing voice with background audio: voice delayed 4 seconds after background start, background at 45% volume
+    - FFmpeg for mixing voice with background audio: voice delayed 4 seconds after background start, background at 50% volume, 320kbps bitrate with highest quality encoding
     - Supabase Storage for audio upload and hosting
     - Auto-generated meditation titles based on user vision responses
 - **Library & Organization:** Two filter tabs (All, Favorites). Pinned meditations appear at top of "All" list (max 3 pins).

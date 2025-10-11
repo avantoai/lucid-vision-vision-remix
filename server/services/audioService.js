@@ -59,14 +59,15 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
       .input(voicePath)
       .input(backgroundPath)
       .complexFilter([
-        // Delay voice by 4 seconds (4000ms), set background to 45% volume
+        // Delay voice by 4 seconds (4000ms), set background to 50% volume
         '[0:a]adelay=4000|4000[voice]',
-        '[1:a]volume=0.45[bg]',
+        '[1:a]volume=0.50[bg]',
         '[voice][bg]amix=inputs=2:duration=longest'
       ])
       .duration(duration * 60)
       .audioCodec('libmp3lame')
-      .audioBitrate('192k')
+      .audioBitrate('320k')
+      .audioQuality(0)
       .on('end', async () => {
         const mixedBuffer = await fs.readFile(outputPath);
         await fs.unlink(voicePath);
