@@ -7,6 +7,7 @@ import AuthScreen from '../screens/Auth/AuthScreen';
 import EmailInputScreen from '../screens/Auth/EmailInputScreen';
 import OnboardingScreen from '../screens/Auth/OnboardingScreen';
 import MainTabNavigator from './MainTabNavigator';
+import CategorySelectionScreen from '../screens/Category/CategorySelectionScreen';
 import VisionFlowScreen from '../screens/Vision/VisionFlowScreen';
 import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
 import MeditationPlayerScreen from '../screens/Player/MeditationPlayerScreen';
@@ -35,6 +36,11 @@ export default function RootNavigator() {
         ) : (
           <>
             <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+            <Stack.Screen 
+              name="CategorySelection" 
+              component={CategorySelectionScreen}
+              options={{ presentation: 'modal' }}
+            />
             <Stack.Screen 
               name="VisionFlow" 
               component={VisionFlowScreen}
