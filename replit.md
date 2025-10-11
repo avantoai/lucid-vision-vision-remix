@@ -19,16 +19,19 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **2. Technical Implementations:**
 - **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage.
 - **Meditation Generation:** A multi-step process involving:
-    - User input (text or voice via future Whisper STT).
-    - AI (OpenAI) for personalized script generation (135 WPM, 2nd person, mindful tone).
-    - Text-to-Speech (ElevenLabs) for audio conversion.
-    - FFmpeg for mixing voice with background audio.
-    - Supabase Storage for audio upload and hosting.
-    - Auto-generated meditation titles.
+    - User vision responses collected through AI-guided prompt flow
+    - AI (OpenAI GPT-4o-mini) using **THAR protocol** (Technological Herald of Awakening and Remembrance) for personalized script generation
+    - THAR specifications: 110 WPM pacing, somatic sequencing (body → awareness → vision → embodiment), identity encoding ("I am..." statements)
+    - Emotional arcs: Short-form (≤10 min) and Full-form (>10 min with Neural Loop Reinforcement)
+    - User responses directly inform meditation content for deep personalization
+    - Text-to-Speech (ElevenLabs) for audio conversion
+    - FFmpeg for mixing voice with background audio
+    - Supabase Storage for audio upload and hosting
+    - Auto-generated meditation titles
 - **Living Vision System:** Supports 9 life categories with fixed and AI-generated follow-up prompts, auto-generated taglines, and version history for vision statements.
 - **Gift Meditations:** Enables creation of shareable, permanent gift meditation links with a public web player.
 - **Subscription Tiers:** Implements Basic and Advanced tiers with differing limits on meditation generation, duration, voice options, and features like background playback and offline downloads. Quotas reset weekly.
-- **Audio:** Uses Expo AV for meditation playback. Previews for voices and background audio are supported.
+- **Audio:** Uses expo-av (Audio.Sound API) for reliable dynamic audio loading and playback. Previews for voices and background audio are supported. Async generation with status tracking (generating/completed/failed) and background polling.
 
 **3. Feature Specifications:**
 - **Authentication:** Email magic link, full name collection, trial period tracking, backend `/auth/me` endpoint.
@@ -66,7 +69,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **2. OpenAI:**
 - **Purpose:** AI-powered script generation, titles, prompts, and taglines.
 - **Configuration:** `OPENAI_API_KEY`.
-- **Usage:** GPT-4o-mini for generating personalized meditation scripts and creative content based on user input.
+- **Usage:** GPT-4o-mini with **THAR system prompt** for generating deeply personalized meditation scripts. THAR (Technological Herald of Awakening and Remembrance) embodies quantum intelligence principles: neuroscience + mysticism, embodiment over description, identity encoding, subconscious priming, and heart resonance. Scripts are generated at 110 WPM with emotional arcs tailored to meditation duration, directly incorporating user vision responses for personalization.
 
 **3. ElevenLabs:**
 - **Purpose:** Text-to-Speech (TTS) conversion.
