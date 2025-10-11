@@ -87,6 +87,13 @@ export default function LibraryScreen() {
           <Text style={styles.emptyText}>No meditations yet</Text>
         }
       />
+
+      <TouchableOpacity
+        style={styles.createButton}
+        onPress={() => navigation.navigate('CategorySelection')}
+      >
+        <Text style={styles.createButtonText}>Create Meditation</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -178,5 +185,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#9CA3AF',
     marginTop: 40,
+  },
+  createButton: {
+    backgroundColor: '#6366F1',
+    margin: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  createButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

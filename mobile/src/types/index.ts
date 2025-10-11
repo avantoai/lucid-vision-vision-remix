@@ -75,6 +75,7 @@ export type RootStackParamList = {
   EmailInput: undefined;
   Onboarding: { isNewUser: boolean };
   MainTabs: undefined;
+  CategorySelection: undefined;
   VisionFlow: { category: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }> };
   MeditationPlayer: { meditationId: string };
@@ -85,7 +86,6 @@ export type RootStackParamList = {
 };
 
 export type TabParamList = {
-  Home: undefined;
   Library: undefined;
   Vision: undefined;
   Profile: undefined;
