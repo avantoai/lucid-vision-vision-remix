@@ -40,32 +40,26 @@ export default function RootNavigator() {
             <Stack.Screen 
               name="CategorySelection" 
               component={CategorySelectionScreen}
-              options={{ presentation: 'modal' }}
             />
             <Stack.Screen 
               name="VisionFlow" 
               component={VisionFlowScreen}
-              options={{ presentation: 'modal' }}
             />
             <Stack.Screen 
               name="MeditationSetup" 
               component={MeditationSetupScreen}
-              options={{ presentation: 'modal' }}
             />
             <Stack.Screen 
               name="MeditationGenerating" 
               component={MeditationGeneratingScreen}
-              options={{ presentation: 'modal' }}
             />
             <Stack.Screen 
               name="MeditationPlayer" 
               component={MeditationPlayerScreen}
-              options={{ presentation: 'modal' }}
             />
             <Stack.Screen 
               name="CreateGift" 
               component={CreateGiftScreen}
-              options={{ presentation: 'modal' }}
             />
           </>
         )}

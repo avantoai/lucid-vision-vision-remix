@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 
@@ -40,7 +40,14 @@ export default function MeditationGeneratingScreen() {
 
         <TouchableOpacity 
           style={styles.libraryButton}
-          onPress={() => navigation.navigate('MainTabs')}
+          onPress={() => {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'MainTabs' }],
+              })
+            );
+          }}
         >
           <Text style={styles.libraryButtonText}>Go to Library</Text>
         </TouchableOpacity>
