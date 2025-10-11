@@ -83,16 +83,27 @@ router.get('/audio/:meditationId', async (req, res) => {
     }
 
     console.log(`🔊 Creating signed URL for audio_url: ${meditation.audio_url}`);
+    console.log(`📦 Bucket: meditations, Path: ${meditation.audio_url}`);
+    
     const { data: urlData, error: urlError } = await supabase.storage
       .from('meditations')
       .createSignedUrl(meditation.audio_url, 3600);
 
     if (urlError) {
       console.error('❌ Failed to create signed URL:', urlError);
+      console.error('❌ Error details - status:', urlError.status, 'statusCode:', urlError.statusCode);
+      console.error('❌ Full error object:', JSON.stringify(urlError, null, 2));
+      
+      // Try listing files to debug
+      const { data: files } = await supabase.storage
+        .from('meditations')
+        .list();
+      console.log('📂 Files in bucket root:', files?.map(f => f.name).join(', '));
+      
       if (urlError.status === 400 || urlError.statusCode === '404') {
         return res.status(404).json({ 
           error: 'Audio file not found',
-          details: 'This meditation was created during testing and the audio file is missing. Please create a new meditation.'
+          details: `Looking for: ${meditation.audio_url}. This meditation was created during testing and the audio file is missing. Please create a new meditation.`
         });
       }
       return res.status(500).json({ error: 'Failed to generate audio URL' });
