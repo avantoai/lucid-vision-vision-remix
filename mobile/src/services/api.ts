@@ -3,6 +3,10 @@ import { API_BASE_URL } from '../constants/config';
 import { User, Meditation, VisionStatement, SubscriptionStatus, QuotaUsage, Gift } from '../types';
 
 class ApiService {
+  constructor() {
+    console.log('🌐 API Service initialized with base URL:', API_BASE_URL);
+  }
+
   private async getAuthToken(): Promise<string | null> {
     return await AsyncStorage.getItem('auth_token');
   }
@@ -25,6 +29,9 @@ class ApiService {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
+    console.log(`📡 API Request: ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`);
+    const startTime = Date.now();
+
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
@@ -32,6 +39,9 @@ class ApiService {
         signal: controller.signal,
       });
 
+      const duration = Date.now() - startTime;
+      console.log(`✅ API Response: ${response.status} (${duration}ms)`);
+      
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -44,9 +54,11 @@ class ApiService {
       clearTimeout(timeoutId);
       
       if (error.name === 'AbortError') {
+        console.error(`⏱️ Request timeout after ${timeoutMs}ms: ${endpoint}`);
         throw new Error('Request timed out. Please check your internet connection and try again.');
       }
       
+      console.error(`❌ API Error: ${endpoint}`, error.message || error);
       throw error;
     }
   }
