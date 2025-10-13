@@ -38,8 +38,9 @@ CREATE TABLE vision_statements (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   category TEXT NOT NULL,
-  statement TEXT NOT NULL,
+  statement TEXT,
   tagline TEXT,
+  status TEXT DEFAULT 'completed' CHECK (status IN ('processing', 'completed', 'failed')),
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
