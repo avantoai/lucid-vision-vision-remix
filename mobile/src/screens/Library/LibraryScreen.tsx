@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, Meditation } from '../../types';
+import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
-type LibraryScreenRouteProp = RouteProp<RootStackParamList, 'MainTabs'>;
+type LibraryScreenRouteProp = RouteProp<TabParamList, 'Library'>;
 
 export default function LibraryScreen() {
   const navigation = useNavigation<LibraryScreenNavigationProp>();
@@ -31,8 +31,8 @@ export default function LibraryScreen() {
       // Check if we should show the notification
       if (route.params?.showGeneratingNotification) {
         setShowNotification(true);
-        // Clear the param to avoid showing it again
-        navigation.setParams({ showGeneratingNotification: false } as any);
+        // Clear the param so it doesn't show again on refocus
+        navigation.setParams({ showGeneratingNotification: undefined } as any);
       }
       
       return () => {

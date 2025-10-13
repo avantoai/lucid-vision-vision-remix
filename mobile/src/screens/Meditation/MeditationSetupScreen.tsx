@@ -73,8 +73,13 @@ export default function MeditationSetupScreen() {
           routes: [
             { 
               name: 'MainTabs',
-              params: {
-                showGeneratingNotification: true
+              state: {
+                routes: [
+                  {
+                    name: 'Library',
+                    params: { showGeneratingNotification: true }
+                  }
+                ]
               }
             }
           ],
