@@ -1,18 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type LibraryScreenRouteProp = RouteProp<RootStackParamList, 'MainTabs'>;
 
 export default function LibraryScreen() {
   const navigation = useNavigation<LibraryScreenNavigationProp>();
+  const route = useRoute<LibraryScreenRouteProp>();
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
   const previousGeneratingIds = useRef<Set<string>>(new Set());
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,10 +28,17 @@ export default function LibraryScreen() {
       loadMeditations();
       startPolling();
       
+      // Check if we should show the notification
+      if (route.params?.showGeneratingNotification) {
+        setShowNotification(true);
+        // Clear the param to avoid showing it again
+        navigation.setParams({ showGeneratingNotification: false } as any);
+      }
+      
       return () => {
         stopPolling();
       };
-    }, [filter])
+    }, [filter, route.params?.showGeneratingNotification])
   );
 
   const startPolling = () => {
@@ -173,6 +183,22 @@ export default function LibraryScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {showNotification && (
+        <View style={styles.notificationBanner}>
+          <View style={styles.notificationContent}>
+            <Text style={styles.notificationText}>
+              Your meditation is being generated. This will take a few minutes. We'll notify you once it's ready ✨
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.dismissButton}
+            onPress={() => setShowNotification(false)}
+          >
+            <Text style={styles.dismissButtonText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {error && (
         <View style={styles.errorContainer}>
@@ -354,6 +380,40 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
+    fontWeight: '600',
+  },
+  notificationBanner: {
+    backgroundColor: '#EEF2FF',
+    marginHorizontal: 20,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  notificationContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  notificationText: {
+    color: '#4338CA',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  dismissButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#C7D2FE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dismissButtonText: {
+    color: '#4338CA',
+    fontSize: 16,
     fontWeight: '600',
   },
 });

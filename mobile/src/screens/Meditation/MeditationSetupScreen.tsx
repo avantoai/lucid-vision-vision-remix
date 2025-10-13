@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
@@ -66,10 +66,20 @@ export default function MeditationSetupScreen() {
         isGift: false,
       });
 
-      navigation.navigate('MeditationGenerating', { 
-        meditationId: meditation.id,
-        category 
-      });
+      // Navigate to Library with notification flag
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            { 
+              name: 'MainTabs',
+              params: {
+                showGeneratingNotification: true
+              }
+            }
+          ],
+        })
+      );
     } catch (error: any) {
       if (error.message === 'QUOTA_EXCEEDED') {
         Alert.alert('Quota Exceeded', 'You\'ve reached your weekly meditation limit. Upgrade to Advanced for unlimited meditations.');

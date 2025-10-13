@@ -75,7 +75,7 @@ export type RootStackParamList = {
   Auth: undefined;
   EmailInput: undefined;
   Onboarding: { isNewUser: boolean };
-  MainTabs: undefined;
+  MainTabs: { showGeneratingNotification?: boolean } | undefined;
   CategorySelection: undefined;
   VisionFlow: { category: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
