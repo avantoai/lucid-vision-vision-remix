@@ -115,26 +115,33 @@ async function updateVisionStatement(userId, category, statement) {
 async function processPromptFlow(userId, category, responses) {
   const allResponses = [...responses];
   
-  const statement = await aiService.synthesizeVisionStatement(category, allResponses);
-  const tagline = await aiService.generateTagline(statement);
-
+  // Deactivate previous vision statements for this category
   await supabase
     .from('vision_statements')
     .update({ is_active: false })
     .eq('user_id', userId)
     .eq('category', category);
 
-  await supabaseAdmin
+  // Create a new vision statement with 'processing' status
+  const { data: visionData, error: insertError } = await supabaseAdmin
     .from('vision_statements')
     .insert({
       user_id: userId,
       category,
-      statement,
-      tagline,
+      statement: null,
+      tagline: null,
+      status: 'processing',
       is_active: true,
       created_at: new Date().toISOString()
-    });
+    })
+    .select()
+    .single();
 
+  if (insertError) {
+    throw new Error('Failed to create vision statement: ' + insertError.message);
+  }
+
+  // Save responses
   for (const response of allResponses) {
     await supabaseAdmin
       .from('vision_responses')
@@ -147,7 +154,46 @@ async function processPromptFlow(userId, category, responses) {
       });
   }
 
-  return { statement, tagline };
+  // Process AI generation in the background (non-blocking)
+  processVisionInBackground(visionData.id, category, allResponses).catch(err => {
+    console.error('Background vision processing error:', err);
+  });
+
+  // Return immediately with the vision ID and processing status
+  return { 
+    visionId: visionData.id,
+    status: 'processing',
+    category
+  };
+}
+
+async function processVisionInBackground(visionId, category, responses) {
+  try {
+    console.log(`🧠 Starting background vision processing for ${visionId}`);
+    
+    const statement = await aiService.synthesizeVisionStatement(category, responses);
+    const tagline = await aiService.generateTagline(statement);
+
+    await supabaseAdmin
+      .from('vision_statements')
+      .update({
+        statement,
+        tagline,
+        status: 'completed'
+      })
+      .eq('id', visionId);
+
+    console.log(`✅ Vision processing completed for ${visionId}`);
+  } catch (error) {
+    console.error(`❌ Vision processing failed for ${visionId}:`, error);
+    
+    await supabaseAdmin
+      .from('vision_statements')
+      .update({
+        status: 'failed'
+      })
+      .eq('id', visionId);
+  }
 }
 
 async function generateNextPrompt(userId, category, previousResponses) {
@@ -160,10 +206,32 @@ async function generateNextPrompt(userId, category, previousResponses) {
   return await aiService.generateNextPrompt(category, previousResponses);
 }
 
+async function getVisionStatus(userId, visionId) {
+  const { data: vision, error } = await supabase
+    .from('vision_statements')
+    .select('*')
+    .eq('id', visionId)
+    .eq('user_id', userId)
+    .single();
+
+  if (error || !vision) {
+    throw new Error('Vision not found');
+  }
+
+  return {
+    visionId: vision.id,
+    status: vision.status,
+    statement: vision.statement,
+    tagline: vision.tagline,
+    category: vision.category
+  };
+}
+
 module.exports = {
   getUserCategories,
   getCategoryVision,
   updateVisionStatement,
   processPromptFlow,
-  generateNextPrompt
+  generateNextPrompt,
+  getVisionStatus
 };

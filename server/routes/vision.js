@@ -57,4 +57,14 @@ router.get('/next-prompt/:category', authenticateUser, async (req, res) => {
   }
 });
 
+router.get('/status/:visionId', authenticateUser, async (req, res) => {
+  try {
+    const status = await visionService.getVisionStatus(req.user.id, req.params.visionId);
+    res.json({ success: true, ...status });
+  } catch (error) {
+    console.error('Vision status error:', error);
+    res.status(500).json({ error: 'Failed to get vision status' });
+  }
+});
+
 module.exports = router;
