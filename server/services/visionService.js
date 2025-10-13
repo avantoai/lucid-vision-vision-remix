@@ -115,6 +115,15 @@ async function updateVisionStatement(userId, category, statement) {
 async function processPromptFlow(userId, category, responses) {
   const allResponses = [...responses];
   
+  // Get the current active vision (if any) to potentially restore on failure
+  const { data: previousVision } = await supabase
+    .from('vision_statements')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('category', category)
+    .eq('is_active', true)
+    .single();
+  
   // Deactivate previous vision statements for this category
   await supabase
     .from('vision_statements')
@@ -155,7 +164,7 @@ async function processPromptFlow(userId, category, responses) {
   }
 
   // Process AI generation in the background (non-blocking)
-  processVisionInBackground(visionData.id, category, allResponses).catch(err => {
+  processVisionInBackground(visionData.id, category, allResponses, previousVision?.id).catch(err => {
     console.error('Background vision processing error:', err);
   });
 
@@ -167,7 +176,7 @@ async function processPromptFlow(userId, category, responses) {
   };
 }
 
-async function processVisionInBackground(visionId, category, responses) {
+async function processVisionInBackground(visionId, category, responses, previousVisionId = null) {
   try {
     console.log(`🧠 Starting background vision processing for ${visionId}`);
     
@@ -187,12 +196,25 @@ async function processVisionInBackground(visionId, category, responses) {
   } catch (error) {
     console.error(`❌ Vision processing failed for ${visionId}:`, error);
     
+    // Mark the new vision as failed
     await supabaseAdmin
       .from('vision_statements')
       .update({
-        status: 'failed'
+        status: 'failed',
+        is_active: false
       })
       .eq('id', visionId);
+
+    // Restore the previous vision if it exists
+    if (previousVisionId) {
+      console.log(`🔄 Restoring previous vision ${previousVisionId} after failure`);
+      await supabaseAdmin
+        .from('vision_statements')
+        .update({
+          is_active: true
+        })
+        .eq('id', previousVisionId);
+    }
   }
 }
 
