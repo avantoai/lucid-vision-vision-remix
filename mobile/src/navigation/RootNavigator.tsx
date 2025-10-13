@@ -10,7 +10,6 @@ import MainTabNavigator from './MainTabNavigator';
 import CategorySelectionScreen from '../screens/Category/CategorySelectionScreen';
 import VisionFlowScreen from '../screens/Vision/VisionFlowScreen';
 import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
-import MeditationGeneratingScreen from '../screens/Meditation/MeditationGeneratingScreen';
 import MeditationPlayerScreen from '../screens/Player/MeditationPlayerScreen';
 import CreateGiftScreen from '../screens/Gift/CreateGiftScreen';
 import GiftPlayerScreen from '../screens/Gift/GiftPlayerScreen';
@@ -48,10 +47,6 @@ export default function RootNavigator() {
             <Stack.Screen 
               name="MeditationSetup" 
               component={MeditationSetupScreen}
-            />
-            <Stack.Screen 
-              name="MeditationGenerating" 
-              component={MeditationGeneratingScreen}
             />
             <Stack.Screen 
               name="MeditationPlayer" 

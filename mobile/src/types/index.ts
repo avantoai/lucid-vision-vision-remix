@@ -79,7 +79,6 @@ export type RootStackParamList = {
   CategorySelection: undefined;
   VisionFlow: { category: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
-  MeditationGenerating: { meditationId: string; category: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;
   GiftPlayer: { giftId: string };
