@@ -18,7 +18,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 
 **2. Technical Implementations:**
 - **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage.
-- **Meditation Generation:** A multi-step process involving:
+- **Meditation Generation:** A multi-step async process involving:
     - User vision responses collected through AI-guided prompt flow
     - AI (OpenAI GPT-4o-mini) using **THAR protocol** (Technological Herald of Awakening and Remembrance) for personalized script generation
     - THAR specifications: 110 WPM pacing, somatic sequencing (body → awareness → vision → embodiment), identity encoding ("I am..." statements)
@@ -29,6 +29,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
     - FFmpeg for mixing voice with background audio: voice delayed 4 seconds after background start, background at 50% volume, 320kbps bitrate with highest quality encoding
     - Supabase Storage for audio upload and hosting
     - Auto-generated meditation titles based on user vision responses
+    - **Async UX Flow:** Users click "Generate Meditation" → immediately navigate to Library with dismissible notification → meditation generates in background → alert when ready
 - **Library & Organization:** Two filter tabs (All, Favorites). Pinned meditations appear at top of "All" list (max 3 pins).
 - **Living Vision System:** Supports 9 life categories with fixed and AI-generated follow-up prompts, auto-generated taglines, and version history for vision statements. Vision processing is async - users can immediately proceed to meditation customization while AI generates their vision statement in the background.
 - **Gift Meditations:** Enables creation of shareable, permanent gift meditation links with a public web player.
