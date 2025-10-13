@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
+import { Alert } from 'react-native';
 import { User } from '../types';
 import api from '../services/api';
 import { parseAuthCallback, saveAuthTokens, clearAuthTokens } from '../services/deepLinkHandler';
@@ -11,7 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   needsOnboarding: boolean;
   login: (email: string, token: string) => Promise<{ isNewUser: boolean; user: User }>;
-  handleDeepLink: (url: string) => Promise<{ success: boolean; isNewUser?: boolean; user?: User }>;
+  handleDeepLink: (url: string) => Promise<{ success: boolean; isNewUser?: boolean; user?: User; error?: string }>;
   logout: () => Promise<void>;
   updateUser: (fullName: string) => Promise<void>;
 }
@@ -36,18 +37,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const initialUrl = await Linking.getInitialURL();
       if (initialUrl) {
-        console.log('Initial URL on app launch:', initialUrl);
-        await handleDeepLink(initialUrl);
+        console.log('📱 Initial URL on app launch:', initialUrl);
+        const result = await handleDeepLink(initialUrl);
+        
+        if (!result.success && result.error) {
+          Alert.alert(
+            'Sign In Error',
+            result.error,
+            [{ text: 'OK' }]
+          );
+        }
       }
     } catch (error) {
-      console.error('Error checking initial URL:', error);
+      console.error('❌ Error checking initial URL:', error);
+      Alert.alert(
+        'Sign In Error',
+        'An unexpected error occurred. Please try again.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
   const setupDeepLinkListener = () => {
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      console.log('Deep link received while app running:', url);
-      handleDeepLink(url);
+    const subscription = Linking.addEventListener('url', async ({ url }) => {
+      console.log('📱 Deep link received while app running:', url);
+      const result = await handleDeepLink(url);
+      
+      if (!result.success && result.error) {
+        Alert.alert(
+          'Sign In Error',
+          result.error,
+          [{ text: 'OK' }]
+        );
+      }
     });
 
     return subscription;
@@ -72,26 +94,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const handleDeepLink = async (url: string): Promise<{ success: boolean; isNewUser?: boolean; user?: User }> => {
+  const handleDeepLink = async (url: string): Promise<{ success: boolean; isNewUser?: boolean; user?: User; error?: string }> => {
     try {
-      console.log('Parsing auth callback from deep link');
+      console.log('🔗 Parsing auth callback from deep link:', url);
       const tokens = parseAuthCallback(url);
       
       if (!tokens) {
-        console.log('No valid tokens found in deep link');
-        return { success: false };
+        console.log('❌ No valid tokens found in deep link');
+        return { success: false, error: 'Invalid authentication link' };
       }
 
-      console.log('Tokens parsed successfully, saving...');
+      console.log('✅ Tokens parsed successfully, saving to storage...');
       await saveAuthTokens(tokens);
 
+      console.log('📡 Fetching user info from backend...');
       const { user: userData, isNewUser } = await api.getUserInfo();
+      
+      console.log('✅ Authentication successful:', { id: userData.id, isNewUser });
       setUser(userData);
 
       return { success: true, isNewUser, user: userData };
-    } catch (error) {
-      console.error('Error handling deep link:', error);
-      return { success: false };
+    } catch (error: any) {
+      console.error('❌ Error handling deep link:', error);
+      
+      const errorMessage = error.message || 'Unknown error occurred';
+      
+      // Clear invalid tokens
+      await clearAuthTokens();
+      
+      return { 
+        success: false, 
+        error: errorMessage.includes('timed out') 
+          ? 'Connection timed out. Please check your internet and try again.'
+          : errorMessage
+      };
     }
   };
 
