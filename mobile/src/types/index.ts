@@ -78,7 +78,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   CategorySelection: undefined;
   VisionFlow: { category: string };
-  MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }> };
+  MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
   MeditationGenerating: { meditationId: string; category: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;

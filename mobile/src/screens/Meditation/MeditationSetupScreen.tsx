@@ -14,12 +14,45 @@ const DURATION_OPTIONS = [5, 10, 15, 20, 30, 45, 60];
 export default function MeditationSetupScreen() {
   const navigation = useNavigation<MeditationSetupNavigationProp>();
   const route = useRoute<MeditationSetupRouteProp>();
-  const { category, responses } = route.params;
+  const { category, responses, visionId } = route.params;
 
   const [duration, setDuration] = useState(10);
   const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS.basic[0].id);
   const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_OPTIONS[0].id);
   const [isLoading, setIsLoading] = useState(false);
+  const [visionStatus, setVisionStatus] = useState<'processing' | 'completed' | 'failed' | null>(visionId ? 'processing' : null);
+  const [visionData, setVisionData] = useState<{ statement: string; tagline: string } | null>(null);
+
+  // Poll for vision status if visionId is present
+  React.useEffect(() => {
+    if (!visionId || visionStatus === 'completed' || visionStatus === 'failed') {
+      return;
+    }
+
+    const checkVisionStatus = async () => {
+      try {
+        const status = await api.getVisionStatus(visionId);
+        
+        if (status.status === 'completed' && status.statement && status.tagline) {
+          setVisionStatus('completed');
+          setVisionData({ statement: status.statement, tagline: status.tagline });
+        } else if (status.status === 'failed') {
+          setVisionStatus('failed');
+          Alert.alert('Vision Processing Failed', 'There was an error creating your vision statement. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error checking vision status:', error);
+      }
+    };
+
+    // Check immediately
+    checkVisionStatus();
+
+    // Then poll every 2 seconds
+    const interval = setInterval(checkVisionStatus, 2000);
+
+    return () => clearInterval(interval);
+  }, [visionId, visionStatus]);
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -59,6 +92,20 @@ export default function MeditationSetupScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Create Meditation</Text>
         <Text style={styles.subtitle}>Customize your {category} meditation</Text>
+
+        {visionStatus === 'processing' && (
+          <View style={styles.visionProcessing}>
+            <ActivityIndicator size="small" color="#6366F1" />
+            <Text style={styles.visionProcessingText}>✨ Crafting your vision statement...</Text>
+          </View>
+        )}
+
+        {visionStatus === 'completed' && visionData && (
+          <View style={styles.visionCompleted}>
+            <Text style={styles.visionTagline}>{visionData.tagline}</Text>
+            <Text style={styles.visionStatement}>{visionData.statement}</Text>
+          </View>
+        )}
 
         <Text style={styles.label}>Duration</Text>
         <View style={styles.optionsGrid}>
@@ -229,5 +276,40 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+  },
+  visionProcessing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+    gap: 12,
+  },
+  visionProcessingText: {
+    fontSize: 16,
+    color: '#6366F1',
+    fontWeight: '500',
+  },
+  visionCompleted: {
+    backgroundColor: '#F0FDF4',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+  },
+  visionTagline: {
+    fontSize: 14,
+    color: '#059669',
+    fontWeight: '600',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  visionStatement: {
+    fontSize: 16,
+    color: '#047857',
+    lineHeight: 24,
   },
 });

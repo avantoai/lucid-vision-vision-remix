@@ -63,13 +63,16 @@ export default function VisionFlowScreen() {
 
     setIsLoading(true);
     try {
-      await api.submitVisionFlow(route.params.category, finalResponses);
+      const result = await api.submitVisionFlow(route.params.category, finalResponses);
+      
+      // Navigate immediately - vision processing happens in background
       navigation.navigate('MeditationSetup', { 
         category: route.params.category, 
-        responses: finalResponses 
+        responses: finalResponses,
+        visionId: result.visionId
       });
     } catch (error) {
-      Alert.alert('Error', 'Failed to create vision statement');
+      Alert.alert('Error', 'Failed to start vision processing');
     } finally {
       setIsLoading(false);
     }

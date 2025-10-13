@@ -143,12 +143,33 @@ class ApiService {
   async submitVisionFlow(
     category: string,
     responses: Array<{ question: string; answer: string }>
-  ): Promise<{ statement: string; tagline: string }> {
+  ): Promise<{ visionId: string; status: string; category: string }> {
     const data = await this.request<any>('/vision/prompt-flow', {
       method: 'POST',
       body: JSON.stringify({ category, responses }),
     });
-    return { statement: data.statement, tagline: data.tagline };
+    return { 
+      visionId: data.visionId, 
+      status: data.status,
+      category: data.category 
+    };
+  }
+
+  async getVisionStatus(visionId: string): Promise<{
+    visionId: string;
+    status: string;
+    statement: string | null;
+    tagline: string | null;
+    category: string;
+  }> {
+    const data = await this.request<any>(`/vision/status/${visionId}`);
+    return {
+      visionId: data.visionId,
+      status: data.status,
+      statement: data.statement,
+      tagline: data.tagline,
+      category: data.category
+    };
   }
 
   async createGift(params: {
