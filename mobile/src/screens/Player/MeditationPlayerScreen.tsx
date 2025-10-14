@@ -92,7 +92,8 @@ export default function MeditationPlayerScreen() {
 
   const handlePlayPause = async () => {
     if (!soundRef.current || !audioReady) {
-      return; // Button is disabled, so this shouldn't be called
+      Alert.alert('Please Wait', 'Audio is still loading...');
+      return;
     }
     
     try {
@@ -129,10 +130,6 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  if (!meditation) {
-    return null;
-  }
-
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
@@ -140,30 +137,40 @@ export default function MeditationPlayerScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.title}>{meditation.title}</Text>
-        <Text style={styles.category}>{meditation.category}</Text>
-        <Text style={styles.duration}>{meditation.duration} minutes</Text>
+        {meditation ? (
+          <>
+            <Text style={styles.title}>{meditation.title}</Text>
+            <Text style={styles.category}>{meditation.category}</Text>
+            <Text style={styles.duration}>{meditation.duration} minutes</Text>
+          </>
+        ) : (
+          <Text style={styles.title}>Loading...</Text>
+        )}
 
-        <TouchableOpacity 
-          style={[
-            styles.playButton, 
-            !audioReady && styles.playButtonDisabled
-          ]} 
-          onPress={handlePlayPause}
-          disabled={!audioReady}
-          activeOpacity={audioReady ? 0.7 : 1}
-        >
-          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
-        </TouchableOpacity>
-
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
-            <Text style={styles.actionText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handlePin}>
-            <Text style={styles.actionText}>{meditation.is_pinned ? '📌' : '📍'}</Text>
+        <View pointerEvents={audioReady ? 'auto' : 'none'}>
+          <TouchableOpacity 
+            style={[
+              styles.playButton, 
+              !audioReady && styles.playButtonDisabled
+            ]} 
+            onPress={audioReady ? handlePlayPause : undefined}
+            disabled={!audioReady}
+            activeOpacity={audioReady ? 0.7 : 1}
+          >
+            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
           </TouchableOpacity>
         </View>
+
+        {meditation && (
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
+              <Text style={styles.actionText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={handlePin}>
+              <Text style={styles.actionText}>{meditation.is_pinned ? '📌' : '📍'}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
