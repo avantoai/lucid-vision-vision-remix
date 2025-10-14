@@ -14,7 +14,6 @@ export default function MeditationPlayerScreen() {
   const route = useRoute<MeditationPlayerRouteProp>();
   const [meditation, setMeditation] = useState<Meditation | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -88,8 +87,6 @@ export default function MeditationPlayerScreen() {
       } else {
         Alert.alert('Error', errorMessage);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -132,12 +129,8 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  if (isLoading || !meditation) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
-      </View>
-    );
+  if (!meditation) {
+    return null;
   }
 
   return (
@@ -158,17 +151,10 @@ export default function MeditationPlayerScreen() {
           ]} 
           onPress={handlePlayPause}
           disabled={!audioReady}
+          activeOpacity={audioReady ? 0.7 : 1}
         >
-          {!audioReady ? (
-            <ActivityIndicator size="large" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
-          )}
+          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
         </TouchableOpacity>
-
-        {!audioReady && (
-          <Text style={styles.loadingText}>Loading audio...</Text>
-        )}
 
         <View style={styles.actions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
