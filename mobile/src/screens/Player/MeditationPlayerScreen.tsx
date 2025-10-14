@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -174,12 +174,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-  },
   closeButton: {
     position: 'absolute',
     top: 50,
@@ -236,12 +230,6 @@ const styles = StyleSheet.create({
   playButtonText: {
     fontSize: 40,
     color: '#FFFFFF',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: -32,
-    marginBottom: 32,
   },
   actions: {
     flexDirection: 'row',
