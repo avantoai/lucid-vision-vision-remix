@@ -79,7 +79,7 @@ export type RootStackParamList = {
   CategorySelection: undefined;
   VisionFlow: { category: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
-  MeditationPlayer: { meditationId: string };
+  MeditationPlayer: { meditation: Meditation };
   CreateGift: undefined;
   GiftPlayer: { giftId: string };
   SelectVoice: { onSelect: (voiceId: string) => void };

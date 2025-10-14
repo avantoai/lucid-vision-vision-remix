@@ -12,14 +12,14 @@ type MeditationPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'M
 export default function MeditationPlayerScreen() {
   const navigation = useNavigation<MeditationPlayerNavigationProp>();
   const route = useRoute<MeditationPlayerRouteProp>();
-  const [meditation, setMeditation] = useState<Meditation | null>(null);
+  const [meditation, setMeditation] = useState<Meditation>(route.params.meditation);
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
-    loadMeditation();
+    loadAudioUrl();
     
     return () => {
       if (soundRef.current) {
@@ -56,32 +56,21 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  const loadMeditation = async () => {
+  const loadAudioUrl = async () => {
     try {
-      console.log('🎵 Loading meditation:', route.params.meditationId);
-      const meditations = await api.getMeditations();
-      console.log('📚 Fetched meditations count:', meditations.length);
-      const med = meditations.find(m => m.id === route.params.meditationId);
-      
-      if (med) {
-        console.log('✅ Found meditation:', med.title);
-        setMeditation(med);
-        const url = await api.getMeditationAudioUrl(med.id);
-        console.log('🔊 Audio URL received:', url ? 'yes' : 'no');
-        setAudioUrl(url);
-      } else {
-        console.log('❌ Meditation not found in list');
-        Alert.alert('Error', 'Meditation not found');
-      }
+      console.log('🔊 Loading audio URL for:', meditation.title);
+      const url = await api.getMeditationAudioUrl(meditation.id);
+      console.log('✅ Audio URL received:', url ? 'yes' : 'no');
+      setAudioUrl(url);
     } catch (error: any) {
-      console.error('❌ Player error:', error);
-      const errorMessage = error?.message || 'Failed to load meditation';
+      console.error('❌ Audio URL error:', error);
+      const errorMessage = error?.message || 'Failed to load audio';
       const isAudioMissing = errorMessage.includes('Audio file not found') || errorMessage.includes('404');
       
       if (isAudioMissing) {
         Alert.alert(
           'Audio File Missing',
-          'This meditation was created during testing and the audio file is missing. Please create a new meditation to listen.',
+          'This meditation audio file is missing. Please try creating a new meditation.',
           [{ text: 'OK', onPress: () => navigation.goBack() }]
         );
       } else {
@@ -111,7 +100,6 @@ export default function MeditationPlayerScreen() {
   };
 
   const handleFavorite = async () => {
-    if (!meditation) return;
     try {
       await api.toggleFavorite(meditation.id);
       setMeditation({ ...meditation, is_favorite: !meditation.is_favorite });
@@ -121,7 +109,6 @@ export default function MeditationPlayerScreen() {
   };
 
   const handlePin = async () => {
-    if (!meditation) return;
     try {
       await api.pinMeditation(meditation.id);
       setMeditation({ ...meditation, is_pinned: !meditation.is_pinned });
@@ -137,15 +124,9 @@ export default function MeditationPlayerScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        {meditation ? (
-          <>
-            <Text style={styles.title}>{meditation.title}</Text>
-            <Text style={styles.category}>{meditation.category}</Text>
-            <Text style={styles.duration}>{meditation.duration} minutes</Text>
-          </>
-        ) : (
-          <Text style={styles.title}>Loading...</Text>
-        )}
+        <Text style={styles.title}>{meditation.title}</Text>
+        <Text style={styles.category}>{meditation.category}</Text>
+        <Text style={styles.duration}>{meditation.duration} minutes</Text>
 
         <View pointerEvents={audioReady ? 'auto' : 'none'}>
           <TouchableOpacity 
@@ -161,16 +142,14 @@ export default function MeditationPlayerScreen() {
           </TouchableOpacity>
         </View>
 
-        {meditation && (
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
-              <Text style={styles.actionText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={handlePin}>
-              <Text style={styles.actionText}>{meditation.is_pinned ? '📌' : '📍'}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
+            <Text style={styles.actionText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={handlePin}>
+            <Text style={styles.actionText}>{meditation.is_pinned ? '📌' : '📍'}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

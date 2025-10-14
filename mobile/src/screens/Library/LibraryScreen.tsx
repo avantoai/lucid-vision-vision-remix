@@ -77,7 +77,7 @@ export default function LibraryScreen() {
                   { text: 'Later', style: 'cancel' },
                   { 
                     text: 'Play Now', 
-                    onPress: () => navigation.navigate('MeditationPlayer', { meditationId: meditation.id })
+                    onPress: () => navigation.navigate('MeditationPlayer', { meditation })
                   }
                 ]
               );
@@ -130,7 +130,7 @@ export default function LibraryScreen() {
         } else if (item.status === 'failed') {
           Alert.alert('Generation Failed', 'This meditation failed to generate. Please create a new one.');
         } else {
-          navigation.navigate('MeditationPlayer', { meditationId: item.id });
+          navigation.navigate('MeditationPlayer', { meditation: item });
         }
       }}
       disabled={item.status !== 'completed'}
