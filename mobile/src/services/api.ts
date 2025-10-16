@@ -88,7 +88,7 @@ class ApiService {
   }
 
   async getUserInfo(): Promise<{ user: User; isNewUser: boolean }> {
-    const data = await this.request<{ user: User; isNewUser: boolean }>('/auth/me');
+    const data = await this.request<{ user: User; isNewUser: boolean }>('/auth/me', {}, 30000);
     await AsyncStorage.setItem('user_id', data.user.id);
     return data;
   }
