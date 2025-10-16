@@ -29,19 +29,37 @@ export default function MeditationSetupScreen() {
       return;
     }
 
+    let errorCount = 0;
+    const MAX_ERRORS = 10;
+
     const checkVisionStatus = async () => {
       try {
         const status = await api.getVisionStatus(visionId);
+        errorCount = 0; // Reset error count on success
         
-        if (status.status === 'completed' && status.statement && status.tagline) {
+        if (status.status === 'completed') {
           setVisionStatus('completed');
-          setVisionData({ statement: status.statement, tagline: status.tagline });
+          if (status.statement && status.tagline) {
+            setVisionData({ statement: status.statement, tagline: status.tagline });
+          }
         } else if (status.status === 'failed') {
           setVisionStatus('failed');
           Alert.alert('Vision Processing Failed', 'There was an error creating your vision statement. Please try again.');
         }
       } catch (error) {
         console.error('Error checking vision status:', error);
+        errorCount++;
+        
+        // Stop polling after too many consecutive errors
+        if (errorCount >= MAX_ERRORS) {
+          console.log('Stopping vision status polling after too many errors');
+          setVisionStatus('failed');
+          Alert.alert(
+            'Connection Issue',
+            'Unable to verify vision processing status. You can still proceed to create your meditation - your vision may still be processing in the background.',
+            [{ text: 'OK' }]
+          );
+        }
       }
     };
 
