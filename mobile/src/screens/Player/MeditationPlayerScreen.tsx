@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Modal, TextInput, ScrollView } from 'react-native';
 import { Audio } from 'expo-av';
 // @ts-ignore - Slider types are incompatible with newer React Native versions
 import Slider from '@react-native-community/slider';
@@ -21,6 +21,11 @@ export default function MeditationPlayerScreen() {
   const [audioReady, setAudioReady] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showEditTitle, setShowEditTitle] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
@@ -172,6 +177,34 @@ export default function MeditationPlayerScreen() {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleEditTitle = () => {
+    if (!meditation) return;
+    setEditedTitle(meditation.title);
+    setShowOptionsMenu(false);
+    setShowEditTitle(true);
+  };
+
+  const handleSaveTitle = async () => {
+    if (!meditation || !editedTitle.trim() || isSavingTitle) return;
+    
+    setIsSavingTitle(true);
+    try {
+      await api.updateMeditationTitle(meditation.id, editedTitle.trim());
+      setMeditation({ ...meditation, title: editedTitle.trim() });
+      setShowEditTitle(false);
+      Alert.alert('Success', 'Title updated successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update title');
+    } finally {
+      setIsSavingTitle(false);
+    }
+  };
+
+  const handleViewTranscript = () => {
+    setShowOptionsMenu(false);
+    setShowTranscript(true);
+  };
+
   if (isLoading || !meditation) {
     return (
       <View style={styles.loadingContainer}>
@@ -184,6 +217,10 @@ export default function MeditationPlayerScreen() {
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.optionsButton} onPress={() => setShowOptionsMenu(true)}>
+        <Text style={styles.optionsText}>•••</Text>
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -244,6 +281,89 @@ export default function MeditationPlayerScreen() {
           <Text style={styles.loadingText}>Loading audio...</Text>
         )}
       </View>
+
+      {/* Options Menu Modal */}
+      <Modal
+        visible={showOptionsMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowOptionsMenu(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setShowOptionsMenu(false)}
+        >
+          <View style={styles.optionsMenu}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleEditTitle}>
+              <Text style={styles.menuItemText}>Edit Title</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
+            <TouchableOpacity style={styles.menuItem} onPress={handleViewTranscript}>
+              <Text style={styles.menuItemText}>View Transcript</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Edit Title Modal */}
+      <Modal
+        visible={showEditTitle}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowEditTitle(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.editTitleModal}>
+            <Text style={styles.modalTitle}>Edit Title</Text>
+            <TextInput
+              style={styles.titleInput}
+              value={editedTitle}
+              onChangeText={setEditedTitle}
+              placeholder="Enter meditation title"
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]} 
+                onPress={() => setShowEditTitle(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.saveButton, isSavingTitle && styles.saveButtonDisabled]} 
+                onPress={handleSaveTitle}
+                disabled={isSavingTitle}
+              >
+                {isSavingTitle ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* View Transcript Modal */}
+      <Modal
+        visible={showTranscript}
+        animationType="slide"
+        onRequestClose={() => setShowTranscript(false)}
+      >
+        <View style={styles.transcriptModal}>
+          <View style={styles.transcriptHeader}>
+            <Text style={styles.transcriptTitle}>Transcript</Text>
+            <TouchableOpacity onPress={() => setShowTranscript(false)}>
+              <Text style={styles.closeTranscript}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView style={styles.transcriptScroll}>
+            <Text style={styles.transcriptText}>{meditation.script}</Text>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -271,6 +391,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#6366F1',
     fontWeight: '600',
+  },
+  optionsButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  optionsText: {
+    fontSize: 24,
+    color: '#6366F1',
+    fontWeight: '600',
+    letterSpacing: 2,
   },
   content: {
     flex: 1,
@@ -349,5 +483,117 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: -32,
     marginBottom: 32,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionsMenu: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    width: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  menuItem: {
+    padding: 16,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: '#111827',
+    textAlign: 'center',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  editTitleModal: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  titleInput: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#F3F4F6',
+  },
+  cancelButtonText: {
+    color: '#6B7280',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  saveButton: {
+    backgroundColor: '#6366F1',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  transcriptModal: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 50,
+  },
+  transcriptHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  transcriptTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  closeTranscript: {
+    fontSize: 28,
+    color: '#6B7280',
+    paddingHorizontal: 8,
+  },
+  transcriptScroll: {
+    flex: 1,
+  },
+  transcriptText: {
+    fontSize: 16,
+    lineHeight: 26,
+    color: '#374151',
+    padding: 20,
   },
 });
