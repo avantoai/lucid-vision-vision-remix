@@ -181,14 +181,31 @@ export default function MeditationPlayerScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
       <View style={styles.content}>
         <Text style={styles.title}>{meditation.title}</Text>
         <Text style={styles.category}>{meditation.category}</Text>
-        <Text style={styles.duration}>{meditation.duration} minutes</Text>
+
+        {audioReady && (
+          <View style={styles.seekContainer}>
+            <Text style={styles.timeText}>{formatTime(position)}</Text>
+            {/* @ts-ignore - Slider component works correctly despite type mismatch */}
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={duration}
+              value={position}
+              onSlidingComplete={handleSeek}
+              minimumTrackTintColor="#6366F1"
+              maximumTrackTintColor="#D1D5DB"
+              thumbTintColor="#6366F1"
+            />
+            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+          </View>
+        )}
 
         <TouchableOpacity 
           style={[
@@ -207,24 +224,6 @@ export default function MeditationPlayerScreen() {
 
         {!audioReady && (
           <Text style={styles.loadingText}>Loading audio...</Text>
-        )}
-
-        {audioReady && (
-          <View style={styles.seekContainer}>
-            <Text style={styles.timeText}>{formatTime(position)}</Text>
-            {/* @ts-ignore - Slider component works correctly despite type mismatch */}
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={duration}
-              value={position}
-              onSlidingComplete={handleSeek}
-              minimumTrackTintColor="#6366F1"
-              maximumTrackTintColor="#D1D5DB"
-              thumbTintColor="#6366F1"
-            />
-            <Text style={styles.timeText}>{formatTime(duration)}</Text>
-          </View>
         )}
 
         <View style={styles.actions}>
@@ -251,21 +250,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
   },
-  closeButton: {
+  backButton: {
     position: 'absolute',
     top: 50,
-    right: 20,
+    left: 20,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  closeText: {
-    fontSize: 24,
-    color: '#6B7280',
+  backText: {
+    fontSize: 18,
+    color: '#6366F1',
+    fontWeight: '600',
   },
   content: {
     flex: 1,
@@ -284,11 +280,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#6366F1',
     textTransform: 'capitalize',
-    marginBottom: 8,
-  },
-  duration: {
-    fontSize: 16,
-    color: '#6B7280',
     marginBottom: 40,
   },
   playButton: {
