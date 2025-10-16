@@ -278,14 +278,19 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
         .order('created_at', { ascending: true });
       
       // Combine existing responses with relevant new ones
-      const relevantResponses = responses.filter(async r => {
+      const relevantResponses = [];
+      for (const r of responses) {
         const cats = await aiService.detectRelevantCategories(r.answer);
-        return cats.includes(relatedCategory);
-      });
+        if (cats.includes(relatedCategory)) {
+          relevantResponses.push(r);
+        }
+      }
       
       const allResponses = [...(existingResponses || []), ...relevantResponses];
       
       if (allResponses.length === 0) continue;
+      
+      console.log(`📝 Generating summary for ${relatedCategory} with ${allResponses.length} total responses (${relevantResponses.length} new)`);
       
       // Generate new summary for this category
       const summary = await aiService.generateVisionSummary(relatedCategory, allResponses);
@@ -303,13 +308,17 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
         // Update existing vision summary
         await supabaseAdmin
           .from('vision_statements')
-          .update({ summary })
+          .update({ 
+            summary,
+            status: 'completed'
+          })
           .eq('id', existingVision.id);
         
-        console.log(`✨ Updated cross-category summary for: ${relatedCategory}`);
+        console.log(`✨ Updated cross-category summary for: ${relatedCategory} (vision_id: ${existingVision.id})`);
+        console.log(`   Summary preview: ${summary.substring(0, 100)}...`);
       } else {
         // Create new vision statement with summary
-        await supabaseAdmin
+        const { data: newVision, error: insertError } = await supabaseAdmin
           .from('vision_statements')
           .insert({
             user_id: vision.user_id,
@@ -320,9 +329,16 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
             status: 'completed',
             is_active: true,
             created_at: new Date().toISOString()
-          });
+          })
+          .select()
+          .single();
         
-        console.log(`✨ Created new cross-category summary for: ${relatedCategory}`);
+        if (insertError) {
+          console.error(`❌ Failed to create cross-category vision for ${relatedCategory}:`, insertError);
+        } else {
+          console.log(`✨ Created new cross-category summary for: ${relatedCategory} (vision_id: ${newVision.id})`);
+          console.log(`   Summary preview: ${summary.substring(0, 100)}...`);
+        }
       }
     }
   } catch (error) {
