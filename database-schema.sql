@@ -40,6 +40,7 @@ CREATE TABLE vision_statements (
   category TEXT NOT NULL,
   statement TEXT,
   tagline TEXT,
+  summary TEXT,
   status TEXT DEFAULT 'completed' CHECK (status IN ('processing', 'completed', 'failed')),
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -147,4 +148,11 @@ CREATE INDEX idx_meditations_user_id ON meditations(user_id);
 CREATE INDEX idx_meditations_category ON meditations(category);
 CREATE INDEX idx_meditations_created_at ON meditations(created_at DESC);
 CREATE INDEX idx_vision_statements_user_category ON vision_statements(user_id, category);
+CREATE INDEX idx_vision_statements_is_active ON vision_statements(is_active);
+CREATE INDEX idx_vision_responses_category ON vision_responses(category);
 CREATE INDEX idx_quota_tracking_user_week ON quota_tracking(user_id, week_start);
+
+-- Unique constraint: only one active vision per user+category
+CREATE UNIQUE INDEX idx_vision_statements_user_category_active 
+ON vision_statements(user_id, category) 
+WHERE is_active = TRUE;
