@@ -9,6 +9,8 @@ import OnboardingScreen from '../screens/Auth/OnboardingScreen';
 import MainTabNavigator from './MainTabNavigator';
 import CategorySelectionScreen from '../screens/Category/CategorySelectionScreen';
 import VisionFlowScreen from '../screens/Vision/VisionFlowScreen';
+import VisionRecordScreen from '../screens/Vision/VisionRecordScreen';
+import VisionEditScreen from '../screens/Vision/VisionEditScreen';
 import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
 import MeditationPlayerScreen from '../screens/Player/MeditationPlayerScreen';
 import CreateGiftScreen from '../screens/Gift/CreateGiftScreen';
@@ -43,6 +45,14 @@ export default function RootNavigator() {
             <Stack.Screen 
               name="VisionFlow" 
               component={VisionFlowScreen}
+            />
+            <Stack.Screen 
+              name="VisionRecord" 
+              component={VisionRecordScreen}
+            />
+            <Stack.Screen 
+              name="VisionEdit" 
+              component={VisionEditScreen}
             />
             <Stack.Screen 
               name="MeditationSetup" 
