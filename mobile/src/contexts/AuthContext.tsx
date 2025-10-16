@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Alert } from 'react-native';
@@ -22,10 +22,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isProcessingDeepLink = useRef(false);
 
   useEffect(() => {
-    checkAuth();
-    checkInitialURL();
+    const initAuth = async () => {
+      const initialUrl = await Linking.getInitialURL();
+      
+      // Check if we have an auth callback URL
+      if (initialUrl) {
+        const tokens = parseAuthCallback(initialUrl);
+        if (tokens) {
+          // We have a fresh login via deep link, skip checkAuth
+          isProcessingDeepLink.current = true;
+          await checkInitialURL();
+          isProcessingDeepLink.current = false;
+          return;
+        }
+      }
+      
+      // No auth callback, do normal auth check
+      await checkAuth();
+    };
+
+    initAuth();
     const subscription = setupDeepLinkListener();
     
     return () => {
