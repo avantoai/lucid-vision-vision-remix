@@ -38,23 +38,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const initialUrl = await Linking.getInitialURL();
       if (initialUrl) {
         console.log('📱 Initial URL on app launch:', initialUrl);
-        const result = await handleDeepLink(initialUrl);
         
-        if (!result.success && result.error) {
-          Alert.alert(
-            'Sign In Error',
-            result.error,
-            [{ text: 'OK' }]
-          );
+        // Try to parse tokens first to determine if this is an auth callback
+        const tokens = parseAuthCallback(initialUrl);
+        
+        if (tokens) {
+          // This is an auth callback URL, process it
+          console.log('🔐 Initial URL contains auth tokens, processing...');
+          const result = await handleDeepLink(initialUrl);
+          
+          if (!result.success && result.error) {
+            Alert.alert(
+              'Sign In Error',
+              result.error,
+              [{ text: 'OK' }]
+            );
+          }
+        } else {
+          // Normal app launch (Expo Go, etc.), not an auth callback
+          console.log('ℹ️ Initial URL is not an auth callback, ignoring');
         }
       }
     } catch (error) {
       console.error('❌ Error checking initial URL:', error);
-      Alert.alert(
-        'Sign In Error',
-        'An unexpected error occurred. Please try again.',
-        [{ text: 'OK' }]
-      );
     }
   };
 

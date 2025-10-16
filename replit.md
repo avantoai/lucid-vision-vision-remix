@@ -17,7 +17,8 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 - **Branding:** Tab bar icons include house (Library), flower (Vision), and person (Profile).
 
 **2. Technical Implementations:**
-- **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage.
+- **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage. Initial URL checking validates auth tokens before processing to prevent false "Invalid authentication link" errors on Expo Go launch.
+- **Dev Mode:** Optional `EXPO_PUBLIC_DEV_MODE` flag in `.env` enables session persistence across app reloads/restarts. After logging in once, session is backed up and auto-restored, eliminating repetitive logins during testing.
 - **Meditation Generation:** A multi-step async process involving:
     - User vision responses collected through AI-guided prompt flow
     - AI (OpenAI GPT-4o-mini) using **THAR protocol** (Technological Herald of Awakening and Remembrance) for personalized script generation
