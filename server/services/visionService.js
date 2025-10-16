@@ -202,12 +202,21 @@ async function processVisionInBackground(visionId, category, responses, previous
     console.log(`🧠 Starting background vision processing for ${visionId}`);
     
     // Generate core vision content
+    console.log(`   Generating statement for ${category}...`);
     const statement = await aiService.synthesizeVisionStatement(category, responses);
+    console.log(`   ✓ Statement generated (${statement.length} chars)`);
+    
+    console.log(`   Generating tagline...`);
     const tagline = await aiService.generateTagline(statement);
+    console.log(`   ✓ Tagline: "${tagline}"`);
+    
+    console.log(`   Generating summary...`);
     const summary = await aiService.generateVisionSummary(category, responses);
+    console.log(`   ✓ Summary generated (${summary.length} chars)`);
 
     // Update the primary category vision
-    await supabaseAdmin
+    console.log(`   Saving to database...`);
+    const { data: updatedVision, error: updateError } = await supabaseAdmin
       .from('vision_statements')
       .update({
         statement,
@@ -215,9 +224,15 @@ async function processVisionInBackground(visionId, category, responses, previous
         summary,
         status: 'completed'
       })
-      .eq('id', visionId);
+      .eq('id', visionId)
+      .select();
+
+    if (updateError) {
+      throw new Error(`Failed to update vision in database: ${updateError.message}`);
+    }
 
     console.log(`✅ Vision processing completed for ${visionId}`);
+    console.log(`   Summary preview: ${summary.substring(0, 150)}...`);
     
     // Detect and update cross-category relevance
     await detectAndUpdateCrossCategories(visionId, category, responses);
