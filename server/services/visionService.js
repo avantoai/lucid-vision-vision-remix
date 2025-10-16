@@ -131,12 +131,23 @@ async function processPromptFlow(userId, category, responses) {
     .eq('is_active', true)
     .single();
   
-  // Deactivate previous vision statements for this category
-  await supabase
+  console.log(`📝 Processing prompt flow for user ${userId}, category: ${category}`);
+  console.log(`   Previous active vision: ${previousVision ? previousVision.id : 'none'}`);
+  
+  // Deactivate previous vision statements for this category using admin client
+  const { error: deactivateError } = await supabaseAdmin
     .from('vision_statements')
     .update({ is_active: false })
     .eq('user_id', userId)
-    .eq('category', category);
+    .eq('category', category)
+    .eq('is_active', true);
+
+  if (deactivateError) {
+    console.error('Failed to deactivate previous visions:', deactivateError);
+    throw new Error('Failed to deactivate previous visions: ' + deactivateError.message);
+  }
+  
+  console.log(`   Deactivated previous visions for ${category}`);
 
   // Create a new vision statement with 'processing' status
   const { data: visionData, error: insertError } = await supabaseAdmin
@@ -154,8 +165,11 @@ async function processPromptFlow(userId, category, responses) {
     .single();
 
   if (insertError) {
+    console.error('Failed to insert new vision:', insertError);
     throw new Error('Failed to create vision statement: ' + insertError.message);
   }
+  
+  console.log(`   Created new vision: ${visionData.id}`);
 
   // Save responses
   for (const response of allResponses) {
