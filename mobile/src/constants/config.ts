@@ -1,7 +1,5 @@
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-export const DEV_MODE = process.env.EXPO_PUBLIC_DEV_MODE === 'true';
-
 export const VOICE_OPTIONS = {
   basic: [
     { id: 'HzVnxqtdk9eqrcwfxD57', name: 'Jen', previewId: 'jen', tier: 'basic' },

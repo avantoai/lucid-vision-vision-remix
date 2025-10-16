@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -12,14 +12,15 @@ type MeditationPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'M
 export default function MeditationPlayerScreen() {
   const navigation = useNavigation<MeditationPlayerNavigationProp>();
   const route = useRoute<MeditationPlayerRouteProp>();
-  const [meditation, setMeditation] = useState<Meditation>(route.params.meditation);
+  const [meditation, setMeditation] = useState<Meditation | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
-    loadAudioUrl();
+    loadMeditation();
     
     return () => {
       if (soundRef.current) {
@@ -56,31 +57,45 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  const loadAudioUrl = async () => {
+  const loadMeditation = async () => {
     try {
-      console.log('🔊 Loading audio URL for:', meditation.title);
-      const url = await api.getMeditationAudioUrl(meditation.id);
-      console.log('✅ Audio URL received:', url ? 'yes' : 'no');
-      setAudioUrl(url);
+      console.log('🎵 Loading meditation:', route.params.meditationId);
+      const meditations = await api.getMeditations();
+      console.log('📚 Fetched meditations count:', meditations.length);
+      const med = meditations.find(m => m.id === route.params.meditationId);
+      
+      if (med) {
+        console.log('✅ Found meditation:', med.title);
+        setMeditation(med);
+        const url = await api.getMeditationAudioUrl(med.id);
+        console.log('🔊 Audio URL received:', url ? 'yes' : 'no');
+        setAudioUrl(url);
+      } else {
+        console.log('❌ Meditation not found in list');
+        Alert.alert('Error', 'Meditation not found');
+      }
     } catch (error: any) {
-      console.error('❌ Audio URL error:', error);
-      const errorMessage = error?.message || 'Failed to load audio';
+      console.error('❌ Player error:', error);
+      const errorMessage = error?.message || 'Failed to load meditation';
       const isAudioMissing = errorMessage.includes('Audio file not found') || errorMessage.includes('404');
       
       if (isAudioMissing) {
         Alert.alert(
           'Audio File Missing',
-          'This meditation audio file is missing. Please try creating a new meditation.',
+          'This meditation was created during testing and the audio file is missing. Please create a new meditation to listen.',
           [{ text: 'OK', onPress: () => navigation.goBack() }]
         );
       } else {
         Alert.alert('Error', errorMessage);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handlePlayPause = async () => {
-    if (!audioReady || !soundRef.current) {
+    if (!soundRef.current || !audioReady) {
+      Alert.alert('Error', 'Audio not loaded yet');
       return;
     }
     
@@ -99,6 +114,7 @@ export default function MeditationPlayerScreen() {
   };
 
   const handleFavorite = async () => {
+    if (!meditation) return;
     try {
       await api.toggleFavorite(meditation.id);
       setMeditation({ ...meditation, is_favorite: !meditation.is_favorite });
@@ -108,6 +124,7 @@ export default function MeditationPlayerScreen() {
   };
 
   const handlePin = async () => {
+    if (!meditation) return;
     try {
       await api.pinMeditation(meditation.id);
       setMeditation({ ...meditation, is_pinned: !meditation.is_pinned });
@@ -115,6 +132,14 @@ export default function MeditationPlayerScreen() {
       Alert.alert('Error', 'Failed to pin meditation');
     }
   };
+
+  if (isLoading || !meditation) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6366F1" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -127,21 +152,8 @@ export default function MeditationPlayerScreen() {
         <Text style={styles.category}>{meditation.category}</Text>
         <Text style={styles.duration}>{meditation.duration} minutes</Text>
 
-        <TouchableOpacity 
-          style={[
-            styles.playButton, 
-            !audioReady && styles.playButtonDisabled
-          ]} 
-          onPress={handlePlayPause}
-          disabled={!audioReady}
-          activeOpacity={audioReady ? 0.7 : 1}
-        >
-          <Text style={[
-            styles.playButtonText,
-            !audioReady && styles.playButtonTextDisabled
-          ]}>
-            {isPlaying ? '⏸' : '▶'}
-          </Text>
+        <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
+          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
         </TouchableOpacity>
 
         <View style={styles.actions}>
@@ -160,6 +172,12 @@ export default function MeditationPlayerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#F9FAFB',
   },
   closeButton: {
@@ -211,16 +229,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  playButtonDisabled: {
-    backgroundColor: '#9CA3AF',
-    opacity: 0.6,
-  },
   playButtonText: {
     fontSize: 40,
     color: '#FFFFFF',
-  },
-  playButtonTextDisabled: {
-    opacity: 0.5,
   },
   actions: {
     flexDirection: 'row',

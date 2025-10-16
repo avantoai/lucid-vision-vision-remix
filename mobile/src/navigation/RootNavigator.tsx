@@ -51,17 +51,6 @@ export default function RootNavigator() {
             <Stack.Screen 
               name="MeditationPlayer" 
               component={MeditationPlayerScreen}
-              options={{ 
-                transitionSpec: {
-                  open: { animation: 'timing', config: { duration: 0 } },
-                  close: { animation: 'timing', config: { duration: 0 } },
-                },
-                cardStyleInterpolator: ({ current }) => ({
-                  cardStyle: {
-                    opacity: current.progress,
-                  },
-                }),
-              }}
             />
             <Stack.Screen 
               name="CreateGift" 
