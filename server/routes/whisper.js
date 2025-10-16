@@ -8,11 +8,13 @@ const upload = multer({
   dest: 'temp/audio/',
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/webm'];
-    if (allowedTypes.includes(file.mimetype)) {
+    console.log(`📎 Received file: ${file.originalname}, MIME type: ${file.mimetype}`);
+    
+    if (file.mimetype && file.mimetype.startsWith('audio/')) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid audio format'));
+      console.error(`❌ Rejected file with MIME type: ${file.mimetype}`);
+      cb(new Error(`Invalid audio format: ${file.mimetype}`));
     }
   }
 });
