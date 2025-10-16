@@ -144,13 +144,14 @@ export default function MeditationPlayerScreen() {
     }
   };
 
-  const handlePin = async () => {
-    if (!meditation) return;
+  const handleRewind = async () => {
+    if (!soundRef.current) return;
+    
     try {
-      await api.pinMeditation(meditation.id);
-      setMeditation({ ...meditation, is_pinned: !meditation.is_pinned });
+      const newPosition = Math.max(0, position - 15000); // Rewind 15 seconds (15000ms)
+      await soundRef.current.setPositionAsync(newPosition);
     } catch (error) {
-      Alert.alert('Error', 'Failed to pin meditation');
+      console.error('Rewind error:', error);
     }
   };
 
@@ -207,33 +208,41 @@ export default function MeditationPlayerScreen() {
           </View>
         )}
 
-        <TouchableOpacity 
-          style={[
-            styles.playButton, 
-            !audioReady && styles.playButtonDisabled
-          ]} 
-          onPress={handlePlayPause}
-          disabled={!audioReady}
-        >
-          {!audioReady ? (
-            <ActivityIndicator size="large" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.controls}>
+          <TouchableOpacity 
+            style={styles.controlButton}
+            onPress={handleRewind}
+            disabled={!audioReady}
+          >
+            <Text style={[styles.controlText, !audioReady && styles.controlTextDisabled]}>↶ 15</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[
+              styles.playButton, 
+              !audioReady && styles.playButtonDisabled
+            ]} 
+            onPress={handlePlayPause}
+            disabled={!audioReady}
+          >
+            {!audioReady ? (
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.controlButton}
+            onPress={handleFavorite}
+          >
+            <Text style={styles.controlText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
+          </TouchableOpacity>
+        </View>
 
         {!audioReady && (
           <Text style={styles.loadingText}>Loading audio...</Text>
         )}
-
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
-            <Text style={styles.actionText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handlePin}>
-            <Text style={styles.actionText}>{meditation.is_pinned ? '📌' : '📍'}</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
@@ -282,29 +291,6 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     marginBottom: 40,
   },
-  playButton: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#6366F1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  playButtonDisabled: {
-    backgroundColor: '#9CA3AF',
-    opacity: 0.6,
-  },
-  playButtonText: {
-    fontSize: 40,
-    color: '#FFFFFF',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: -32,
-    marginBottom: 32,
-  },
   seekContainer: {
     width: '100%',
     flexDirection: 'row',
@@ -322,14 +308,46 @@ const styles = StyleSheet.create({
     minWidth: 45,
     textAlign: 'center',
   },
-  actions: {
+  controls: {
     flexDirection: 'row',
-    gap: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 30,
+    marginBottom: 40,
   },
-  actionButton: {
-    padding: 12,
+  controlButton: {
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  actionText: {
-    fontSize: 32,
+  controlText: {
+    fontSize: 28,
+    color: '#6366F1',
+  },
+  controlTextDisabled: {
+    opacity: 0.3,
+  },
+  playButton: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#6366F1',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+    opacity: 0.6,
+  },
+  playButtonText: {
+    fontSize: 40,
+    color: '#FFFFFF',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: -32,
+    marginBottom: 32,
   },
 });
