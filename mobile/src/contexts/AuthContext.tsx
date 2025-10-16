@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 import { User } from '../types';
 import api from '../services/api';
 import { parseAuthCallback, saveAuthTokens, clearAuthTokens } from '../services/deepLinkHandler';
+import { DEV_MODE } from '../constants/config';
 
 interface AuthContextType {
   user: User | null;
@@ -83,8 +84,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAuth = async () => {
     try {
-      const token = await AsyncStorage.getItem('auth_token');
-      const userId = await AsyncStorage.getItem('user_id');
+      let token = await AsyncStorage.getItem('auth_token');
+      let userId = await AsyncStorage.getItem('user_id');
+      
+      // DEV MODE: Restore session from backup if missing
+      if (DEV_MODE && (!token || !userId)) {
+        console.log('🛠️ DEV MODE: No session found, checking for backup...');
+        const backupToken = await AsyncStorage.getItem('dev_backup_token');
+        const backupUserId = await AsyncStorage.getItem('dev_backup_user_id');
+        
+        if (backupToken && backupUserId) {
+          console.log('🛠️ DEV MODE: Restoring session from backup');
+          await AsyncStorage.setItem('auth_token', backupToken);
+          await AsyncStorage.setItem('user_id', backupUserId);
+          token = backupToken;
+          userId = backupUserId;
+        } else {
+          console.log('🛠️ DEV MODE: No backup found - please log in once');
+          console.log('🛠️ Your session will persist across reloads after login');
+        }
+      }
       
       if (token && userId) {
         console.log('🔍 Checking auth, fetching user info...');
@@ -119,6 +138,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('✅ Authentication successful:', { id: userData.id, isNewUser });
       setUser(userData);
 
+      // DEV MODE: Save backup of session for persistence across reloads
+      if (DEV_MODE) {
+        const authToken = await AsyncStorage.getItem('auth_token');
+        const userId = await AsyncStorage.getItem('user_id');
+        if (authToken && userId) {
+          console.log('🛠️ DEV MODE: Backing up session for persistence');
+          await AsyncStorage.setItem('dev_backup_token', authToken);
+          await AsyncStorage.setItem('dev_backup_user_id', userId);
+        }
+      }
+
       return { success: true, isNewUser, user: userData };
     } catch (error: any) {
       console.error('❌ Error handling deep link:', error);
@@ -144,8 +174,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
+    if (DEV_MODE) {
+      console.log('🛠️ DEV MODE: Logging out (session will auto-restore on reload)');
+    }
+    
     await clearAuthTokens();
     setUser(null);
+    
+    // DEV MODE: Session backup remains, will restore on next checkAuth
   };
 
   const updateUser = async (fullName: string) => {
