@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Audio } from 'expo-av';
+// @ts-ignore - Slider types are incompatible with newer React Native versions
+import Slider from '@react-native-community/slider';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, Meditation } from '../../types';
@@ -17,6 +19,8 @@ export default function MeditationPlayerScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
@@ -45,15 +49,33 @@ export default function MeditationPlayerScreen() {
       
       const { sound } = await Audio.Sound.createAsync(
         { uri: audioUrl },
-        { shouldPlay: false }
+        { shouldPlay: false },
+        onPlaybackStatusUpdate
       );
       
       soundRef.current = sound;
+      
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded && status.durationMillis) {
+        setDuration(status.durationMillis);
+      }
+      
       setAudioReady(true);
       console.log('Audio loaded successfully');
     } catch (error) {
       console.error('Failed to load audio:', error);
       Alert.alert('Error', 'Failed to load audio file');
+    }
+  };
+
+  const onPlaybackStatusUpdate = (status: any) => {
+    if (status.isLoaded) {
+      setPosition(status.positionMillis || 0);
+      setIsPlaying(status.isPlaying);
+      
+      if (status.durationMillis) {
+        setDuration(status.durationMillis);
+      }
     }
   };
 
@@ -132,6 +154,23 @@ export default function MeditationPlayerScreen() {
     }
   };
 
+  const handleSeek = async (value: number) => {
+    if (!soundRef.current) return;
+    
+    try {
+      await soundRef.current.setPositionAsync(value);
+    } catch (error) {
+      console.error('Seek error:', error);
+    }
+  };
+
+  const formatTime = (millis: number): string => {
+    const totalSeconds = Math.floor(millis / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   if (isLoading || !meditation) {
     return (
       <View style={styles.loadingContainer}>
@@ -168,6 +207,24 @@ export default function MeditationPlayerScreen() {
 
         {!audioReady && (
           <Text style={styles.loadingText}>Loading audio...</Text>
+        )}
+
+        {audioReady && (
+          <View style={styles.seekContainer}>
+            <Text style={styles.timeText}>{formatTime(position)}</Text>
+            {/* @ts-ignore - Slider component works correctly despite type mismatch */}
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={duration}
+              value={position}
+              onSlidingComplete={handleSeek}
+              minimumTrackTintColor="#6366F1"
+              maximumTrackTintColor="#D1D5DB"
+              thumbTintColor="#6366F1"
+            />
+            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+          </View>
         )}
 
         <View style={styles.actions}>
@@ -256,6 +313,23 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: -32,
     marginBottom: 32,
+  },
+  seekContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 40,
+  },
+  slider: {
+    flex: 1,
+    height: 40,
+  },
+  timeText: {
+    fontSize: 14,
+    color: '#6B7280',
+    minWidth: 45,
+    textAlign: 'center',
   },
   actions: {
     flexDirection: 'row',
