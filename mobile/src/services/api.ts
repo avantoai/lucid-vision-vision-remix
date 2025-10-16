@@ -150,6 +150,8 @@ class ApiService {
   async getCategoryVision(category: string): Promise<{
     statement: string | null;
     tagline: string | null;
+    summary: string | null;
+    status: string;
     responses: Array<{ question: string; answer: string }>;
   }> {
     const data = await this.request<{ vision: any }>(`/vision/category/${category}`);

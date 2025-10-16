@@ -55,7 +55,7 @@ export default function VisionScreen() {
                 styles.categoryCard,
                 status === 'completed' && styles.categoryCardCompleted,
               ]}
-              onPress={() => navigation.navigate('VisionFlow', { category: category.id })}
+              onPress={() => navigation.navigate('VisionDetail', { category: category.id })}
             >
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>

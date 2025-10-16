@@ -78,6 +78,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   CategorySelection: undefined;
   VisionFlow: { category: string };
+  VisionDetail: { category: string };
   VisionRecord: { category: string; prompt: string; responses: Array<{ question: string; answer: string }> };
   VisionEdit: { category: string; prompt: string; responses: Array<{ question: string; answer: string }>; audioUri: string | null; recordingDuration: number };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
