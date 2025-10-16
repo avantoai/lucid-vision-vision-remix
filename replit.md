@@ -24,7 +24,8 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
   - Matching URL added to Supabase Auth → URL Configuration → Redirect URLs with wildcard (e.g., `exp://192.168.128.119:8081/**`)
   - Update both when local IP address changes (WiFi reconnection)
 - **Meditation Generation:** A multi-step async process involving:
-    - User vision responses collected through AI-guided prompt flow
+    - **Speech-to-Text Input:** Primary input method using Expo AV audio recording with OpenAI Whisper transcription. Users can tap microphone to record responses (with timer), stop to transcribe, then review/edit transcript. Alternative "Write ✏️" button provides direct text input.
+    - User vision responses collected through AI-guided prompt flow (VisionFlow → VisionRecord → VisionEdit)
     - AI (OpenAI GPT-4o-mini) using **THAR protocol** (Technological Herald of Awakening and Remembrance) for personalized script generation
     - THAR specifications: 110 WPM pacing, somatic sequencing (body → awareness → vision → embodiment), identity encoding ("I am..." statements)
     - **Spacious Pauses:** Scripts include 1.5-2.5 second pauses between every sentence using ElevenLabs `<break time="X.Xs" />` tags, varying by context (settling: 2.5-3s, descriptive: 1.5-2s, identity: 2.5-3s, transitions: 3s max)
