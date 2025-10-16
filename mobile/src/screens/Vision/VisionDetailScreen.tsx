@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
@@ -14,9 +14,11 @@ export default function VisionDetailScreen() {
   const [visionData, setVisionData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadVisionData();
-  }, [route.params.category]);
+  useFocusEffect(
+    useCallback(() => {
+      loadVisionData();
+    }, [route.params.category])
+  );
 
   const loadVisionData = async () => {
     try {
