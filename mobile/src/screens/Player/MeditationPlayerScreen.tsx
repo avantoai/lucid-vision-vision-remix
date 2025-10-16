@@ -80,8 +80,7 @@ export default function MeditationPlayerScreen() {
   };
 
   const handlePlayPause = async () => {
-    if (!soundRef.current || !audioReady) {
-      Alert.alert('Please Wait', 'Audio is still loading...');
+    if (!audioReady || !soundRef.current) {
       return;
     }
     
@@ -128,19 +127,22 @@ export default function MeditationPlayerScreen() {
         <Text style={styles.category}>{meditation.category}</Text>
         <Text style={styles.duration}>{meditation.duration} minutes</Text>
 
-        <View pointerEvents={audioReady ? 'auto' : 'none'}>
-          <TouchableOpacity 
-            style={[
-              styles.playButton, 
-              !audioReady && styles.playButtonDisabled
-            ]} 
-            onPress={audioReady ? handlePlayPause : undefined}
-            disabled={!audioReady}
-            activeOpacity={audioReady ? 0.7 : 1}
-          >
-            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity 
+          style={[
+            styles.playButton, 
+            !audioReady && styles.playButtonDisabled
+          ]} 
+          onPress={handlePlayPause}
+          disabled={!audioReady}
+          activeOpacity={audioReady ? 0.7 : 1}
+        >
+          <Text style={[
+            styles.playButtonText,
+            !audioReady && styles.playButtonTextDisabled
+          ]}>
+            {isPlaying ? '⏸' : '▶'}
+          </Text>
+        </TouchableOpacity>
 
         <View style={styles.actions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
@@ -216,6 +218,9 @@ const styles = StyleSheet.create({
   playButtonText: {
     fontSize: 40,
     color: '#FFFFFF',
+  },
+  playButtonTextDisabled: {
+    opacity: 0.5,
   },
   actions: {
     flexDirection: 'row',
