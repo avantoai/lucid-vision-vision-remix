@@ -22,7 +22,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isProcessingDeepLink = useRef(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -32,10 +31,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (initialUrl) {
         const tokens = parseAuthCallback(initialUrl);
         if (tokens) {
-          // We have a fresh login via deep link, skip checkAuth
-          isProcessingDeepLink.current = true;
-          await checkInitialURL();
-          isProcessingDeepLink.current = false;
+          // We have a fresh login via deep link, skip checkAuth to avoid duplicate API call
+          await checkInitialURL(initialUrl);
+          setIsLoading(false); // Complete loading after deep link processing
           return;
         }
       }
@@ -52,9 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const checkInitialURL = async () => {
+  const checkInitialURL = async (url?: string) => {
     try {
-      const initialUrl = await Linking.getInitialURL();
+      const initialUrl = url || await Linking.getInitialURL();
       if (initialUrl) {
         console.log('📱 Initial URL on app launch:', initialUrl);
         
