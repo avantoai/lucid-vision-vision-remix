@@ -46,7 +46,7 @@ const FIXED_PROMPTS = {
 };
 
 async function getUserCategories(userId) {
-  const { data: visions } = await supabase
+  const { data: visions } = await supabaseAdmin
     .from('vision_statements')
     .select('category, statement, tagline, summary')
     .eq('user_id', userId)
@@ -70,7 +70,7 @@ async function getUserCategories(userId) {
 }
 
 async function getCategoryVision(userId, category) {
-  const { data: vision } = await supabase
+  const { data: vision } = await supabaseAdmin
     .from('vision_statements')
     .select('*')
     .eq('user_id', userId)
@@ -78,7 +78,7 @@ async function getCategoryVision(userId, category) {
     .eq('is_active', true)
     .single();
 
-  const { data: responses } = await supabase
+  const { data: responses } = await supabaseAdmin
     .from('vision_responses')
     .select('*')
     .eq('user_id', userId)
@@ -97,7 +97,7 @@ async function getCategoryVision(userId, category) {
 async function updateVisionStatement(userId, category, statement) {
   const tagline = await aiService.generateTagline(statement);
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('vision_statements')
     .update({ is_active: false })
     .eq('user_id', userId)
@@ -123,7 +123,7 @@ async function processPromptFlow(userId, category, responses) {
   const allResponses = [...responses];
   
   // Get the current active vision (if any) to potentially restore on failure
-  const { data: previousVision } = await supabase
+  const { data: previousVision } = await supabaseAdmin
     .from('vision_statements')
     .select('id')
     .eq('user_id', userId)
@@ -251,7 +251,7 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
     console.log(`🔍 Detecting cross-category relevance for vision ${visionId}`);
     
     // Get user ID from vision
-    const { data: vision } = await supabase
+    const { data: vision } = await supabaseAdmin
       .from('vision_statements')
       .select('user_id')
       .eq('id', visionId)
@@ -284,7 +284,7 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
     // Update or create vision summaries for each relevant category
     for (const relatedCategory of allRelevantCategories) {
       // Get existing vision responses for this category
-      const { data: existingResponses } = await supabase
+      const { data: existingResponses } = await supabaseAdmin
         .from('vision_responses')
         .select('question, answer')
         .eq('user_id', vision.user_id)
@@ -310,7 +310,7 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
       const summary = await aiService.generateVisionSummary(relatedCategory, allResponses);
       
       // Check if vision statement exists for this category
-      const { data: existingVision } = await supabase
+      const { data: existingVision } = await supabaseAdmin
         .from('vision_statements')
         .select('id')
         .eq('user_id', vision.user_id)
@@ -372,7 +372,7 @@ async function generateNextPrompt(userId, category, previousResponses) {
 }
 
 async function getVisionStatus(userId, visionId) {
-  const { data: vision, error } = await supabase
+  const { data: vision, error } = await supabaseAdmin
     .from('vision_statements')
     .select('*')
     .eq('id', visionId)
