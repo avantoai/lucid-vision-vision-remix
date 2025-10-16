@@ -205,6 +205,11 @@ export default function MeditationPlayerScreen() {
     setShowTranscript(true);
   };
 
+  const cleanTranscript = (script: string): string => {
+    // Remove ElevenLabs break tags like <break time="2.5s" />
+    return script.replace(/<break time="[^"]*"\s*\/>/g, '');
+  };
+
   if (isLoading || !meditation) {
     return (
       <View style={styles.loadingContainer}>
@@ -360,7 +365,7 @@ export default function MeditationPlayerScreen() {
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.transcriptScroll}>
-            <Text style={styles.transcriptText}>{meditation.script}</Text>
+            <Text style={styles.transcriptText}>{cleanTranscript(meditation.script)}</Text>
           </ScrollView>
         </View>
       </Modal>
