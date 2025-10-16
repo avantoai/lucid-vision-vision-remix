@@ -5,7 +5,14 @@ const { authenticateUser } = require('../middleware/auth');
 const whisperService = require('../services/whisperService');
 
 const upload = multer({
-  dest: 'temp/audio/',
+  storage: multer.diskStorage({
+    destination: 'temp/audio/',
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = file.originalname.split('.').pop();
+      cb(null, `audio-${uniqueSuffix}.${ext}`);
+    }
+  }),
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     console.log(`📎 Received file: ${file.originalname}, MIME type: ${file.mimetype}`);
