@@ -3,6 +3,10 @@ const aiService = require('./aiService');
 const audioService = require('./audioService');
 const quotaService = require('./quotaService');
 
+function stripBreakTags(script) {
+  return script.replace(/<break\s+time=['"][\d.]+s['"]\s*\/>/g, '');
+}
+
 async function createMeditationPlaceholder({ userId, category, duration, voiceId, background, isGift }) {
   console.log(`🎨 Creating meditation placeholder for user: ${userId}`);
   
@@ -72,10 +76,11 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     console.log(`✓ [${meditationId}] Title: "${title}"`);
 
     console.log(`⏳ [${meditationId}] Step 5/5: Saving to database...`);
+    const cleanScript = stripBreakTags(script);
     const { error } = await supabaseAdmin
       .from('meditations')
       .update({
-        script,
+        script: cleanScript,
         audio_url: audioUrl,
         title_auto: title,
         title: title,
@@ -129,6 +134,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
   });
 
   const title = await aiService.generateTitle(script, category, responses);
+  const cleanScript = stripBreakTags(script);
 
   const { data: meditation, error } = await supabaseAdmin
     .from('meditations')
@@ -138,7 +144,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
       duration,
       voice_id: voiceId,
       background,
-      script,
+      script: cleanScript,
       audio_url: audioUrl,
       title_auto: title,
       title: title,

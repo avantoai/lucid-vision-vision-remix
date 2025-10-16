@@ -142,7 +142,7 @@ class ApiService {
     });
   }
 
-  async getVisionCategories(): Promise<Array<{ name: string; status: string; tagline: string | null }>> {
+  async getVisionCategories(): Promise<Array<{ name: string; status: string; tagline: string | null; hasSummary: boolean }>> {
     const data = await this.request<{ categories: any[] }>('/vision/categories');
     return data.categories;
   }

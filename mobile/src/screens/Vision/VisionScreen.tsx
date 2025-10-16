@@ -47,25 +47,26 @@ export default function VisionScreen() {
         {CATEGORIES.map((category) => {
           const categoryData = categories.find(c => c.name === category.id);
           const status = categoryData?.status || 'not_started';
+          const hasSummary = categoryData?.hasSummary || false;
           
           return (
             <TouchableOpacity
               key={category.id}
               style={[
                 styles.categoryCard,
-                status === 'completed' && styles.categoryCardCompleted,
+                hasSummary && styles.categoryCardWithSummary,
               ]}
               onPress={() => navigation.navigate('VisionDetail', { category: category.id })}
             >
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
-                {status === 'completed' && <View style={styles.completedBadge} />}
+                {hasSummary && <View style={styles.summaryBadge}><Text style={styles.summaryBadgeText}>✨</Text></View>}
               </View>
               {categoryData?.tagline && (
                 <Text style={styles.categoryTagline}>{categoryData.tagline}</Text>
               )}
               <Text style={styles.categoryStatus}>
-                {status === 'completed' ? 'Complete' : status === 'in_progress' ? 'In Progress' : 'Not Started'}
+                {hasSummary ? 'Vision Created' : status === 'in_progress' ? 'In Progress' : 'Not Started'}
               </Text>
             </TouchableOpacity>
           );
@@ -114,6 +115,19 @@ const styles = StyleSheet.create({
   categoryCardCompleted: {
     borderColor: '#10B981',
     backgroundColor: '#F0FDF4',
+  },
+  categoryCardWithSummary: {
+    borderColor: '#6366F1',
+    backgroundColor: '#EEF2FF',
+  },
+  summaryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    backgroundColor: '#6366F1',
+  },
+  summaryBadgeText: {
+    fontSize: 14,
   },
   categoryHeader: {
     flexDirection: 'row',
