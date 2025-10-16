@@ -95,8 +95,7 @@ export default function MeditationPlayerScreen() {
 
   const handlePlayPause = async () => {
     if (!soundRef.current || !audioReady) {
-      Alert.alert('Error', 'Audio not loaded yet');
-      return;
+      return; // Button is disabled, so this shouldn't be called
     }
     
     try {
@@ -152,9 +151,24 @@ export default function MeditationPlayerScreen() {
         <Text style={styles.category}>{meditation.category}</Text>
         <Text style={styles.duration}>{meditation.duration} minutes</Text>
 
-        <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
-          <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+        <TouchableOpacity 
+          style={[
+            styles.playButton, 
+            !audioReady && styles.playButtonDisabled
+          ]} 
+          onPress={handlePlayPause}
+          disabled={!audioReady}
+        >
+          {!audioReady ? (
+            <ActivityIndicator size="large" color="#FFFFFF" />
+          ) : (
+            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+          )}
         </TouchableOpacity>
+
+        {!audioReady && (
+          <Text style={styles.loadingText}>Loading audio...</Text>
+        )}
 
         <View style={styles.actions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleFavorite}>
@@ -229,9 +243,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
+  playButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+    opacity: 0.6,
+  },
   playButtonText: {
     fontSize: 40,
     color: '#FFFFFF',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: -32,
+    marginBottom: 32,
   },
   actions: {
     flexDirection: 'row',
