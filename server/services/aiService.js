@@ -213,10 +213,79 @@ Create a powerful, present-tense statement that captures their vision. Use "I" l
   return completion.choices[0].message.content.trim();
 }
 
+async function generateVisionSummary(category, responses) {
+  const responseSummary = responses.map((r, i) => `${i + 1}. ${r.question}\n   ${r.answer}`).join('\n\n');
+
+  const prompt = `Create a comprehensive, detailed vision summary (3-5 paragraphs) for the ${category} category based on these responses:
+
+${responseSummary}
+
+This summary should:
+- Capture the depth and nuance of their vision across all their responses
+- Be written in first person ("I") to help them see and feel themselves living this vision
+- Include specific details, emotions, and aspirations they've shared
+- Paint a vivid, inspiring picture of what they're creating in this area of life
+- Feel personal, specific, and emotionally resonant
+
+Return only the summary paragraphs, nothing else.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.8,
+    max_tokens: 600
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+async function detectRelevantCategories(response) {
+  const CATEGORIES = ['health', 'wealth', 'relationships', 'play', 'love', 'purpose', 'spirit', 'healing', 'freeform'];
+  
+  const prompt = `Analyze this user response and identify which life categories it touches on:
+
+Response: "${response}"
+
+Available categories:
+- health: Physical wellbeing, vitality, body, energy, fitness
+- wealth: Finances, abundance, money, resources, prosperity
+- relationships: Connections, family, friends, community, partnerships
+- play: Joy, fun, hobbies, recreation, adventure, creativity
+- love: Romance, intimacy, self-love, compassion, heart
+- purpose: Meaning, mission, impact, calling, contribution
+- spirit: Spirituality, consciousness, connection to higher self, meditation, faith
+- healing: Transformation, release, growth, therapy, inner work
+- freeform: General life vision, doesn't fit other categories
+
+Return ONLY a JSON array of category names that are clearly relevant to this response. Only include categories that are strongly present. If only one category fits, return a single-item array. Be selective - don't include every category.
+
+Example formats:
+["health"]
+["wealth", "purpose"]
+["relationships", "love"]`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3,
+    max_tokens: 100
+  });
+
+  try {
+    const result = JSON.parse(completion.choices[0].message.content.trim());
+    return Array.isArray(result) ? result.filter(cat => CATEGORIES.includes(cat)) : [];
+  } catch (error) {
+    console.error('Failed to parse category detection:', error);
+    return [];
+  }
+}
+
 module.exports = {
   generateScript,
   generateTitle,
   generateNextPrompt,
   generateTagline,
-  synthesizeVisionStatement
+  synthesizeVisionStatement,
+  generateVisionSummary,
+  detectRelevantCategories
 };

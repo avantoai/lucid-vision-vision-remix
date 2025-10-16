@@ -48,19 +48,24 @@ const FIXED_PROMPTS = {
 async function getUserCategories(userId) {
   const { data: visions } = await supabase
     .from('vision_statements')
-    .select('category, statement, tagline')
+    .select('category, statement, tagline, summary')
     .eq('user_id', userId)
     .eq('is_active', true);
 
   const visionMap = {};
   visions?.forEach(v => {
-    visionMap[v.category] = { statement: v.statement, tagline: v.tagline };
+    visionMap[v.category] = { 
+      statement: v.statement, 
+      tagline: v.tagline,
+      summary: v.summary 
+    };
   });
 
   return CATEGORIES.map(category => ({
     name: category,
     status: visionMap[category] ? 'in_progress' : 'not_started',
-    tagline: visionMap[category]?.tagline || null
+    tagline: visionMap[category]?.tagline || null,
+    hasSummary: !!visionMap[category]?.summary
   }));
 }
 
@@ -83,6 +88,8 @@ async function getCategoryVision(userId, category) {
   return {
     statement: vision?.statement || null,
     tagline: vision?.tagline || null,
+    summary: vision?.summary || null,
+    status: vision?.status || 'not_started',
     responses: responses || []
   };
 }
@@ -180,19 +187,26 @@ async function processVisionInBackground(visionId, category, responses, previous
   try {
     console.log(`🧠 Starting background vision processing for ${visionId}`);
     
+    // Generate core vision content
     const statement = await aiService.synthesizeVisionStatement(category, responses);
     const tagline = await aiService.generateTagline(statement);
+    const summary = await aiService.generateVisionSummary(category, responses);
 
+    // Update the primary category vision
     await supabaseAdmin
       .from('vision_statements')
       .update({
         statement,
         tagline,
+        summary,
         status: 'completed'
       })
       .eq('id', visionId);
 
     console.log(`✅ Vision processing completed for ${visionId}`);
+    
+    // Detect and update cross-category relevance
+    await detectAndUpdateCrossCategories(visionId, category, responses);
   } catch (error) {
     console.error(`❌ Vision processing failed for ${visionId}:`, error);
     
@@ -215,6 +229,105 @@ async function processVisionInBackground(visionId, category, responses, previous
         })
         .eq('id', previousVisionId);
     }
+  }
+}
+
+async function detectAndUpdateCrossCategories(visionId, primaryCategory, responses) {
+  try {
+    console.log(`🔍 Detecting cross-category relevance for vision ${visionId}`);
+    
+    // Get user ID from vision
+    const { data: vision } = await supabase
+      .from('vision_statements')
+      .select('user_id')
+      .eq('id', visionId)
+      .single();
+    
+    if (!vision) return;
+    
+    // Analyze each response for cross-category relevance
+    const allRelevantCategories = new Set([primaryCategory]);
+    
+    for (const response of responses) {
+      const categories = await aiService.detectRelevantCategories(response.answer);
+      categories.forEach(cat => {
+        if (cat !== primaryCategory) {
+          allRelevantCategories.add(cat);
+        }
+      });
+    }
+    
+    // Remove primary category from the set
+    allRelevantCategories.delete(primaryCategory);
+    
+    if (allRelevantCategories.size === 0) {
+      console.log(`No cross-category relevance detected`);
+      return;
+    }
+    
+    console.log(`📊 Found cross-category relevance: ${Array.from(allRelevantCategories).join(', ')}`);
+    
+    // Update or create vision summaries for each relevant category
+    for (const relatedCategory of allRelevantCategories) {
+      // Get existing vision responses for this category
+      const { data: existingResponses } = await supabase
+        .from('vision_responses')
+        .select('question, answer')
+        .eq('user_id', vision.user_id)
+        .eq('category', relatedCategory)
+        .order('created_at', { ascending: true });
+      
+      // Combine existing responses with relevant new ones
+      const relevantResponses = responses.filter(async r => {
+        const cats = await aiService.detectRelevantCategories(r.answer);
+        return cats.includes(relatedCategory);
+      });
+      
+      const allResponses = [...(existingResponses || []), ...relevantResponses];
+      
+      if (allResponses.length === 0) continue;
+      
+      // Generate new summary for this category
+      const summary = await aiService.generateVisionSummary(relatedCategory, allResponses);
+      
+      // Check if vision statement exists for this category
+      const { data: existingVision } = await supabase
+        .from('vision_statements')
+        .select('id')
+        .eq('user_id', vision.user_id)
+        .eq('category', relatedCategory)
+        .eq('is_active', true)
+        .single();
+      
+      if (existingVision) {
+        // Update existing vision summary
+        await supabaseAdmin
+          .from('vision_statements')
+          .update({ summary })
+          .eq('id', existingVision.id);
+        
+        console.log(`✨ Updated cross-category summary for: ${relatedCategory}`);
+      } else {
+        // Create new vision statement with summary
+        await supabaseAdmin
+          .from('vision_statements')
+          .insert({
+            user_id: vision.user_id,
+            category: relatedCategory,
+            statement: null,
+            tagline: null,
+            summary,
+            status: 'completed',
+            is_active: true,
+            created_at: new Date().toISOString()
+          });
+        
+        console.log(`✨ Created new cross-category summary for: ${relatedCategory}`);
+      }
+    }
+  } catch (error) {
+    console.error('Cross-category detection error:', error);
+    // Don't fail the whole process if cross-category detection fails
   }
 }
 
