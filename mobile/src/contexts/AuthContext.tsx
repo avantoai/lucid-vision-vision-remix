@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useRef, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Alert } from 'react-native';
