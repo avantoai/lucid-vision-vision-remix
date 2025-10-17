@@ -114,40 +114,44 @@ export default function VisionRecordScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.category}>{route.params.category}</Text>
-        <Text style={styles.prompt}>{route.params.prompt}</Text>
+        <View style={styles.topContent}>
+          <Text style={styles.category}>{route.params.category}</Text>
+          <Text style={styles.prompt}>{route.params.prompt}</Text>
+        </View>
 
-        {isRecording && (
-          <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
-        )}
-
-        {!isRecording && !isLoading && (
-          <Text style={styles.helpText}>Tap to Record</Text>
-        )}
-
-        <TouchableOpacity
-          style={[styles.micButton, isRecording && styles.micButtonRecording]}
-          onPress={isRecording ? stopRecording : startRecording}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="large" color={colors.white} />
-          ) : isRecording ? (
-            <View style={styles.stopIcon} />
-          ) : (
-            <Ionicons name="mic" size={64} color={colors.white} />
+        <View style={styles.micContent}>
+          {isRecording && (
+            <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
           )}
-        </TouchableOpacity>
 
-        {!isRecording && !isLoading && (
-          <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
-            <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
-            <Text style={styles.writeButtonText}>Write</Text>
+          {!isRecording && !isLoading && (
+            <Text style={styles.helpText}>Tap to Record</Text>
+          )}
+
+          <TouchableOpacity
+            style={[styles.micButton, isRecording && styles.micButtonRecording]}
+            onPress={isRecording ? stopRecording : startRecording}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="large" color={colors.white} />
+            ) : isRecording ? (
+              <View style={styles.stopIcon} />
+            ) : (
+              <Ionicons name="mic" size={64} color={colors.white} />
+            )}
           </TouchableOpacity>
-        )}
+
+          {!isRecording && !isLoading && (
+            <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
+              <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
+              <Text style={styles.writeButtonText}>Write</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {route.params.responses.length > 0 && (
-          <View style={styles.responsesIndicator}>
+          <View style={styles.bottomSection}>
             <Text style={styles.responsesCount}>{route.params.responses.length} previous responses</Text>
           </View>
         )}
@@ -175,24 +179,36 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
     paddingTop: 100,
-    alignItems: 'center',
+    paddingBottom: 100,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topContent: {
+    width: '100%',
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 60,
+  },
+  micContent: {
+    alignItems: 'center',
+  },
+  bottomSection: {
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
   },
   category: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '400',
     color: colors.primary,
     textTransform: 'capitalize',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   prompt: {
-    fontSize: 20,
+    fontSize: 24,
     color: colors.text,
-    marginBottom: 40,
     textAlign: 'center',
-    paddingHorizontal: 20,
   },
   helpText: {
     fontSize: 16,
@@ -235,11 +251,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     fontWeight: '600',
-  },
-  responsesIndicator: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
   },
   responsesCount: {
     fontSize: 14,
