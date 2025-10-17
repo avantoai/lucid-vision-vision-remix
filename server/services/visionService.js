@@ -380,9 +380,14 @@ async function generateNextPrompt(userId, category, previousResponses) {
   // Analyze sentiment of most recent response (if any)
   let emotionBias = 'neutral';
   if (previousResponses.length > 0) {
-    const lastResponse = previousResponses[previousResponses.length - 1];
-    emotionBias = await aiService.analyzeSentiment(lastResponse.answer);
-    console.log(`💭 Emotional tone detected: ${emotionBias}`);
+    try {
+      const lastResponse = previousResponses[previousResponses.length - 1];
+      emotionBias = await aiService.analyzeSentiment(lastResponse.answer);
+      console.log(`💭 Emotional tone detected: ${emotionBias}`);
+    } catch (error) {
+      console.error('⚠️ Sentiment analysis failed, defaulting to neutral:', error.message);
+      emotionBias = 'neutral';
+    }
   }
   
   // FIRST: Check if user has existing vision context for this category
