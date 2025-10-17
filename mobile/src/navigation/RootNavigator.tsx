@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types';
@@ -21,6 +21,20 @@ import { colors } from '../theme';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+const DarkTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: colors.primary,
+    background: colors.background,
+    card: colors.surface,
+    text: colors.text,
+    border: colors.border,
+    notification: colors.primary,
+  },
+};
+
 export default function RootNavigator() {
   const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
 
@@ -31,7 +45,7 @@ export default function RootNavigator() {
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
-      <NavigationContainer>
+      <NavigationContainer theme={DarkTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <>
