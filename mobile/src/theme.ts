@@ -4,6 +4,7 @@ export const colors = {
   primary: '#7c3aed',        // Purple accent
   primaryLight: '#a78bfa',   // Lighter purple
   primaryDark: '#6d28d9',    // Darker purple
+  secondary: '#a78bfa',      // Secondary highlight/accent (lighter purple)
   
   // Backgrounds
   background: '#0f0f0f',     // Very dark background

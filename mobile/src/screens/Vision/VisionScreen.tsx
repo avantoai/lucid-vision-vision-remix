@@ -118,14 +118,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.successLight,
   },
   categoryCardWithSummary: {
-    borderColor: colors.primary,
+    borderColor: colors.secondary,
     backgroundColor: colors.surfaceLight,
   },
   summaryBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
   },
   summaryBadgeText: {
     fontSize: 14,
