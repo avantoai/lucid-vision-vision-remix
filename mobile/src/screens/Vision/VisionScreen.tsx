@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
@@ -12,6 +13,7 @@ type VisionScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function VisionScreen() {
   const navigation = useNavigation<VisionScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,14 +34,14 @@ export default function VisionScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: insets.top }}>
       <View style={styles.header}>
         <Text style={styles.title}>Living Vision</Text>
         <Text style={styles.subtitle}>Track and evolve your vision across all life categories</Text>

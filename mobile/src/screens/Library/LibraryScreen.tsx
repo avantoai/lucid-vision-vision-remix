@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
@@ -13,6 +14,7 @@ type LibraryScreenRouteProp = RouteProp<TabParamList, 'Library'>;
 export default function LibraryScreen() {
   const navigation = useNavigation<LibraryScreenNavigationProp>();
   const route = useRoute<LibraryScreenRouteProp>();
+  const insets = useSafeAreaInsets();
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -173,7 +175,7 @@ export default function LibraryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.title}>My Library</Text>
         <View style={styles.filterContainer}>

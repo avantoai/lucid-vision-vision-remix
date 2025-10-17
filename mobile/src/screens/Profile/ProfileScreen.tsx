@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { SubscriptionStatus, QuotaUsage } from '../../types';
@@ -7,6 +8,7 @@ import { colors } from '../../theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const insets = useSafeAreaInsets();
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
   const [quotaUsage, setQuotaUsage] = useState<QuotaUsage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
         {user?.full_name && (
