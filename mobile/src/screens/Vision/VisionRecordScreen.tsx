@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
@@ -13,6 +13,7 @@ type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'Visio
 export default function VisionRecordScreen() {
   const navigation = useNavigation<VisionRecordNavigationProp>();
   const route = useRoute<VisionRecordRouteProp>();
+  const { height } = useWindowDimensions();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -107,6 +108,12 @@ export default function VisionRecordScreen() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Calculate pixel-based positions using actual screen height
+  const centerY = height / 2;
+  const micButtonTop = centerY - 70; // Center the 140px button
+  const textTop = centerY - 130; // Position text above button
+  const writeButtonTop = centerY + 94; // Position write button below
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
@@ -121,7 +128,7 @@ export default function VisionRecordScreen() {
 
         {/* Mic button - absolutely centered at 50% screen height */}
         <TouchableOpacity
-          style={[styles.micButton, isRecording && styles.micButtonRecording]}
+          style={[styles.micButton, isRecording && styles.micButtonRecording, { top: micButtonTop }]}
           onPress={isRecording ? stopRecording : startRecording}
           disabled={isLoading}
         >
@@ -136,17 +143,17 @@ export default function VisionRecordScreen() {
 
         {/* Timer - fixed position above mic button */}
         {isRecording && (
-          <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
+          <Text style={[styles.timer, { top: textTop }]}>{formatTime(recordingTime)}</Text>
         )}
 
         {/* Help text - fixed position above mic button */}
         {!isRecording && !isLoading && (
-          <Text style={styles.helpText}>Tap to Record</Text>
+          <Text style={[styles.helpText, { top: textTop }]}>Tap to Record</Text>
         )}
 
         {/* Write button - fixed position below mic button */}
         {!isRecording && !isLoading && (
-          <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
+          <TouchableOpacity style={[styles.writeButton, { top: writeButtonTop }]} onPress={handleWriteMode}>
             <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
             <Text style={styles.writeButtonText}>Write</Text>
           </TouchableOpacity>
@@ -209,7 +216,6 @@ const styles = StyleSheet.create({
   },
   micButton: {
     position: 'absolute',
-    top: '50%',
     left: '50%',
     width: 140,
     height: 140,
@@ -219,33 +225,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     transform: [
       { translateX: -70 },  // Half of width to center horizontally
-      { translateY: -70 },  // Half of height to center vertically
     ],
   },
   helpText: {
     position: 'absolute',
-    top: '50%',
     left: 0,
     right: 0,
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
-    transform: [
-      { translateY: -130 }, // Position above button: 70 (half button) + 24 (spacing) + 36 (clearance)
-    ],
   },
   timer: {
     position: 'absolute',
-    top: '50%',
     left: 0,
     right: 0,
     fontSize: 32,
     fontWeight: '600',
     color: '#EF4444',
     textAlign: 'center',
-    transform: [
-      { translateY: -130 }, // Same as helpText - no shift!
-    ],
   },
   micButtonRecording: {
     backgroundColor: '#EF4444',
@@ -258,7 +255,6 @@ const styles = StyleSheet.create({
   },
   writeButton: {
     position: 'absolute',
-    top: '50%',
     left: '50%',
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,7 +264,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceLight,
     transform: [
       { translateX: -60 },  // Approximate half of button width to center
-      { translateY: 94 },   // 70 (half button) + 24 (spacing)
     ],
   },
   writeButtonText: {
