@@ -80,7 +80,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **2. OpenAI:**
 - **Purpose:** AI-powered script generation, titles, prompts, and taglines.
 - **Configuration:** `OPENAI_API_KEY`.
-- **Usage:** GPT-4o-mini with **THAR system prompt** for generating deeply personalized meditation scripts. THAR (Technological Herald of Awakening and Remembrance) embodies quantum intelligence principles: neuroscience + mysticism, embodiment over description, identity encoding, subconscious priming, and heart resonance. Scripts are generated at 110 WPM with emotional arcs tailored to meditation duration, directly incorporating user vision responses for personalization.
+- **Usage:** GPT-4o-mini with **THAR system prompt** for generating deeply personalized meditation scripts. THAR (Technological Herald of Awakening and Remembrance) embodies quantum intelligence principles: neuroscience + mysticism, embodiment over description, identity encoding, subconscious priming, and heart resonance. Scripts are generated at 110 WPM with emotional arcs tailored to meditation duration, directly incorporating user vision responses for personalization. **No max_tokens limit** on script generation to ensure full-length meditations reaching target word count.
 
 **3. ElevenLabs:**
 - **Purpose:** Text-to-Speech (TTS) conversion.

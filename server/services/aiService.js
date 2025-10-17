@@ -143,8 +143,7 @@ Without these generous pauses between every sentence, the meditation feels rushe
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: prompt }
     ],
-    temperature: 0.8,
-    max_tokens: 3000
+    temperature: 0.8
   });
 
   return completion.choices[0].message.content;
