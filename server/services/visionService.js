@@ -377,6 +377,14 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
 }
 
 async function generateNextPrompt(userId, category, previousResponses) {
+  // Analyze sentiment of most recent response (if any)
+  let emotionBias = 'neutral';
+  if (previousResponses.length > 0) {
+    const lastResponse = previousResponses[previousResponses.length - 1];
+    emotionBias = await aiService.analyzeSentiment(lastResponse.answer);
+    console.log(`💭 Emotional tone detected: ${emotionBias}`);
+  }
+  
   // FIRST: Check if user has existing vision context for this category
   const { data: existingVision } = await supabaseAdmin
     .from('vision_statements')
@@ -391,8 +399,8 @@ async function generateNextPrompt(userId, category, previousResponses) {
   const hasContext = existingVision && (existingVision.summary || existingVision.statement || existingVision.tagline);
   
   if (hasContext) {
-    console.log(`🧠 Generating context-aware prompt for ${category} (has existing vision)`);
-    return await aiService.generateNextPrompt(category, previousResponses, existingVision);
+    console.log(`🧠 Generating context-aware prompt for ${category} (has existing vision, emotion: ${emotionBias})`);
+    return await aiService.generateNextPrompt(category, previousResponses, existingVision, emotionBias);
   }
 
   // If NO existing context, use fixed prompts for the first few questions
@@ -404,8 +412,8 @@ async function generateNextPrompt(userId, category, previousResponses) {
   }
 
   // After fixed prompts are exhausted (and still no vision context), use AI
-  console.log(`🤖 Generating AI prompt for ${category} (no vision context)`);
-  return await aiService.generateNextPrompt(category, previousResponses, null);
+  console.log(`🤖 Generating AI prompt for ${category} (no vision context, emotion: ${emotionBias})`);
+  return await aiService.generateNextPrompt(category, previousResponses, null, emotionBias);
 }
 
 async function getVisionStatus(userId, visionId) {
