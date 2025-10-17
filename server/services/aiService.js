@@ -171,36 +171,7 @@ The title should reflect the specific vision and themes, not generic meditation 
   return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
 }
 
-async function analyzeSentiment(userResponse) {
-  const prompt = `Analyze the emotional tone of this user response and classify it as one of three states:
-
-Response: "${userResponse}"
-
-Classifications:
-- "expansive": inspired, clear, hopeful, energized, open, confident
-- "contracted": doubtful, fearful, stuck, uncertain, closed, hesitant
-- "neutral": factual, brief, straightforward, neither positive nor negative
-
-Return ONLY one word: expansive, contracted, or neutral`;
-
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.3,
-    max_tokens: 10
-  });
-
-  const result = completion.choices[0].message.content.trim().toLowerCase();
-  
-  // Ensure valid result
-  if (['expansive', 'contracted', 'neutral'].includes(result)) {
-    return result;
-  }
-  
-  return 'neutral'; // default fallback
-}
-
-async function generateNextPrompt(category, previousResponses, existingVision = null, emotionBias = 'neutral') {
+async function generateNextPrompt(category, previousResponses, existingVision = null) {
   const responseHistory = previousResponses.map((r, i) => `${i + 1}. ${r.question}\nAnswer: ${r.answer}`).join('\n\n');
 
   let contextSection = '';
@@ -217,51 +188,35 @@ async function generateNextPrompt(category, previousResponses, existingVision = 
 The user already has a vision for ${category}:
 ${contextParts.join('\n\n')}
 
-Build on this existing vision by lightly mirroring their language or imagery.
+Generate a question that BUILDS on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your question to show continuity.
 `;
     }
   }
 
-  const prompt = `You are guiding someone to deepen their life vision for the category: ${category}.
+  const prompt = `You're guiding someone to deepen their vision for: ${category}
 
-They've shared the following so far:
+Previous conversation:
 ${responseHistory}
 ${contextSection}
 
-Current emotional tone: ${emotionBias}.
+Generate ONE simple, focused follow-up question that either:
+- Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
+- Expands context (30% probability): Explores related life areas or future possibilities
 
-Generate ONE short, emotionally resonant follow-up question that moves the conversation forward naturally.
+${existingVision ? 'Remember to build on their existing vision context above.' : ''}
 
-Tone logic:
-- If emotionBias = "expansive": invite embodiment or inspired next steps.
-- If emotionBias = "contracted": offer grounding, gentle clarification.
-- If emotionBias = "neutral": open imagination or sensory detail.
+STYLE REQUIREMENTS:
+- Keep it SHORT (10-15 words maximum)
+- Use simple, conversational language
+- Focus on ONE specific thing only
+- Avoid compound questions (no "and", "or", "but also")
+- Make it feel natural and easy to answer
 
-Question type probabilities:
-- 40% Evoke (imaginative / sensory / emotional)
-- 35% Clarify (values / priorities / meaning)
-- 25% Embody (integration into present life)
-Adjust these weights dynamically based on emotionBias above.
+BAD: "How does embodying this financial abundance influence not only your daily choices but also the legacy you wish to create for your family and community in the years to come?"
 
-If the user already has a vision, build on it by lightly mirroring their language or imagery.
-If they don't yet have one, gently open new territory of imagination or feeling.
-
-Tone:
-- curious, grounded, emotionally intelligent
-- sounds like a conscious guide or coach speaking naturally
-- never mechanical, abstract, or formal
-
-STYLE RULES:
-- 10–15 words max
-- one clear idea per question
-- avoid conjunctions (no "and/or/but also")
-- use plain, vivid language
-- no filler like "tell me" or "can you share"
-
-EXAMPLES:
-Evoke → "What does vitality feel like when you wake up each morning?"
-Clarify → "What matters most about being truly wealthy?"
-Embody → "What's one small way this vision shows up in your day?"
+GOOD: "What does abundance feel like in your body?"
+GOOD: "How do you want to experience wealth daily?"
+GOOD: "What legacy matters most to you?"
 
 Return only the question, nothing else.`;
 
@@ -272,7 +227,7 @@ Return only the question, nothing else.`;
     max_tokens: 100
   });
 
-  return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+  return completion.choices[0].message.content.trim();
 }
 
 async function generateTagline(visionStatement) {
@@ -385,6 +340,5 @@ module.exports = {
   generateTagline,
   synthesizeVisionStatement,
   generateVisionSummary,
-  detectRelevantCategories,
-  analyzeSentiment
+  detectRelevantCategories
 };
