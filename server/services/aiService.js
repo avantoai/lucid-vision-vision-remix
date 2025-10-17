@@ -176,14 +176,22 @@ async function generateNextPrompt(category, previousResponses, existingVision = 
   const responseHistory = previousResponses.map((r, i) => `${i + 1}. ${r.question}\nAnswer: ${r.answer}`).join('\n\n');
 
   let contextSection = '';
-  if (existingVision && existingVision.summary) {
-    contextSection = `
+  if (existingVision) {
+    // Build context from whatever fields are available
+    const contextParts = [];
+    if (existingVision.tagline) contextParts.push(`Tagline: "${existingVision.tagline}"`);
+    if (existingVision.statement) contextParts.push(`Statement: "${existingVision.statement}"`);
+    if (existingVision.summary) contextParts.push(`Summary: ${existingVision.summary}`);
+    
+    if (contextParts.length > 0) {
+      contextSection = `
 **Existing Vision Context:**
 The user already has a vision for ${category}:
-${existingVision.summary}
+${contextParts.join('\n\n')}
 
 Generate a question that BUILDS on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your question to show continuity.
 `;
+    }
   }
 
   const prompt = `You're guiding someone to deepen their vision for: ${category}

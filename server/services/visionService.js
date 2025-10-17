@@ -377,13 +377,7 @@ async function detectAndUpdateCrossCategories(visionId, primaryCategory, respons
 }
 
 async function generateNextPrompt(userId, category, previousResponses) {
-  const fixedPrompts = FIXED_PROMPTS[category] || FIXED_PROMPTS.freeform;
-  
-  if (previousResponses.length < fixedPrompts.length) {
-    return fixedPrompts[previousResponses.length];
-  }
-
-  // Fetch existing vision context for this category
+  // FIRST: Check if user has existing vision context for this category
   const { data: existingVision } = await supabaseAdmin
     .from('vision_statements')
     .select('statement, tagline, summary')
@@ -392,7 +386,26 @@ async function generateNextPrompt(userId, category, previousResponses) {
     .eq('is_active', true)
     .single();
 
-  return await aiService.generateNextPrompt(category, previousResponses, existingVision);
+  // If they have ANY existing vision context (summary, statement, or tagline),
+  // ALWAYS use context-aware AI prompts to build on their existing work
+  const hasContext = existingVision && (existingVision.summary || existingVision.statement || existingVision.tagline);
+  
+  if (hasContext) {
+    console.log(`🧠 Generating context-aware prompt for ${category} (has existing vision)`);
+    return await aiService.generateNextPrompt(category, previousResponses, existingVision);
+  }
+
+  // If NO existing context, use fixed prompts for the first few questions
+  const fixedPrompts = FIXED_PROMPTS[category] || FIXED_PROMPTS.freeform;
+  
+  if (previousResponses.length < fixedPrompts.length) {
+    console.log(`📝 Using fixed prompt ${previousResponses.length + 1}/${fixedPrompts.length} for ${category}`);
+    return fixedPrompts[previousResponses.length];
+  }
+
+  // After fixed prompts are exhausted (and still no vision context), use AI
+  console.log(`🤖 Generating AI prompt for ${category} (no vision context)`);
+  return await aiService.generateNextPrompt(category, previousResponses, null);
 }
 
 async function getVisionStatus(userId, visionId) {
