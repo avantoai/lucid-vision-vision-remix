@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucid Vision UI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .kit-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .kit-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .kit-header p {
+            font-size: 18px;
+            color: #9ca3af;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #7c3aed;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .component-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .component-label {
+            font-size: 14px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .color-swatch {
+            text-align: center;
+        }
+
+        .color-box {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .color-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-code {
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            background: #7c3aed;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .btn-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .btn-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Forms */
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        /* Slider */
+        .slider-container {
+            margin-bottom: 24px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: #3a3a3a;
+            border-radius: 3px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .slider-track {
+            height: 100%;
+            background: #7c3aed;
+            border-radius: 3px;
+            width: 40%;
+            position: relative;
+        }
+
+        .slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: #7c3aed;
+            border-radius: 50%;
+            position: absolute;
+            right: -10px;
+            top: -7px;
+        }
+
+        .slider-label {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Media Player */
+        .media-player {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .media-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #3a3a3a;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #7c3aed;
+            border-radius: 2px;
+            width: 30%;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Recording Button */
+        .record-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .record-button {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: #7c3aed;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.4);
+        }
+
+        .record-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(124, 58, 237, 0.6);
+        }
+
+        .record-button svg {
+            width: 64px;
+            height: 64px;
+            fill: currentColor;
+        }
+
+        .record-timer {
+            font-size: 24px;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+
+        /* Cards */
+        .content-card {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .card-category {
+            font-size: 12px;
+            color: #7c3aed;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .card-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            flex-shrink: 0;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #2a2a2a;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: #7c3aed;
+            color: #7c3aed;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px 0;
+            background: #1a1a1a;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #7c3aed;
+        }
+
+        .nav-item svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Typography */
+        .typography-example {
+            margin-bottom: 24px;
+        }
+
+        .hero-text {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .subtitle-text {
+            font-size: 18px;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .body-text {
+            font-size: 16px;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .checklist-item::before {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Icons */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 24px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .icon svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .icon-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="kit-header">
+            <h1>Lucid Vision UI Kit</h1>
+            <p>A sleek, modern meditation app design system</p>
+        </div>
+
+        <!-- Colors -->
+        <section class="section">
+            <h2 class="section-title">Color Palette</h2>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #0a0a0a;"></div>
+                    <div class="color-name">Background</div>
+                    <div class="color-code">#0a0a0a</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #1a1a1a;"></div>
+                    <div class="color-name">Surface</div>
+                    <div class="color-code">#1a1a1a</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #2a2a2a;"></div>
+                    <div class="color-name">Card</div>
+                    <div class="color-code">#2a2a2a</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #7c3aed;"></div>
+                    <div class="color-name">Primary Purple</div>
+                    <div class="color-code">#7c3aed</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #ffffff;"></div>
+                    <div class="color-name">Text Primary</div>
+                    <div class="color-code">#ffffff</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #9ca3af;"></div>
+                    <div class="color-name">Text Secondary</div>
+                    <div class="color-code">#9ca3af</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="section">
+            <h2 class="section-title">Typography</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Hero / Title</div>
+                    <div class="hero-text">Your Loving Partnership</div>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Subtitle</div>
+                    <div class="subtitle-text">Turn your dreams into reality, one vision at a time.</div>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Body Text</div>
+                    <div class="body-text">Welcome to your personalized morning affirmations. Today, we will focus on embracing your inner strength and manifesting your dreams.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Buttons -->
+        <section class="section">
+            <h2 class="section-title">Buttons</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Primary Button</div>
+                    <button class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Generate Visualization
+                    </button>
+                    <button class="btn btn-primary">Create my first visualization</button>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Secondary Button</div>
+                    <button class="btn btn-secondary">Resend Link</button>
+                    <button class="btn btn-secondary">Change Email Address</button>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Icon Buttons</div>
+                    <div style="text-align: center;">
+                        <button class="btn-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                        <button class="btn-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                            </svg>
+                        </button>
+                        <button class="btn-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+                        <button class="btn-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Forms -->
+        <section class="section">
+            <h2 class="section-title">Form Elements</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Text Input</div>
+                    <input type="text" class="form-input" placeholder="Email Address">
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Select Dropdown</div>
+                    <select class="form-select">
+                        <option>Goal-Oriented Visualization</option>
+                        <option>Ambient</option>
+                    </select>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Slider</div>
+                    <div class="slider-container">
+                        <div class="slider">
+                            <div class="slider-track">
+                                <div class="slider-thumb"></div>
+                            </div>
+                        </div>
+                        <div class="slider-label">10m</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Media Player -->
+        <section class="section">
+            <h2 class="section-title">Media Player</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Player Controls</div>
+                    <div class="media-player">
+                        <div class="media-controls">
+                            <button class="btn-icon">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon" style="font-size: 32px;">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12.01 19V7h-.02v12h.02zm0-14l-5 5h4v2h2V10h4l-5-5z" transform="rotate(180 12 12)"/>
+                                    <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" transform="scale(-1, 1) translate(-24, 0)"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span>00:20</span>
+                            <span>05:30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recording Interface -->
+        <section class="section">
+            <h2 class="section-title">Recording Interface</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Record Button</div>
+                    <div class="record-container">
+                        <div class="record-timer">1:11</div>
+                        <button class="record-button">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-primary" style="max-width: 200px;">
+                            Write
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="section">
+            <h2 class="section-title">Navigation</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Tab Navigation</div>
+                    <div class="tabs">
+                        <div class="tab active">Feed</div>
+                        <div class="tab">Saved</div>
+                    </div>
+                </div>
+                <div class="component-card">
+                    <div class="component-label">Bottom Navigation</div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                            <span class="nav-label">Library</span>
+                        </div>
+                        <div class="nav-item">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="2"/>
+                                <path d="M12 2C10.5 2 9 3 9 5c0 1.5 1 3 3 3s3-1.5 3-3c0-2-1.5-3-3-3z"/>
+                                <path d="M19.5 6.5c-1.5-1-3.5-0.5-4.5 1s-0.5 3.5 1 4.5 3.5 0.5 4.5-1 0.5-3.5-1-4.5z"/>
+                                <path d="M19.5 17.5c-1 1.5-0.5 3.5 1 4.5s3.5 0.5 4.5-1 0.5-3.5-1-4.5-3.5-0.5-4.5 1z"/>
+                                <path d="M12 22c1.5 0 3-1 3-3s-1-3-3-3-3 1.5-3 3c0 2 1.5 3 3 3z"/>
+                                <path d="M4.5 17.5c1 1.5 0.5 3.5-1 4.5s-3.5 0.5-4.5-1-0.5-3.5 1-4.5 3.5-0.5 4.5 1z"/>
+                                <path d="M4.5 6.5c1.5-1 3.5-0.5 4.5 1s0.5 3.5-1 4.5-3.5 0.5-4.5-1-0.5-3.5 1-4.5z"/>
+                            </svg>
+                            <span class="nav-label">Vision</span>
+                        </div>
+                        <div class="nav-item">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            <span class="nav-label">Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards -->
+        <section class="section">
+            <h2 class="section-title">Content Cards</h2>
+            <div class="component-card">
+                <div class="component-label">Transmission Card</div>
+                <div class="content-card">
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="card-category">Relationships</span>
+                            <span class="card-time">• 15 min</span>
+                        </div>
+                        <div class="card-title">Calling In Your Dream Queen</div>
+                    </div>
+                    <div class="card-image"></div>
+                </div>
+                <div class="content-card">
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="card-category">Personal Growth</span>
+                            <span class="card-time">• 10 min</span>
+                        </div>
+                        <div class="card-title">Lucid Vision 2028</div>
+                    </div>
+                    <div class="card-image" style="background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);"></div>
+                </div>
+                <div class="content-card">
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="card-category">Health</span>
+                            <span class="card-time">• 8 min</span>
+                        </div>
+                        <div class="card-title">Morning Vitality Flow</div>
+                    </div>
+                    <div class="card-image" style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);"></div>
+                </div>
+                <div class="content-card">
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="card-category">Finance</span>
+                            <span class="card-time">• 12 min</span>
+                        </div>
+                        <div class="card-title">Abundance Mindset</div>
+                    </div>
+                    <div class="card-image" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lists -->
+        <section class="section">
+            <h2 class="section-title">Lists</h2>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Checklist</div>
+                    <ul class="checklist">
+                        <li class="checklist-item">Save this visualization</li>
+                        <li class="checklist-item">Explore & clarify your vision</li>
+                        <li class="checklist-item">Reprogram your mind</li>
+                        <li class="checklist-item">Create the life of your ultimate vision</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Icons -->
+        <section class="section">
+            <h2 class="section-title">Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Close</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Play</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Pause</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Heart</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Mic</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Share</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Home</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Profile</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="2"/>
+                            <path d="M12 2C10.5 2 9 3 9 5c0 1.5 1 3 3 3s3-1.5 3-3c0-2-1.5-3-3-3z"/>
+                            <path d="M19.5 6.5c-1.5-1-3.5-0.5-4.5 1s-0.5 3.5 1 4.5 3.5 0.5 4.5-1 0.5-3.5-1-4.5z"/>
+                            <path d="M19.5 17.5c-1 1.5-0.5 3.5 1 4.5s3.5 0.5 4.5-1 0.5-3.5-1-4.5-3.5-0.5-4.5 1z"/>
+                            <path d="M12 22c1.5 0 3-1 3-3s-1-3-3-3-3 1.5-3 3c0 2 1.5 3 3 3z"/>
+                            <path d="M4.5 17.5c1 1.5 0.5 3.5-1 4.5s-3.5 0.5-4.5-1-0.5-3.5 1-4.5 3.5-0.5 4.5 1z"/>
+                            <path d="M4.5 6.5c1.5-1 3.5-0.5 4.5 1s0.5 3.5-1 4.5-3.5 0.5-4.5-1-0.5-3.5 1-4.5z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Vision</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Chevron</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Menu</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+                    <div class="icon-label">Star</div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

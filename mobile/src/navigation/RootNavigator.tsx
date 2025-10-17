@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types';
@@ -16,8 +16,23 @@ import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
 import MeditationPlayerScreen from '../screens/Player/MeditationPlayerScreen';
 import CreateGiftScreen from '../screens/Gift/CreateGiftScreen';
 import GiftPlayerScreen from '../screens/Gift/GiftPlayerScreen';
+import { theme } from '../theme/theme';
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+const DarkTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: theme.colors.primary,
+    background: theme.colors.background,
+    card: theme.colors.surface,
+    text: theme.colors.text.primary,
+    border: theme.colors.border,
+    notification: theme.colors.primary,
+  },
+};
 
 export default function RootNavigator() {
   const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
@@ -27,8 +42,13 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <NavigationContainer theme={DarkTheme}>
+      <Stack.Navigator 
+        screenOptions={{ 
+          headerShown: false,
+          cardStyle: { backgroundColor: theme.colors.background },
+        }}
+      >
         {!isAuthenticated ? (
           <>
             <Stack.Screen name="Auth" component={AuthScreen} />
