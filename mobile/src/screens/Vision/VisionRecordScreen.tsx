@@ -225,24 +225,26 @@ const styles = StyleSheet.create({
   helpText: {
     position: 'absolute',
     top: '50%',
-    left: '50%',
+    left: 0,
+    right: 0,
     fontSize: 16,
     color: colors.textSecondary,
+    textAlign: 'center',
     transform: [
-      { translateX: -45 },  // Approximate half of text width to center
-      { translateY: -120 }, // 70 (half button) + 24 (spacing) + 26 (half text height)
+      { translateY: -112 }, // 70 (half button) + 24 (spacing) + 18 (text height)
     ],
   },
   timer: {
     position: 'absolute',
     top: '50%',
-    left: '50%',
+    left: 0,
+    right: 0,
     fontSize: 32,
     fontWeight: '600',
     color: '#EF4444',
+    textAlign: 'center',
     transform: [
-      { translateX: -40 },  // Approximate half of text width to center
-      { translateY: -120 }, // Same position as helpText - no shift!
+      { translateY: -112 }, // Same as helpText - no shift!
     ],
   },
   micButtonRecording: {
