@@ -200,15 +200,26 @@ Previous conversation:
 ${responseHistory}
 ${contextSection}
 
-Generate ONE single follow-up question that either:
+Generate ONE simple, focused follow-up question that either:
 - Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
 - Expands context (30% probability): Explores related life areas or future possibilities
 
 ${existingVision ? 'Remember to build on their existing vision context above.' : ''}
 
-IMPORTANT: Ask only ONE question. Do NOT combine multiple questions or use "and" to join questions. Keep it simple and focused.
+STYLE REQUIREMENTS:
+- Keep it SHORT (10-15 words maximum)
+- Use simple, conversational language
+- Focus on ONE specific thing only
+- Avoid compound questions (no "and", "or", "but also")
+- Make it feel natural and easy to answer
 
-Return only the question, nothing else. Make it personal and evocative.`;
+BAD: "How does embodying this financial abundance influence not only your daily choices but also the legacy you wish to create for your family and community in the years to come?"
+
+GOOD: "What does abundance feel like in your body?"
+GOOD: "How do you want to experience wealth daily?"
+GOOD: "What legacy matters most to you?"
+
+Return only the question, nothing else.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
