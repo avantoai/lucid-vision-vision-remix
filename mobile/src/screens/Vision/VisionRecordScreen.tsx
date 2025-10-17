@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     transform: [
-      { translateY: -112 }, // 70 (half button) + 24 (spacing) + 18 (text height)
+      { translateY: -130 }, // Position above button: 70 (half button) + 24 (spacing) + 36 (clearance)
     ],
   },
   timer: {
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     textAlign: 'center',
     transform: [
-      { translateY: -112 }, // Same as helpText - no shift!
+      { translateY: -130 }, // Same as helpText - no shift!
     ],
   },
   micButtonRecording: {
