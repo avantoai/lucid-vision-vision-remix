@@ -15,6 +15,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 - **Mobile-First Design:** The application is primarily designed for mobile platforms, ensuring a responsive and intuitive user experience.
 - **Dark Mode Theme:** Centralized theming system (`mobile/src/theme.ts`) with dark mode palette. Background: #0f0f0f (very dark), Surface: #1a1a1a (cards), Primary accent: #7c3aed (purple), Secondary accent: #a78bfa (lighter purple for highlights). All screens use centralized theme colors for consistency. NavigationContainer configured with custom DarkTheme for proper stack transitions and modal backgrounds.
 - **Navigation:** Utilizes React Navigation with a Stack Navigator and Bottom Tab Navigator for a structured and user-friendly flow. The Library screen is the default home screen. Tab bar styled with dark surface and purple accent.
+- **Icon System:** All UI elements use Ionicons flat vector icons (no emojis) for professional, consistent design. Icons are properly sized and themed to match the dark mode palette.
 - **Branding:** Tab bar icons include house (Library), flower (Vision), and person (Profile).
 
 **2. Technical Implementations:**

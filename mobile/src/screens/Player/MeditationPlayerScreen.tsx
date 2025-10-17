@@ -301,7 +301,7 @@ export default function MeditationPlayerScreen() {
         onRequestClose={() => setShowOptionsMenu(false)}
       >
         <TouchableOpacity 
-          style={styles.modalOverlay} 
+          style={styles.optionsOverlay} 
           activeOpacity={1} 
           onPress={() => setShowOptionsMenu(false)}
         >
@@ -324,7 +324,7 @@ export default function MeditationPlayerScreen() {
         animationType="slide"
         onRequestClose={() => setShowEditTitle(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.centeredModalOverlay}>
           <View style={styles.editTitleModal}>
             <Text style={styles.modalTitle}>Edit Title</Text>
             <TextInput
@@ -492,13 +492,20 @@ const styles = StyleSheet.create({
     marginTop: -32,
     marginBottom: 32,
   },
-  modalOverlay: {
+  optionsOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  centeredModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   optionsMenu: {
+    position: 'absolute',
+    top: 90,
+    right: 20,
     backgroundColor: colors.surface,
     borderRadius: 12,
     width: 200,
