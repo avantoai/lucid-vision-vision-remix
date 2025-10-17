@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navig
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 type LibraryScreenRouteProp = RouteProp<TabParamList, 'Library'>;
@@ -142,7 +143,7 @@ export default function LibraryScreen() {
       <Text style={styles.meditationCategory}>{item.category}</Text>
       {item.status === 'generating' && (
         <View style={styles.generatingBadge}>
-          <ActivityIndicator size="small" color="#6366F1" />
+          <ActivityIndicator size="small" color={colors.primary} />
           <Text style={styles.generatingText}>Generating...</Text>
         </View>
       )}
@@ -159,7 +160,7 @@ export default function LibraryScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -232,13 +233,13 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 16,
   },
   filterContainer: {
@@ -258,28 +259,28 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.surfaceLight,
   },
   filterButtonActive: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
   },
   filterText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   filterTextActive: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   listContainer: {
     padding: 20,
   },
   meditationCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
   },
   meditationHeader: {
     flexDirection: 'row',
@@ -290,16 +291,16 @@ const styles = StyleSheet.create({
   meditationTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     flex: 1,
   },
   meditationDuration: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   meditationCategory: {
     fontSize: 14,
-    color: '#6366F1',
+    color: colors.primary,
     textTransform: 'capitalize',
   },
   pinnedBadge: {
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
   },
   generatingText: {
     fontSize: 14,
-    color: '#6366F1',
+    color: colors.primary,
     fontWeight: '500',
   },
   failedBadge: {
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
-    color: '#9CA3AF',
+    color: colors.textTertiary,
     marginTop: 40,
   },
   errorContainer: {
@@ -362,12 +363,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   retryText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 14,
     fontWeight: '600',
   },
   createButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     margin: 20,
     paddingVertical: 16,
     borderRadius: 12,
@@ -378,18 +379,18 @@ const styles = StyleSheet.create({
     right: 0,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },
   notificationBanner: {
-    backgroundColor: '#EEF2FF',
+    backgroundColor: colors.surfaceLight,
     marginHorizontal: 20,
     marginBottom: 12,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#C7D2FE',
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
@@ -399,7 +400,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   notificationText: {
-    color: '#4338CA',
+    color: colors.text,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -407,12 +408,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#C7D2FE',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   dismissButtonText: {
-    color: '#4338CA',
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: '600',
   },

@@ -7,6 +7,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type MeditationPlayerRouteProp = RouteProp<RootStackParamList, 'MeditationPlayer'>;
 type MeditationPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'MeditationPlayer'>;
@@ -213,7 +214,7 @@ export default function MeditationPlayerScreen() {
   if (isLoading || !meditation) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -242,9 +243,9 @@ export default function MeditationPlayerScreen() {
               maximumValue={duration}
               value={position}
               onSlidingComplete={handleSeek}
-              minimumTrackTintColor="#6366F1"
-              maximumTrackTintColor="#D1D5DB"
-              thumbTintColor="#6366F1"
+              minimumTrackTintColor={colors.primary}
+              maximumTrackTintColor={colors.border}
+              thumbTintColor={colors.primary}
             />
             <Text style={styles.timeText}>{formatTime(duration)}</Text>
           </View>
@@ -268,7 +269,7 @@ export default function MeditationPlayerScreen() {
             disabled={!audioReady}
           >
             {!audioReady ? (
-              <ActivityIndicator size="large" color="#FFFFFF" />
+              <ActivityIndicator size="large" color={colors.white} />
             ) : (
               <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
             )}
@@ -326,6 +327,7 @@ export default function MeditationPlayerScreen() {
               value={editedTitle}
               onChangeText={setEditedTitle}
               placeholder="Enter meditation title"
+              placeholderTextColor={colors.textTertiary}
               autoFocus
             />
             <View style={styles.modalButtons}>
@@ -341,7 +343,7 @@ export default function MeditationPlayerScreen() {
                 disabled={isSavingTitle}
               >
                 {isSavingTitle ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color={colors.white} />
                 ) : (
                   <Text style={styles.saveButtonText}>Save</Text>
                 )}
@@ -376,13 +378,13 @@ export default function MeditationPlayerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   backButton: {
     position: 'absolute',
@@ -394,7 +396,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 18,
-    color: '#6366F1',
+    color: colors.primary,
     fontWeight: '600',
   },
   optionsButton: {
@@ -407,7 +409,7 @@ const styles = StyleSheet.create({
   },
   optionsText: {
     fontSize: 24,
-    color: '#6366F1',
+    color: colors.primary,
     fontWeight: '600',
     letterSpacing: 2,
   },
@@ -420,13 +422,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 12,
   },
   category: {
     fontSize: 18,
-    color: '#6366F1',
+    color: colors.primary,
     textTransform: 'capitalize',
     marginBottom: 40,
   },
@@ -443,7 +445,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
     minWidth: 45,
     textAlign: 'center',
   },
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
   },
   controlText: {
     fontSize: 28,
-    color: '#6366F1',
+    color: colors.primary,
   },
   controlTextDisabled: {
     opacity: 0.3,
@@ -471,21 +473,21 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   playButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: colors.textTertiary,
     opacity: 0.6,
   },
   playButtonText: {
     fontSize: 40,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   loadingText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginTop: -32,
     marginBottom: 32,
   },
@@ -496,7 +498,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionsMenu: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     width: 200,
     shadowColor: '#000',
@@ -510,15 +512,15 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
   },
   menuDivider: {
     height: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.border,
   },
   editTitleModal: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 24,
     width: '85%',
@@ -527,17 +529,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 16,
     textAlign: 'center',
   },
   titleInput: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 20,
+    color: colors.text,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -550,28 +553,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.surfaceLight,
   },
   cancelButtonText: {
-    color: '#6B7280',
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: '600',
   },
   saveButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
   },
   saveButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: colors.textTertiary,
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
   transcriptModal: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     paddingTop: 50,
   },
   transcriptHeader: {
@@ -580,16 +583,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: colors.border,
   },
   transcriptTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
   },
   closeTranscript: {
     fontSize: 28,
-    color: '#6B7280',
+    color: colors.textSecondary,
     paddingHorizontal: 8,
   },
   transcriptScroll: {
@@ -598,7 +601,7 @@ const styles = StyleSheet.create({
   transcriptText: {
     fontSize: 16,
     lineHeight: 26,
-    color: '#374151',
+    color: colors.textSecondary,
     padding: 20,
   },
 });

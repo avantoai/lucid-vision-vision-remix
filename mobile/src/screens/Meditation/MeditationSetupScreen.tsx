@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type MeditationSetupRouteProp = RouteProp<RootStackParamList, 'MeditationSetup'>;
 type MeditationSetupNavigationProp = StackNavigationProp<RootStackParamList, 'MeditationSetup'>;
@@ -128,7 +129,7 @@ export default function MeditationSetupScreen() {
 
         {visionStatus === 'processing' && (
           <View style={styles.visionProcessing}>
-            <ActivityIndicator size="small" color="#6366F1" />
+            <ActivityIndicator size="small" color={colors.primary} />
             <Text style={styles.visionProcessingText}>✨ Crafting your vision statement...</Text>
           </View>
         )}
@@ -215,7 +216,7 @@ export default function MeditationSetupScreen() {
           disabled={isLoading}
         >
           {isLoading ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colors.white} />
           ) : (
             <Text style={styles.generateButtonText}>Generate Meditation</Text>
           )}
@@ -228,7 +229,7 @@ export default function MeditationSetupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   closeButton: {
     position: 'absolute',
@@ -238,13 +239,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeText: {
     fontSize: 24,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   content: {
     padding: 20,
@@ -253,19 +254,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 32,
     textTransform: 'capitalize',
   },
   label: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 12,
   },
   optionsGrid: {
@@ -275,28 +276,28 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   optionButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
   },
   optionButtonSelected: {
-    borderColor: '#6366F1',
-    backgroundColor: '#EEF2FF',
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
   },
   optionText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   optionTextSelected: {
-    color: '#6366F1',
+    color: colors.primary,
     fontWeight: '600',
   },
   generateButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -306,14 +307,14 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   generateButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },
   visionProcessing: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EEF2FF',
+    backgroundColor: colors.surfaceLight,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   },
   visionProcessingText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: colors.primary,
     fontWeight: '500',
   },
   visionCompleted: {

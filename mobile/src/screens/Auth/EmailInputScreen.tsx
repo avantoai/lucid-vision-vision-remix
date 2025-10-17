@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type EmailInputNavigationProp = StackNavigationProp<RootStackParamList, 'EmailInput'>;
 
@@ -82,26 +83,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 24,
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
+    color: colors.text,
   },
   button: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },
@@ -121,12 +123,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
   },
   successMessage: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
   },
   waitingText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: colors.textTertiary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

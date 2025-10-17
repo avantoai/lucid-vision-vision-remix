@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
+import { colors } from '../../theme';
 
 type AuthScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Auth'>;
 
@@ -32,28 +33,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#111827',
+    color: colors.text,
   },
   subtitle: {
     fontSize: 18,
-    color: '#6B7280',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 40,
   },
   button: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     paddingHorizontal: 48,
     borderRadius: 12,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },

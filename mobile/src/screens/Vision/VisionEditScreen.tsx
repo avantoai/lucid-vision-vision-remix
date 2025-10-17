@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type VisionEditRouteProp = RouteProp<RootStackParamList, 'VisionEdit'>;
 type VisionEditNavigationProp = StackNavigationProp<RootStackParamList, 'VisionEdit'>;
@@ -93,7 +94,7 @@ export default function VisionEditScreen() {
   if (isTranscribing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Transcribing your response...</Text>
       </View>
     );
@@ -112,6 +113,7 @@ export default function VisionEditScreen() {
         <TextInput
           style={styles.input}
           placeholder="Type or edit your response..."
+          placeholderTextColor={colors.textTertiary}
           value={currentAnswer}
           onChangeText={setCurrentAnswer}
           multiline
@@ -159,18 +161,18 @@ export default function VisionEditScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   closeButton: {
     position: 'absolute',
@@ -180,13 +182,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeText: {
     fontSize: 24,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   content: {
     padding: 20,
@@ -195,24 +197,25 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#6366F1',
+    color: colors.primary,
     textTransform: 'capitalize',
     marginBottom: 16,
   },
   prompt: {
     fontSize: 20,
-    color: '#111827',
+    color: colors.text,
     marginBottom: 24,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     minHeight: 180,
     marginBottom: 20,
+    color: colors.text,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -226,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
   },
   completeButton: {
     backgroundColor: '#10B981',
@@ -235,7 +238,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -245,11 +248,11 @@ const styles = StyleSheet.create({
   responsesTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 12,
   },
   responseCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
@@ -257,11 +260,11 @@ const styles = StyleSheet.create({
   responseQuestion: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   responseAnswer: {
     fontSize: 14,
-    color: '#111827',
+    color: colors.text,
   },
 });

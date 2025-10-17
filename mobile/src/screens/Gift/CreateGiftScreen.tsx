@@ -6,6 +6,7 @@ import * as Clipboard from 'expo-clipboard';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
 import { VOICE_OPTIONS } from '../../constants/config';
+import { colors } from '../../theme';
 
 type CreateGiftNavigationProp = StackNavigationProp<RootStackParamList, 'CreateGift'>;
 
@@ -71,12 +72,14 @@ export default function CreateGiftScreen() {
           value={String(duration)}
           onChangeText={(text) => setDuration(parseInt(text) || 5)}
           keyboardType="number-pad"
+          placeholderTextColor={colors.textTertiary}
         />
 
         <Text style={styles.label}>Question</Text>
         <TextInput
           style={styles.input}
           placeholder="What would you like them to reflect on?"
+          placeholderTextColor={colors.textTertiary}
           value={currentQuestion}
           onChangeText={setCurrentQuestion}
         />
@@ -85,6 +88,7 @@ export default function CreateGiftScreen() {
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Your heartfelt message..."
+          placeholderTextColor={colors.textTertiary}
           value={currentAnswer}
           onChangeText={setCurrentAnswer}
           multiline
@@ -125,7 +129,7 @@ export default function CreateGiftScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   closeButton: {
     position: 'absolute',
@@ -135,13 +139,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeText: {
     fontSize: 24,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   content: {
     padding: 20,
@@ -150,28 +154,29 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 24,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
+    color: colors.text,
   },
   textArea: {
     minHeight: 100,
@@ -184,7 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -194,11 +199,11 @@ const styles = StyleSheet.create({
   responsesTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 12,
   },
   responseCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
@@ -206,15 +211,15 @@ const styles = StyleSheet.create({
   responseQuestion: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   responseAnswer: {
     fontSize: 14,
-    color: '#111827',
+    color: colors.text,
   },
   createButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },

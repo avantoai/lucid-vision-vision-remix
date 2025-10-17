@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type CategorySelectionNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -31,7 +32,7 @@ export default function CategorySelectionScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -79,13 +80,13 @@ export default function CategorySelectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
@@ -96,29 +97,29 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: colors.primary,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   categoriesContainer: {
     padding: 20,
     paddingTop: 0,
   },
   categoryCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     textTransform: 'capitalize',
   },
   visionBadge: {
@@ -140,12 +141,12 @@ const styles = StyleSheet.create({
   },
   categoryDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   categoryTagline: {
     fontSize: 14,
-    color: '#6366F1',
+    color: colors.primary,
     fontStyle: 'italic',
   },
 });

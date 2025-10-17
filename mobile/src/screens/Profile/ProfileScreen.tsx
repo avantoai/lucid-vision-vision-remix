@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } fr
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { SubscriptionStatus, QuotaUsage } from '../../types';
+import { colors } from '../theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -39,7 +40,7 @@ export default function ProfileScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -95,13 +96,13 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
@@ -110,37 +111,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   name: {
     fontSize: 18,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     margin: 20,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 12,
   },
   tierBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     marginBottom: 8,
   },
   tierText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -155,12 +156,12 @@ const styles = StyleSheet.create({
   },
   quotaLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   quotaValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
   },
   logoutButton: {
     backgroundColor: '#EF4444',
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },

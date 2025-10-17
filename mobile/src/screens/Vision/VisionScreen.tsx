@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type VisionScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -31,7 +32,7 @@ export default function VisionScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -79,13 +80,13 @@ export default function VisionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
@@ -94,37 +95,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   categoriesContainer: {
     padding: 20,
   },
   categoryCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
   },
   categoryCardCompleted: {
     borderColor: '#10B981',
     backgroundColor: '#F0FDF4',
   },
   categoryCardWithSummary: {
-    borderColor: '#6366F1',
-    backgroundColor: '#EEF2FF',
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
   },
   summaryBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
   },
   summaryBadgeText: {
     fontSize: 14,
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#111827',
+    color: colors.text,
     textTransform: 'capitalize',
   },
   completedBadge: {
@@ -149,12 +150,12 @@ const styles = StyleSheet.create({
   },
   categoryTagline: {
     fontSize: 14,
-    color: '#6366F1',
+    color: colors.primary,
     fontStyle: 'italic',
     marginBottom: 4,
   },
   categoryStatus: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
 });

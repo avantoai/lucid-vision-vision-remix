@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { colors } from '../../theme';
 
 type OnboardingRouteProp = RouteProp<RootStackParamList, 'Onboarding'>;
 type OnboardingNavigationProp = StackNavigationProp<RootStackParamList, 'Onboarding'>;
@@ -48,6 +49,7 @@ export default function OnboardingScreen() {
           <TextInput
             style={styles.input}
             placeholder="Your full name"
+            placeholderTextColor={colors.textTertiary}
             value={fullName}
             onChangeText={setFullName}
             autoCapitalize="words"
@@ -74,32 +76,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 24,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 24,
+    color: colors.text,
   },
   button: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },

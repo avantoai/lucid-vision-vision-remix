@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type VisionFlowRouteProp = RouteProp<RootStackParamList, 'VisionFlow'>;
 type VisionFlowNavigationProp = StackNavigationProp<RootStackParamList, 'VisionFlow'>;
@@ -34,7 +35,7 @@ export default function VisionFlowScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#6366F1" />
+      <ActivityIndicator size="large" color={colors.primary} />
       <Text style={styles.loadingText}>Loading your vision prompt...</Text>
     </View>
   );
@@ -45,11 +46,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
 });

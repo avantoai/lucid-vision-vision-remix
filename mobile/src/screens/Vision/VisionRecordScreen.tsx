@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 import { RootStackParamList } from '../../types';
+import { colors } from '../../theme';
 
 type VisionRecordRouteProp = RouteProp<RootStackParamList, 'VisionRecord'>;
 type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'VisionRecord'>;
@@ -129,7 +130,7 @@ export default function VisionRecordScreen() {
           disabled={isLoading}
         >
           {isLoading ? (
-            <ActivityIndicator size="large" color="#FFFFFF" />
+            <ActivityIndicator size="large" color={colors.white} />
           ) : isRecording ? (
             <View style={styles.stopIcon} />
           ) : (
@@ -156,7 +157,7 @@ export default function VisionRecordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   closeButton: {
     position: 'absolute',
@@ -166,13 +167,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeText: {
     fontSize: 24,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   content: {
     flex: 1,
@@ -184,20 +185,20 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#6366F1',
+    color: colors.primary,
     textTransform: 'capitalize',
     marginBottom: 16,
   },
   prompt: {
     fontSize: 20,
-    color: '#111827',
+    color: colors.text,
     marginBottom: 40,
     textAlign: 'center',
     paddingHorizontal: 20,
   },
   helpText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 24,
   },
   timer: {
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
@@ -224,18 +225,18 @@ const styles = StyleSheet.create({
   stopIcon: {
     width: 40,
     height: 40,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     borderRadius: 4,
   },
   writeButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 20,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.surfaceLight,
   },
   writeButtonText: {
     fontSize: 16,
-    color: '#374151',
+    color: colors.text,
     fontWeight: '600',
   },
   responsesIndicator: {
@@ -245,6 +246,6 @@ const styles = StyleSheet.create({
   },
   responsesCount: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
 });

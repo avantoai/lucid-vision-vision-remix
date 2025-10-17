@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
+import { colors } from '../../theme';
 
 type GiftPlayerRouteProp = RouteProp<RootStackParamList, 'GiftPlayer'>;
 type GiftPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'GiftPlayer'>;
@@ -65,7 +66,7 @@ export default function GiftPlayerScreen() {
   if (isLoading || !gift) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -98,13 +99,13 @@ export default function GiftPlayerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background,
   },
   closeButton: {
     position: 'absolute',
@@ -114,13 +115,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeText: {
     fontSize: 24,
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   content: {
     flex: 1,
@@ -130,39 +131,39 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   senderName: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#6366F1',
+    color: colors.primary,
     marginBottom: 32,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 12,
   },
   duration: {
     fontSize: 16,
-    color: '#6B7280',
+    color: colors.textSecondary,
     marginBottom: 40,
   },
   playButton: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
   },
   playButtonText: {
     fontSize: 40,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   saveButton: {
     backgroundColor: '#10B981',
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '600',
   },
