@@ -5,7 +5,6 @@ import { TabParamList } from '../types';
 import LibraryScreen from '../screens/Library/LibraryScreen';
 import VisionScreen from '../screens/Vision/VisionScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
-import { theme } from '../theme/theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -14,22 +13,8 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.text.tertiary,
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopWidth: 0,
-          height: theme.components.bottomNav.height,
-          paddingBottom: 20,
-          paddingTop: 20,
-        },
-        tabBarLabelStyle: {
-          fontSize: theme.typography.sizes.tiny,
-          fontWeight: theme.typography.weights.medium,
-        },
-        tabBarIconStyle: {
-          marginBottom: -4,
-        },
+        tabBarActiveTintColor: '#6366F1',
+        tabBarInactiveTintColor: '#9CA3AF',
       }}
     >
       <Tab.Screen 
@@ -37,8 +22,8 @@ export default function MainTabNavigator() {
         component={LibraryScreen}
         options={{ 
           tabBarLabel: 'Library',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home" size={theme.components.bottomNav.iconSize} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -47,8 +32,8 @@ export default function MainTabNavigator() {
         component={VisionScreen}
         options={{ 
           tabBarLabel: 'Vision',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="flower" size={theme.components.bottomNav.iconSize} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="flower" size={size} color={color} />
           ),
         }}
       />
@@ -57,8 +42,8 @@ export default function MainTabNavigator() {
         component={ProfileScreen}
         options={{ 
           tabBarLabel: 'Profile',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person" size={theme.components.bottomNav.iconSize} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

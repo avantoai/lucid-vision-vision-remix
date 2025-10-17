@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 import { RootStackParamList } from '../../types';
-import { Text, Button, RecordButton, IconButton } from '../../components/ui';
-import { theme } from '../../theme/theme';
-import { Ionicons } from '@expo/vector-icons';
 
 type VisionRecordRouteProp = RouteProp<RootStackParamList, 'VisionRecord'>;
 type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'VisionRecord'>;
@@ -109,116 +106,117 @@ export default function VisionRecordScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <IconButton
-        icon={<Ionicons name="close" size={24} color={theme.colors.text.primary} />}
-        onPress={() => navigation.goBack()}
-        style={styles.closeButton}
-      />
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.closeText}>✕</Text>
+      </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text variant="heading" color="primary" weight="bold" align="center" style={styles.category}>
-          {route.params.category}
-        </Text>
-        
-        <Text variant="subheading" color="body" align="center" style={styles.prompt}>
-          {route.params.prompt}
-        </Text>
+        <Text style={styles.category}>{route.params.category}</Text>
+        <Text style={styles.prompt}>{route.params.prompt}</Text>
 
         {isRecording && (
-          <Text variant="title" weight="semibold" style={styles.timer}>
-            {formatTime(recordingTime)}
-          </Text>
+          <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
         )}
 
         {!isRecording && !isLoading && (
-          <Text variant="body" color="secondary" style={styles.helpText}>
-            Tap to Record
-          </Text>
+          <Text style={styles.helpText}>Tap to Record</Text>
         )}
 
-        <View style={styles.recordContainer}>
+        <TouchableOpacity
+          style={[styles.micButton, isRecording && styles.micButtonRecording]}
+          onPress={isRecording ? stopRecording : startRecording}
+          disabled={isLoading}
+        >
           {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-            </View>
+            <ActivityIndicator size="large" color="#FFFFFF" />
+          ) : isRecording ? (
+            <View style={styles.stopIcon} />
           ) : (
-            <RecordButton
-              isRecording={isRecording}
-              onPress={isRecording ? stopRecording : startRecording}
-              disabled={isLoading}
-              icon={
-                isRecording ? (
-                  <View style={styles.stopIcon} />
-                ) : (
-                  <Text style={styles.micIcon}>🎙️</Text>
-                )
-              }
-            />
+            <Text style={styles.micIcon}>🎙️</Text>
           )}
-        </View>
+        </TouchableOpacity>
 
         {!isRecording && !isLoading && (
-          <Button
-            title="Write ✏️"
-            onPress={handleWriteMode}
-            variant="secondary"
-            size="medium"
-            style={styles.writeButton}
-          />
+          <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
+            <Text style={styles.writeButtonText}>Write ✏️</Text>
+          </TouchableOpacity>
         )}
 
         {route.params.responses.length > 0 && (
-          <Text variant="small" color="secondary" style={styles.responsesCount}>
-            {route.params.responses.length} previous responses
-          </Text>
+          <View style={styles.responsesIndicator}>
+            <Text style={styles.responsesCount}>{route.params.responses.length} previous responses</Text>
+          </View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#F9FAFB',
   },
   closeButton: {
     position: 'absolute',
     top: 50,
     right: 20,
     zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeText: {
+    fontSize: 24,
+    color: '#6B7280',
   },
   content: {
     flex: 1,
-    padding: theme.spacing.xl,
+    padding: 20,
     paddingTop: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
   category: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#6366F1',
     textTransform: 'capitalize',
-    marginBottom: theme.spacing.lg,
+    marginBottom: 16,
   },
   prompt: {
-    marginBottom: theme.spacing.huge,
-    paddingHorizontal: theme.spacing.xl,
+    fontSize: 20,
+    color: '#111827',
+    marginBottom: 40,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
   helpText: {
-    marginBottom: theme.spacing.xxl,
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 24,
   },
   timer: {
-    color: theme.colors.status.error,
-    marginBottom: theme.spacing.xxl,
+    fontSize: 32,
+    fontWeight: '600',
+    color: '#EF4444',
+    marginBottom: 24,
   },
-  recordContainer: {
-    marginBottom: theme.spacing.xxl,
-  },
-  loadingContainer: {
-    width: 160,
-    height: 160,
-    alignItems: 'center',
+  micButton: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#6366F1',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  micButtonRecording: {
+    backgroundColor: '#EF4444',
   },
   micIcon: {
     fontSize: 64,
@@ -226,14 +224,27 @@ const styles = StyleSheet.create({
   stopIcon: {
     width: 40,
     height: 40,
-    backgroundColor: theme.colors.text.primary,
-    borderRadius: theme.borderRadius.sm,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
   },
   writeButton: {
-    marginTop: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 20,
+    backgroundColor: '#E5E7EB',
   },
-  responsesCount: {
+  writeButtonText: {
+    fontSize: 16,
+    color: '#374151',
+    fontWeight: '600',
+  },
+  responsesIndicator: {
     position: 'absolute',
     bottom: 40,
+    alignSelf: 'center',
+  },
+  responsesCount: {
+    fontSize: 14,
+    color: '#6B7280',
   },
 });

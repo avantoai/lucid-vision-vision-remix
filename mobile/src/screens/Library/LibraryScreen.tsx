@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
-import { Text, Button, Card, IconButton } from '../../components/ui';
-import { theme } from '../../theme/theme';
-import { Ionicons } from '@expo/vector-icons';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 type LibraryScreenRouteProp = RouteProp<TabParamList, 'Library'>;
@@ -31,8 +28,10 @@ export default function LibraryScreen() {
       loadMeditations();
       startPolling();
       
+      // Check if we should show the notification
       if (route.params?.showGeneratingNotification) {
         setShowNotification(true);
+        // Clear the param so it doesn't show again on refocus
         navigation.setParams({ showGeneratingNotification: undefined } as any);
       }
       
@@ -124,6 +123,7 @@ export default function LibraryScreen() {
 
   const renderMeditation = ({ item }: { item: Meditation }) => (
     <TouchableOpacity
+      style={styles.meditationCard}
       onPress={() => {
         if (item.status === 'generating') {
           Alert.alert('Still Generating', 'This meditation is still being created. You\'ll be notified when it\'s ready!');
@@ -133,121 +133,80 @@ export default function LibraryScreen() {
           navigation.navigate('MeditationPlayer', { meditationId: item.id });
         }
       }}
-      activeOpacity={0.7}
+      disabled={item.status !== 'completed'}
     >
-      <Card style={styles.meditationCard}>
-        <View style={styles.cardContent}>
-          <View style={styles.cardMeta}>
-            <Text variant="tiny" color="primary" weight="semibold" style={styles.categoryText}>
-              {item.category}
-            </Text>
-            <Text variant="tiny" color="secondary">
-              {item.duration} min
-            </Text>
-          </View>
-          
-          <Text variant="subheading" weight="bold" numberOfLines={2} style={styles.title}>
-            {item.title}
-          </Text>
-          
-          {item.status === 'generating' && (
-            <View style={styles.generatingBadge}>
-              <ActivityIndicator size="small" color={theme.colors.primary} />
-              <Text variant="small" color="primary" weight="medium">Generating...</Text>
-            </View>
-          )}
-          
-          {item.status === 'failed' && (
-            <View style={styles.failedBadge}>
-              <Text 
-                variant="small" 
-                weight="medium" 
-                style={styles.failedText}
-              >
-                ❌ Generation failed
-              </Text>
-            </View>
-          )}
-          
-          <View style={styles.badges}>
-            {item.is_pinned && <Text variant="tiny">📌 Pinned</Text>}
-            {item.is_favorite && <Text variant="tiny">❤️</Text>}
-          </View>
+      <View style={styles.meditationHeader}>
+        <Text style={styles.meditationTitle}>{item.title}</Text>
+        <Text style={styles.meditationDuration}>{item.duration} min</Text>
+      </View>
+      <Text style={styles.meditationCategory}>{item.category}</Text>
+      {item.status === 'generating' && (
+        <View style={styles.generatingBadge}>
+          <ActivityIndicator size="small" color="#6366F1" />
+          <Text style={styles.generatingText}>Generating...</Text>
         </View>
-        
-        <View style={styles.cardImage} />
-      </Card>
+      )}
+      {item.status === 'failed' && (
+        <View style={styles.failedBadge}>
+          <Text style={styles.failedText}>❌ Generation failed</Text>
+        </View>
+      )}
+      {item.is_pinned && <Text style={styles.pinnedBadge}>📌 Pinned</Text>}
+      {item.is_favorite && <Text style={styles.favoriteBadge}>❤️</Text>}
     </TouchableOpacity>
   );
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <ActivityIndicator size="large" color="#6366F1" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text variant="title" weight="bold">My Library</Text>
-        
-        <View style={styles.tabs}>
+        <Text style={styles.title}>My Library</Text>
+        <View style={styles.filterContainer}>
           <TouchableOpacity
-            style={[styles.tab, filter === 'all' && styles.tabActive]}
+            style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
             onPress={() => setFilter('all')}
           >
-            <Text 
-              variant="body" 
-              weight="semibold"
-              style={filter === 'all' ? styles.tabTextActive : styles.tabText}
-            >
-              All
-            </Text>
+            <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>All</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab, filter === 'favorites' && styles.tabActive]}
+            style={[styles.filterButton, filter === 'favorites' && styles.filterButtonActive]}
             onPress={() => setFilter('favorites')}
           >
-            <Text 
-              variant="body" 
-              weight="semibold"
-              style={filter === 'favorites' ? styles.tabTextActive : styles.tabText}
-            >
-              Favorites
-            </Text>
+            <Text style={[styles.filterText, filter === 'favorites' && styles.filterTextActive]}>Favorites</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {showNotification && (
-        <Card style={styles.notificationBanner}>
+        <View style={styles.notificationBanner}>
           <View style={styles.notificationContent}>
-            <Text variant="small" color="body">
+            <Text style={styles.notificationText}>
               Your meditation is being generated. This will take a few minutes. We'll notify you once it's ready ✨
             </Text>
           </View>
-          <IconButton
-            icon={<Ionicons name="close" size={20} color={theme.colors.text.primary} />}
+          <TouchableOpacity
+            style={styles.dismissButton}
             onPress={() => setShowNotification(false)}
-            size="small"
-          />
-        </Card>
+          >
+            <Text style={styles.dismissButtonText}>✕</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {error && (
-        <Card style={styles.errorContainer}>
-          <Text variant="small" style={styles.errorText}>
-            ⚠️ {error}
-          </Text>
-          <Button
-            title="Retry"
-            onPress={loadMeditations}
-            variant="primary"
-            size="small"
-          />
-        </Card>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>⚠️ {error}</Text>
+          <TouchableOpacity onPress={loadMeditations} style={styles.retryButton}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       <FlatList
@@ -256,149 +215,205 @@ export default function LibraryScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
-          !error ? (
-            <Text variant="body" color="secondary" align="center" style={styles.emptyText}>
-              No meditations yet
-            </Text>
-          ) : null
+          !error ? <Text style={styles.emptyText}>No meditations yet</Text> : null
         }
       />
 
-      <View style={styles.createButtonContainer}>
-        <Button
-          title="Create Meditation"
-          onPress={() => navigation.navigate('CategorySelection')}
-          variant="primary"
-          fullWidth
-        />
-      </View>
-    </SafeAreaView>
+      <TouchableOpacity
+        style={styles.createButton}
+        onPress={() => navigation.navigate('CategorySelection')}
+      >
+        <Text style={styles.createButtonText}>Create Meditation</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#F9FAFB',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#F9FAFB',
   },
   header: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.xl,
-    paddingBottom: theme.spacing.md,
-  },
-  tabs: {
-    flexDirection: 'row',
-    marginTop: theme.spacing.lg,
-    borderBottomWidth: 2,
-    borderBottomColor: theme.colors.card,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: theme.spacing.lg,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    marginBottom: -2,
-  },
-  tabActive: {
-    borderBottomColor: theme.colors.primary,
-  },
-  tabText: {
-    color: theme.colors.text.secondary,
-  },
-  tabTextActive: {
-    color: theme.colors.primary,
-  },
-  listContainer: {
-    padding: theme.spacing.xl,
-    paddingBottom: 120,
-  },
-  meditationCard: {
-    flexDirection: 'row',
-    gap: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-  },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  cardMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  categoryText: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    padding: 20,
+    paddingTop: 60,
   },
   title: {
-    marginBottom: theme.spacing.sm,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 16,
   },
-  cardImage: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.primary,
+  filterContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#E5E7EB',
+  },
+  filterButtonActive: {
+    backgroundColor: '#6366F1',
+  },
+  filterText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  filterTextActive: {
+    color: '#FFFFFF',
+  },
+  listContainer: {
+    padding: 20,
+  },
+  meditationCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  meditationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  meditationTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    flex: 1,
+  },
+  meditationDuration: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  meditationCategory: {
+    fontSize: 14,
+    color: '#6366F1',
+    textTransform: 'capitalize',
+  },
+  pinnedBadge: {
+    fontSize: 12,
+    color: '#F59E0B',
+    marginTop: 4,
+  },
+  favoriteBadge: {
+    fontSize: 12,
+    marginTop: 4,
   },
   generatingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.sm,
+    marginTop: 8,
+    gap: 8,
+  },
+  generatingText: {
+    fontSize: 14,
+    color: '#6366F1',
+    fontWeight: '500',
   },
   failedBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.sm,
-    marginTop: theme.spacing.sm,
+    backgroundColor: '#FEE2E2',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
     alignSelf: 'flex-start',
   },
-  badges: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.xs,
+  failedText: {
+    fontSize: 12,
+    color: '#DC2626',
+    fontWeight: '500',
   },
   emptyText: {
-    marginTop: theme.spacing.huge,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#9CA3AF',
+    marginTop: 40,
   },
   errorContainer: {
-    marginHorizontal: theme.spacing.xl,
-    marginBottom: theme.spacing.md,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: '#FEF2F2',
+    margin: 20,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
   },
   errorText: {
-    color: theme.colors.status.error,
-    marginBottom: theme.spacing.sm,
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 8,
   },
-  failedText: {
-    color: theme.colors.status.error,
+  retryButton: {
+    backgroundColor: '#DC2626',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
-  createButtonContainer: {
+  retryText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  createButton: {
+    backgroundColor: '#6366F1',
+    margin: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: theme.spacing.xl,
-    backgroundColor: theme.colors.background,
+  },
+  createButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
   notificationBanner: {
-    marginHorizontal: theme.spacing.xl,
-    marginBottom: theme.spacing.md,
+    backgroundColor: '#EEF2FF',
+    marginHorizontal: 20,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
   },
   notificationContent: {
     flex: 1,
+    marginRight: 12,
+  },
+  notificationText: {
+    color: '#4338CA',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  dismissButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#C7D2FE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dismissButtonText: {
+    color: '#4338CA',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
