@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } fr
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { SubscriptionStatus, QuotaUsage } from '../../types';
-import { colors } from '../theme';
+import { colors } from '../../theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
