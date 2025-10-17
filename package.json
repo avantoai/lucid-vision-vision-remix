@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "analyze:durations": "node server/scripts/analyze-meditation-durations.js"
+    "analyze:durations": "node server/scripts/analyze-meditation-durations.js",
+    "query:metrics": "node server/scripts/meditation-metrics.js"
   },
   "keywords": [],
   "author": "",
