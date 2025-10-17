@@ -383,7 +383,16 @@ async function generateNextPrompt(userId, category, previousResponses) {
     return fixedPrompts[previousResponses.length];
   }
 
-  return await aiService.generateNextPrompt(category, previousResponses);
+  // Fetch existing vision context for this category
+  const { data: existingVision } = await supabaseAdmin
+    .from('vision_statements')
+    .select('statement, tagline, summary')
+    .eq('user_id', userId)
+    .eq('category', category)
+    .eq('is_active', true)
+    .single();
+
+  return await aiService.generateNextPrompt(category, previousResponses, existingVision);
 }
 
 async function getVisionStatus(userId, visionId) {

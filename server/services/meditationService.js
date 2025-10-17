@@ -51,13 +51,22 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     console.log(`✓ [${meditationId}] User: ${user?.full_name || 'friend'}`);
 
     console.log(`⏳ [${meditationId}] Step 2/5: Generating AI script (110 WPM, ~${duration * 110} words)...`);
+    
+    // Fetch all active vision statements for enrichment
+    const { data: visionStatements } = await supabaseAdmin
+      .from('vision_statements')
+      .select('category, statement, tagline, summary')
+      .eq('user_id', userId)
+      .eq('is_active', true);
+    
     const scriptStart = Date.now();
     const script = await aiService.generateScript({
       category,
       duration,
       background,
       responses,
-      userName: user?.full_name || 'friend'
+      userName: user?.full_name || 'friend',
+      visionStatements: visionStatements || []
     });
     console.log(`✓ [${meditationId}] Script generated in ${((Date.now() - scriptStart) / 1000).toFixed(1)}s (${script.length} chars)`);
 
@@ -118,12 +127,20 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
     .eq('id', userId)
     .single();
 
+  // Fetch all active vision statements for enrichment
+  const { data: visionStatements } = await supabaseAdmin
+    .from('vision_statements')
+    .select('category, statement, tagline, summary')
+    .eq('user_id', userId)
+    .eq('is_active', true);
+
   const script = await aiService.generateScript({
     category,
     duration,
     background,
     responses,
-    userName: user?.full_name || 'friend'
+    userName: user?.full_name || 'friend',
+    visionStatements: visionStatements || []
   });
 
   const audioUrl = await audioService.generateMeditationAudio({

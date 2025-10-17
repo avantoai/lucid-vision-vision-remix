@@ -54,7 +54,7 @@ Generate **transformative, emotionally resonant guided visualizations** that hel
 
 The meditation should feel VERY spacious and breathable, never rushed. Err on the side of longer pauses. Every sentence gets a substantial pause.`;
 
-async function generateScript({ category, duration, background, responses, userName }) {
+async function generateScript({ category, duration, background, responses, userName, visionStatements = [] }) {
   // THAR uses 110 WPM average narration speed
   const targetWords = Math.floor(duration * 110);
   const minWords = Math.floor(targetWords * 0.9);
@@ -64,6 +64,26 @@ async function generateScript({ category, duration, background, responses, userN
   const responseSummary = responses
     .map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answer}`)
     .join('\n\n');
+
+  // Format existing vision context for enrichment
+  let visionContext = '';
+  if (visionStatements && visionStatements.length > 0) {
+    const visionSummaries = visionStatements
+      .filter(v => v.summary)
+      .map(v => `**${v.category}:** ${v.summary}`)
+      .join('\n\n');
+    
+    if (visionSummaries) {
+      visionContext = `
+
+**Existing Vision Context:**
+${userName} has already developed visions across multiple life areas. Use these tastefully to enrich the meditation with continuity, depth, and coherence across their life:
+
+${visionSummaries}
+
+When relevant, weave in subtle references or connections to their broader vision landscape. Don't force it - let it enhance naturally.`;
+    }
+  }
 
   // Determine emotional arc based on duration
   let arcGuide = '';
@@ -92,6 +112,7 @@ User: ${userName}
 
 **User's Vision & Responses:**
 ${responseSummary}
+${visionContext}
 
 **Requirements:**
 - Target: ${minWords}-${maxWords} words (at ~110 WPM)
@@ -151,17 +172,31 @@ The title should reflect the specific vision and themes, not generic meditation 
   return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
 }
 
-async function generateNextPrompt(category, previousResponses) {
+async function generateNextPrompt(category, previousResponses, existingVision = null) {
   const responseHistory = previousResponses.map((r, i) => `${i + 1}. ${r.question}\nAnswer: ${r.answer}`).join('\n\n');
+
+  let contextSection = '';
+  if (existingVision && existingVision.summary) {
+    contextSection = `
+**Existing Vision Context:**
+The user already has a vision for ${category}:
+${existingVision.summary}
+
+Generate a question that BUILDS on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your question to show continuity.
+`;
+  }
 
   const prompt = `You're guiding someone to deepen their vision for: ${category}
 
 Previous conversation:
 ${responseHistory}
+${contextSection}
 
 Generate ONE single follow-up question that either:
 - Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
 - Expands context (30% probability): Explores related life areas or future possibilities
+
+${existingVision ? 'Remember to build on their existing vision context above.' : ''}
 
 IMPORTANT: Ask only ONE question. Do NOT combine multiple questions or use "and" to join questions. Keep it simple and focused.
 
