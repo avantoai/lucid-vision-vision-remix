@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
 import { colors } from '../../theme';
@@ -103,7 +104,7 @@ export default function VisionEditScreen() {
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
+        <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -185,10 +186,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 24,
-    color: colors.textSecondary,
   },
   content: {
     padding: 20,

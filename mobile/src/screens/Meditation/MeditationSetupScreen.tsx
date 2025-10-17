@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
 import api from '../../services/api';
@@ -120,7 +121,7 @@ export default function MeditationSetupScreen() {
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
+        <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -130,7 +131,8 @@ export default function MeditationSetupScreen() {
         {visionStatus === 'processing' && (
           <View style={styles.visionProcessing}>
             <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={styles.visionProcessingText}>✨ Crafting your vision statement...</Text>
+            <Ionicons name="sparkles" size={18} color={colors.primary} style={{ marginLeft: 8, marginRight: 4 }} />
+            <Text style={styles.visionProcessingText}>Crafting your vision statement...</Text>
           </View>
         )}
 
@@ -242,10 +244,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 24,
-    color: colors.textSecondary,
   },
   content: {
     padding: 20,

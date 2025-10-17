@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
 import { colors } from '../../theme';
@@ -69,7 +70,7 @@ export default function VisionDetailScreen() {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>✨</Text>
+            <Ionicons name="sparkles" size={64} color={colors.primary} style={{ marginBottom: 16 }} />
             <Text style={styles.emptyTitle}>No Vision Yet</Text>
             <Text style={styles.emptyDescription}>
               Begin exploring your vision for {route.params.category} to create a personalized summary.
@@ -171,10 +172,6 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 24,

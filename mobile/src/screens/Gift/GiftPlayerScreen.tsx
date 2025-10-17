@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } fr
 import { useAudioPlayer } from 'expo-audio';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -74,7 +75,7 @@ export default function GiftPlayerScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
+        <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -85,7 +86,7 @@ export default function GiftPlayerScreen() {
         <Text style={styles.duration}>{gift.meditation.duration} minutes</Text>
 
         <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
-          <Text style={styles.playButtonText}>{player.playing ? '⏸' : '▶'}</Text>
+          <Ionicons name={player.playing ? 'pause' : 'play'} size={40} color={colors.white} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveToLibrary}>
@@ -118,10 +119,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 24,
-    color: colors.textSecondary,
   },
   content: {
     flex: 1,
@@ -160,10 +157,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
-  },
-  playButtonText: {
-    fontSize: 40,
-    color: colors.white,
   },
   saveButton: {
     backgroundColor: colors.success,

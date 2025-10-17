@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
 import { colors } from '../../theme';
@@ -149,11 +150,17 @@ export default function LibraryScreen() {
       )}
       {item.status === 'failed' && (
         <View style={styles.failedBadge}>
-          <Text style={styles.failedText}>❌ Generation failed</Text>
+          <Ionicons name="close-circle" size={16} color={colors.errorDark} style={{ marginRight: 6 }} />
+          <Text style={styles.failedText}>Generation failed</Text>
         </View>
       )}
-      {item.is_pinned && <Text style={styles.pinnedBadge}>📌 Pinned</Text>}
-      {item.is_favorite && <Text style={styles.favoriteBadge}>❤️</Text>}
+      {item.is_pinned && (
+        <View style={styles.pinnedBadge}>
+          <Ionicons name="pin" size={16} color={colors.warning} style={{ marginRight: 4 }} />
+          <Text style={styles.pinnedBadgeText}>Pinned</Text>
+        </View>
+      )}
+      {item.is_favorite && <Ionicons name="heart" size={18} color="#EF4444" style={{ marginTop: 4 }} />}
     </TouchableOpacity>
   );
 
@@ -189,14 +196,15 @@ export default function LibraryScreen() {
         <View style={styles.notificationBanner}>
           <View style={styles.notificationContent}>
             <Text style={styles.notificationText}>
-              Your meditation is being generated. This will take a few minutes. We'll notify you once it's ready ✨
+              Your meditation is being generated. This will take a few minutes. We'll notify you once it's ready{' '}
             </Text>
+            <Ionicons name="sparkles" size={16} color={colors.primary} />
           </View>
           <TouchableOpacity
             style={styles.dismissButton}
             onPress={() => setShowNotification(false)}
           >
-            <Text style={styles.dismissButtonText}>✕</Text>
+            <Ionicons name="close" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       )}
@@ -304,13 +312,13 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   pinnedBadge: {
-    fontSize: 12,
-    color: colors.warning,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 4,
   },
-  favoriteBadge: {
+  pinnedBadgeText: {
     fontSize: 12,
-    marginTop: 4,
+    color: colors.warning,
   },
   generatingBadge: {
     flexDirection: 'row',
@@ -324,6 +332,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   failedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.errorLight,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -398,6 +408,9 @@ const styles = StyleSheet.create({
   notificationContent: {
     flex: 1,
     marginRight: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   notificationText: {
     color: colors.text,

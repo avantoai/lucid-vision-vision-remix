@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } fr
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { colors } from '../../theme';
 
@@ -109,7 +110,7 @@ export default function VisionRecordScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
+        <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -134,13 +135,14 @@ export default function VisionRecordScreen() {
           ) : isRecording ? (
             <View style={styles.stopIcon} />
           ) : (
-            <Text style={styles.micIcon}>🎙️</Text>
+            <Ionicons name="mic" size={64} color={colors.white} />
           )}
         </TouchableOpacity>
 
         {!isRecording && !isLoading && (
           <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
-            <Text style={styles.writeButtonText}>Write ✏️</Text>
+            <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
+            <Text style={styles.writeButtonText}>Write</Text>
           </TouchableOpacity>
         )}
 
@@ -170,10 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 24,
-    color: colors.textSecondary,
   },
   content: {
     flex: 1,
@@ -219,9 +217,6 @@ const styles = StyleSheet.create({
   micButtonRecording: {
     backgroundColor: '#EF4444',
   },
-  micIcon: {
-    fontSize: 64,
-  },
   stopIcon: {
     width: 40,
     height: 40,
@@ -229,6 +224,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   writeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 20,

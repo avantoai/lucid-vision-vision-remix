@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
@@ -61,7 +62,11 @@ export default function VisionScreen() {
             >
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
-                {hasSummary && <View style={styles.summaryBadge}><Text style={styles.summaryBadgeText}>✨</Text></View>}
+                {hasSummary && (
+                  <View style={styles.summaryBadge}>
+                    <Ionicons name="sparkles" size={16} color={colors.primary} />
+                  </View>
+                )}
               </View>
               {categoryData?.tagline && (
                 <Text style={styles.categoryTagline}>{categoryData.tagline}</Text>
@@ -123,12 +128,11 @@ const styles = StyleSheet.create({
   },
   summaryBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 12,
     backgroundColor: colors.primaryLight,
-  },
-  summaryBadgeText: {
-    fontSize: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoryHeader: {
     flexDirection: 'row',

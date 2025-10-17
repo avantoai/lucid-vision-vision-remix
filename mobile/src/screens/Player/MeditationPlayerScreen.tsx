@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
 import { colors } from '../../theme';
@@ -271,7 +272,7 @@ export default function MeditationPlayerScreen() {
             {!audioReady ? (
               <ActivityIndicator size="large" color={colors.white} />
             ) : (
-              <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+              <Ionicons name={isPlaying ? 'pause' : 'play'} size={40} color={colors.white} />
             )}
           </TouchableOpacity>
 
@@ -279,7 +280,11 @@ export default function MeditationPlayerScreen() {
             style={styles.controlButton}
             onPress={handleFavorite}
           >
-            <Text style={styles.controlText}>{meditation.is_favorite ? '❤️' : '🤍'}</Text>
+            <Ionicons 
+              name={meditation.is_favorite ? 'heart' : 'heart-outline'} 
+              size={32} 
+              color={meditation.is_favorite ? '#EF4444' : colors.primary} 
+            />
           </TouchableOpacity>
         </View>
 
@@ -363,7 +368,7 @@ export default function MeditationPlayerScreen() {
           <View style={styles.transcriptHeader}>
             <Text style={styles.transcriptTitle}>Transcript</Text>
             <TouchableOpacity onPress={() => setShowTranscript(false)}>
-              <Text style={styles.closeTranscript}>✕</Text>
+              <Ionicons name="close" size={28} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.transcriptScroll}>
@@ -481,10 +486,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.textTertiary,
     opacity: 0.6,
   },
-  playButtonText: {
-    fontSize: 40,
-    color: colors.white,
-  },
   loadingText: {
     fontSize: 14,
     color: colors.textSecondary,
@@ -589,11 +590,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.text,
-  },
-  closeTranscript: {
-    fontSize: 28,
-    color: colors.textSecondary,
-    paddingHorizontal: 8,
   },
   transcriptScroll: {
     flex: 1,
