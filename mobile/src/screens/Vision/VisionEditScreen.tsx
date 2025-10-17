@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
+import { Text, Button, Input, Card, IconButton } from '../../components/ui';
+import { theme } from '../../theme/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 type VisionEditRouteProp = RouteProp<RootStackParamList, 'VisionEdit'>;
 type VisionEditNavigationProp = StackNavigationProp<RootStackParamList, 'VisionEdit'>;
@@ -93,175 +96,143 @@ export default function VisionEditScreen() {
   if (isTranscribing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
-        <Text style={styles.loadingText}>Transcribing your response...</Text>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text variant="body" color="secondary" style={styles.loadingText}>
+          Transcribing your response...
+        </Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeText}>✕</Text>
-      </TouchableOpacity>
-
-      <View style={styles.content}>
-        <Text style={styles.category}>{route.params.category}</Text>
-        <Text style={styles.prompt}>{route.params.prompt}</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Type or edit your response..."
-          value={currentAnswer}
-          onChangeText={setCurrentAnswer}
-          multiline
-          numberOfLines={8}
-          textAlignVertical="top"
-          editable={!isLoading}
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <IconButton
+          icon={<Ionicons name="close" size={24} color={theme.colors.text.primary} />}
+          onPress={() => navigation.goBack()}
+          style={styles.closeButton}
         />
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.nextButton, isLoading && styles.buttonDisabled]}
-            onPress={handleNextPrompt}
-            disabled={isLoading}
-          >
-            <Text style={styles.actionButtonText}>
-              {isLoading ? 'Loading...' : 'Next Prompt'}
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.content}>
+          <Text variant="heading" color="primary" weight="bold" align="center" style={styles.category}>
+            {route.params.category}
+          </Text>
+          
+          <Text variant="subheading" color="body" align="center" style={styles.prompt}>
+            {route.params.prompt}
+          </Text>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.completeButton, isLoading && styles.buttonDisabled]}
-            onPress={handleCreateMeditation}
-            disabled={isLoading}
-          >
-            <Text style={styles.actionButtonText}>Create Meditation</Text>
-          </TouchableOpacity>
-        </View>
+          <Input
+            style={styles.input}
+            placeholder="Type or edit your response..."
+            value={currentAnswer}
+            onChangeText={setCurrentAnswer}
+            multiline
+            numberOfLines={8}
+            textAlignVertical="top"
+            editable={!isLoading}
+          />
 
-        {route.params.responses.length > 0 && (
-          <View style={styles.responsesContainer}>
-            <Text style={styles.responsesTitle}>Previous Responses ({route.params.responses.length}):</Text>
-            {route.params.responses.map((r, index) => (
-              <View key={index} style={styles.responseCard}>
-                <Text style={styles.responseQuestion}>{r.question}</Text>
-                <Text style={styles.responseAnswer}>{r.answer}</Text>
-              </View>
-            ))}
+          <View style={styles.buttonRow}>
+            <Button
+              title={isLoading ? 'Loading...' : 'Next Prompt'}
+              onPress={handleNextPrompt}
+              variant="secondary"
+              disabled={isLoading}
+              loading={isLoading}
+              style={styles.button}
+            />
+
+            <Button
+              title="Create Meditation"
+              onPress={handleCreateMeditation}
+              variant="primary"
+              disabled={isLoading}
+              loading={isLoading}
+              style={styles.button}
+            />
           </View>
-        )}
-      </View>
-    </ScrollView>
+
+          {route.params.responses.length > 0 && (
+            <View style={styles.responsesContainer}>
+              <Text variant="subheading" weight="semibold" style={styles.responsesTitle}>
+                Previous Responses ({route.params.responses.length}):
+              </Text>
+              {route.params.responses.map((r, index) => (
+                <Card key={index} style={styles.responseCard}>
+                  <Text variant="small" color="secondary" weight="semibold" numberOfLines={1}>
+                    {r.question}
+                  </Text>
+                  <Text variant="body" color="body" style={styles.responseAnswer}>
+                    {r.answer}
+                  </Text>
+                </Card>
+              ))}
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: theme.colors.background,
+  },
+  scrollView: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: theme.colors.background,
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#6B7280',
+    marginTop: theme.spacing.lg,
   },
   closeButton: {
     position: 'absolute',
     top: 50,
     right: 20,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 24,
-    color: '#6B7280',
   },
   content: {
-    padding: 20,
+    padding: theme.spacing.xl,
     paddingTop: 100,
   },
   category: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6366F1',
     textTransform: 'capitalize',
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
   },
   prompt: {
-    fontSize: 20,
-    color: '#111827',
-    marginBottom: 24,
+    marginBottom: theme.spacing.xxxl,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    minHeight: 180,
-    marginBottom: 20,
+    minHeight: 160,
+    marginBottom: theme.spacing.xxl,
+    paddingTop: theme.spacing.lg,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xxxl,
   },
-  actionButton: {
+  button: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  nextButton: {
-    backgroundColor: '#6366F1',
-  },
-  completeButton: {
-    backgroundColor: '#10B981',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  actionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
   },
   responsesContainer: {
-    marginTop: 32,
+    marginTop: theme.spacing.xl,
   },
   responsesTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
+    marginBottom: theme.spacing.lg,
   },
   responseCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-  },
-  responseQuestion: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginBottom: 4,
+    marginBottom: theme.spacing.md,
   },
   responseAnswer: {
-    fontSize: 14,
-    color: '#111827',
+    marginTop: theme.spacing.sm,
   },
 });
