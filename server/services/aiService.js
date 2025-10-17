@@ -272,7 +272,7 @@ Return only the question, nothing else.`;
     max_tokens: 100
   });
 
-  return completion.choices[0].message.content.trim();
+  return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
 }
 
 async function generateTagline(visionStatement) {
