@@ -175,7 +175,7 @@ export default function LibraryScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: 20 }]}>
       <View style={styles.header}>
         <Text style={styles.title}>My Library</Text>
         <View style={styles.filterContainer}>

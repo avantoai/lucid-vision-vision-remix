@@ -34,14 +34,14 @@ export default function VisionScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+      <View style={[styles.loadingContainer, { paddingTop: 20 }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: insets.top }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 20 }}>
       <View style={styles.header}>
         <Text style={styles.title}>Living Vision</Text>
         <Text style={styles.subtitle}>Track and evolve your vision across all life categories</Text>
