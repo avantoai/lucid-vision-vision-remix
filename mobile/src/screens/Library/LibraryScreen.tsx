@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   pinnedBadge: {
     fontSize: 12,
-    color: '#F59E0B',
+    color: colors.warning,
     marginTop: 4,
   },
   favoriteBadge: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   failedBadge: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: colors.errorLight,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   failedText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: colors.errorDark,
     fontWeight: '500',
   },
   emptyText: {
@@ -343,20 +343,20 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   errorContainer: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.errorLight,
     margin: 20,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: colors.error,
   },
   errorText: {
-    color: '#DC2626',
+    color: colors.errorDark,
     fontSize: 14,
     marginBottom: 8,
   },
   retryButton: {
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.errorDark,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,

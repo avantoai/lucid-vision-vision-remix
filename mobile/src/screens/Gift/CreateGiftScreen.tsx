@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   addButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.success,
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',

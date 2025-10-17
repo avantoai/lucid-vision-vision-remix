@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +17,7 @@ import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
 import MeditationPlayerScreen from '../screens/Player/MeditationPlayerScreen';
 import CreateGiftScreen from '../screens/Gift/CreateGiftScreen';
 import GiftPlayerScreen from '../screens/Gift/GiftPlayerScreen';
+import { colors } from '../theme';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -27,8 +29,10 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <>
             <Stack.Screen name="Auth" component={AuthScreen} />
@@ -78,7 +82,8 @@ export default function RootNavigator() {
           component={GiftPlayerScreen}
           options={{ presentation: 'modal' }}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }

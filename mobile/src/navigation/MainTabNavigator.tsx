@@ -5,6 +5,7 @@ import { TabParamList } from '../types';
 import LibraryScreen from '../screens/Library/LibraryScreen';
 import VisionScreen from '../screens/Vision/VisionScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import { colors } from '../theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -13,8 +14,12 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#6366F1',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textTertiary,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+        },
       }}
     >
       <Tab.Screen 

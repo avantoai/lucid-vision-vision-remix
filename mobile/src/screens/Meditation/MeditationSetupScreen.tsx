@@ -326,16 +326,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   visionCompleted: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.successLight,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#86EFAC',
+    borderColor: colors.success,
   },
   visionTagline: {
     fontSize: 14,
-    color: '#059669',
+    color: colors.successDark,
     fontWeight: '600',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   visionStatement: {
     fontSize: 16,
-    color: '#047857',
+    color: colors.successDark,
     lineHeight: 24,
   },
 });

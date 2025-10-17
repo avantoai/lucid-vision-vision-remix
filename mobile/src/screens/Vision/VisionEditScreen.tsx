@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   completeButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.success,
   },
   buttonDisabled: {
     opacity: 0.6,

@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   trialText: {
     fontSize: 14,
-    color: '#10B981',
+    color: colors.success,
   },
   quotaRow: {
     flexDirection: 'row',
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   logoutButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: colors.error,
     margin: 20,
     paddingVertical: 16,
     borderRadius: 12,

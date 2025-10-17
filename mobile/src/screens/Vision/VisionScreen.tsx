@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   categoryCardCompleted: {
-    borderColor: '#10B981',
-    backgroundColor: '#F0FDF4',
+    borderColor: colors.success,
+    backgroundColor: colors.successLight,
   },
   categoryCardWithSummary: {
     borderColor: colors.primary,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#10B981',
+    backgroundColor: colors.success,
   },
   categoryTagline: {
     fontSize: 14,
