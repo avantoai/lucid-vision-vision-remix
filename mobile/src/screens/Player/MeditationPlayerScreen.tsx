@@ -225,11 +225,11 @@ export default function MeditationPlayerScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>← Back</Text>
+        <Ionicons name="chevron-back" size={24} color={colors.text} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.optionsButton} onPress={() => setShowOptionsMenu(true)}>
-        <Text style={styles.optionsText}>•••</Text>
+        <Ionicons name="ellipsis-horizontal" size={24} color={colors.text} />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -414,11 +414,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backText: {
-    fontSize: 18,
-    color: colors.primary,
-    fontWeight: '600',
-  },
   optionsButton: {
     position: 'absolute',
     top: layout.headerTop,
@@ -430,12 +425,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  optionsText: {
-    fontSize: 24,
-    color: colors.primary,
-    fontWeight: '600',
-    letterSpacing: 2,
   },
   content: {
     flex: 1,

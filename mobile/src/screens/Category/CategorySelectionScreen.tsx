@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
@@ -39,13 +40,14 @@ export default function CategorySelectionScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="chevron-back" size={24} color={colors.textSecondary} />
+      </TouchableOpacity>
+
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
         <Text style={styles.title}>Choose a Category</Text>
         <Text style={styles.subtitle}>Select a category to create your meditation</Text>
       </View>
@@ -88,16 +90,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
   },
+  backButton: {
+    position: 'absolute',
+    top: layout.headerTop,
+    left: layout.headerSide,
+    zIndex: 10,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
     padding: layout.screenHorizontal,
     paddingTop: layout.screenTopBase,
-  },
-  backButton: {
-    marginBottom: 16,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: colors.primary,
   },
   title: {
     fontSize: 28,
