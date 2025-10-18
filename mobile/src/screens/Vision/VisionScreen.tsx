@@ -60,7 +60,13 @@ export default function VisionScreen() {
                 styles.categoryCard,
                 hasSummary && styles.categoryCardWithSummary,
               ]}
-              onPress={() => navigation.navigate('VisionDetail', { category: category.id })}
+              onPress={() => {
+                if (hasSummary) {
+                  navigation.navigate('VisionDetail', { category: category.id });
+                } else {
+                  navigation.navigate('VisionFlow', { category: category.id });
+                }
+              }}
             >
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
