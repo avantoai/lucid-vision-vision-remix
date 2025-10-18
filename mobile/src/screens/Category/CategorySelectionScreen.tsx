@@ -104,8 +104,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: layout.screenHorizontal,
-    paddingTop: layout.screenTopBase + layout.headerButtonSize,
-    paddingLeft: layout.headerSide + layout.headerButtonSize + 12,
+    paddingTop: layout.screenTopBase + layout.headerButtonSize + 20,
   },
   title: {
     fontSize: 28,
