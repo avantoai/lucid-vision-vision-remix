@@ -2,7 +2,7 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
 
 const CATEGORIES = [
-  'freeform', 'health', 'wealth', 'relationships', 
+  'health', 'wealth', 'relationships', 
   'play', 'love', 'purpose', 'spirit', 'healing'
 ];
 
