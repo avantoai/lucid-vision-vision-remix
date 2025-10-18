@@ -255,18 +255,7 @@ Return ONLY the tagline starting with "I" or "we". Nothing else.`;
     max_tokens: 30
   });
 
-  let tagline = completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
-  
-  // Server-side validation: Ensure tagline starts with "I" or "we"
-  if (!tagline.match(/^(I|We)\s/i)) {
-    console.log(`⚠️  Tagline didn't start with I/we: "${tagline}"`);
-    // If it doesn't start with I/we, try to convert it
-    // Remove gerunds and convert to first person
-    tagline = `I ${tagline.charAt(0).toLowerCase()}${tagline.slice(1)}`;
-    console.log(`✓ Converted to: "${tagline}"`);
-  }
-  
-  return tagline;
+  return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
 }
 
 async function synthesizeVisionStatement(category, responses) {
