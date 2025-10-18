@@ -19,6 +19,9 @@ export default function VisionRecordScreen() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Get the current prompt with defensive fallback
+  const currentPrompt = route.params.prompts?.[route.params.currentPromptIndex] || 'What does this vision mean to you?';
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRecording) {
@@ -77,7 +80,7 @@ export default function VisionRecordScreen() {
 
       navigation.navigate('VisionEdit', {
         category: route.params.category,
-        prompt: route.params.prompts[route.params.currentPromptIndex],
+        prompt: currentPrompt,
         responses: route.params.responses,
         audioUri: uri,
         recordingDuration: recordingTime
@@ -95,7 +98,7 @@ export default function VisionRecordScreen() {
   const handleWriteMode = () => {
     navigation.navigate('VisionEdit', {
       category: route.params.category,
-      prompt: route.params.prompts[route.params.currentPromptIndex],
+      prompt: currentPrompt,
       responses: route.params.responses,
       audioUri: null,
       recordingDuration: 0
@@ -123,7 +126,7 @@ export default function VisionRecordScreen() {
       <View style={styles.content}>
         <View style={styles.topContent}>
           <Text style={styles.category}>{route.params.category}</Text>
-          <Text style={styles.prompt}>{route.params.prompts[route.params.currentPromptIndex]}</Text>
+          <Text style={styles.prompt}>{currentPrompt}</Text>
         </View>
 
         {/* Mic button - absolutely centered at 50% screen height */}
