@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
   },
   prompt: {
     fontSize: 28,
+    fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
   },
