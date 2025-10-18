@@ -71,7 +71,7 @@ export default function VisionScreen() {
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
                 {hasSummary && (
-                  <Ionicons name="sparkles" size={20} color={colors.warning} />
+                  <Ionicons name="sparkles" size={20} color="#fbbf24" />
                 )}
               </View>
               {categoryData?.tagline && (
@@ -154,8 +154,7 @@ const styles = StyleSheet.create({
   },
   categoryTagline: {
     fontSize: 14,
-    color: colors.primary,
-    fontStyle: 'italic',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   categoryStatus: {
