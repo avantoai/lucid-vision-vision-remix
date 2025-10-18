@@ -143,7 +143,9 @@ export default function LibraryScreen() {
         <Ionicons name="heart" size={18} color="#EF4444" style={styles.favoriteIcon} />
       )}
       <View style={styles.meditationHeader}>
-        <Text style={styles.meditationCategory}>{item.category.toUpperCase()}</Text>
+        <Text style={styles.meditationCategory}>
+          {item.category.charAt(0).toUpperCase() + item.category.slice(1).toLowerCase()}
+        </Text>
         <Text style={styles.bulletSeparator}> • </Text>
         <Text style={styles.meditationDuration}>{item.duration} min</Text>
       </View>
