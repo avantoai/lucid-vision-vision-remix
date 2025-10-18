@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   prompt: {
-    fontSize: 24,
+    fontSize: 28,
     color: colors.text,
     textAlign: 'center',
   },
