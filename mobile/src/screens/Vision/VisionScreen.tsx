@@ -71,7 +71,7 @@ export default function VisionScreen() {
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
                 {hasSummary && (
-                  <Ionicons name="sparkles" size={20} color="#fbbf24" />
+                  <Ionicons name="sparkles" size={20} color="#fedf8d" />
                 )}
               </View>
               {categoryData?.tagline && (
