@@ -57,19 +57,6 @@ router.get('/next-prompt/:category', authenticateUser, async (req, res) => {
   }
 });
 
-router.get('/multiple-prompts/:category', authenticateUser, async (req, res) => {
-  try {
-    const { responses, count } = req.query;
-    const parsedResponses = responses ? JSON.parse(responses) : [];
-    const promptCount = count ? parseInt(count) : 5;
-    const prompts = await visionService.generateMultiplePrompts(req.user.id, req.params.category, parsedResponses, promptCount);
-    res.json({ success: true, prompts });
-  } catch (error) {
-    console.error('Multiple prompts error:', error);
-    res.status(500).json({ error: 'Failed to generate multiple prompts' });
-  }
-});
-
 router.get('/status/:visionId', authenticateUser, async (req, res) => {
   try {
     const status = await visionService.getVisionStatus(req.user.id, req.params.visionId);

@@ -408,45 +408,6 @@ async function generateNextPrompt(userId, category, previousResponses) {
   return await aiService.generateNextPrompt(category, previousResponses, null);
 }
 
-async function generateMultiplePrompts(userId, category, previousResponses, count = 5) {
-  // Get user's existing vision context
-  const { data: existingVision } = await supabaseAdmin
-    .from('vision_statements')
-    .select('statement, tagline, summary')
-    .eq('user_id', userId)
-    .eq('category', category)
-    .eq('is_active', true)
-    .single();
-
-  const hasContext = existingVision && (existingVision.summary || existingVision.statement || existingVision.tagline);
-  const fixedPrompts = FIXED_PROMPTS[category] || FIXED_PROMPTS.freeform;
-  const prompts = [];
-
-  // For first-time users without context, include fixed prompts first
-  if (!hasContext && previousResponses.length < fixedPrompts.length) {
-    // Add remaining fixed prompts
-    for (let i = previousResponses.length; i < fixedPrompts.length && prompts.length < count; i++) {
-      prompts.push(fixedPrompts[i]);
-    }
-  }
-
-  // Fill remaining slots with AI-generated prompts
-  const remainingCount = count - prompts.length;
-  if (remainingCount > 0) {
-    console.log(`🤖 Generating ${remainingCount} AI prompts for ${category}`);
-    const aiPrompts = await aiService.generateMultiplePrompts(
-      category, 
-      previousResponses, 
-      existingVision,
-      remainingCount
-    );
-    prompts.push(...aiPrompts);
-  }
-
-  console.log(`✅ Generated ${prompts.length} prompts for ${category}`);
-  return prompts;
-}
-
 async function getVisionStatus(userId, visionId) {
   const { data: vision, error } = await supabaseAdmin
     .from('vision_statements')
@@ -474,6 +435,5 @@ module.exports = {
   updateVisionStatement,
   processPromptFlow,
   generateNextPrompt,
-  generateMultiplePrompts,
   getVisionStatus
 };
