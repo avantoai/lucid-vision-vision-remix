@@ -260,7 +260,15 @@ export default function MeditationPlayerScreen() {
             onPress={handleRewind}
             disabled={!audioReady}
           >
-            <Text style={[styles.controlText, !audioReady && styles.controlTextDisabled]}>↶ 15</Text>
+            <View style={styles.rewindIconContainer}>
+              <Ionicons 
+                name="refresh-outline" 
+                size={32} 
+                color={!audioReady ? colors.textTertiary : colors.primary}
+                style={{ transform: [{ scaleX: -1 }] }}
+              />
+              <Text style={[styles.rewindLabel, !audioReady && styles.controlTextDisabled]}>15</Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -475,6 +483,15 @@ const styles = StyleSheet.create({
   },
   controlTextDisabled: {
     opacity: 0.3,
+  },
+  rewindIconContainer: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  rewindLabel: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: '600',
   },
   playButton: {
     width: 100,
