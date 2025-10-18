@@ -37,10 +37,10 @@ export const colors = {
 export const layout = {
   // Screen padding (consistent with primary screens: Library, Vision, Profile)
   screenHorizontal: 20,     // Horizontal padding for all screens
-  screenTopBase: 70,         // Top padding for content (includes safe area consideration)
+  screenTopBase: 80,         // Top padding for content (includes safe area consideration)
   
   // Header element positioning (back buttons, close buttons, menu buttons)
-  headerTop: 70,            // Top position for header buttons
+  headerTop: 80,            // Top position for header buttons
   headerSide: 20,           // Side position for header buttons (left/right)
   headerButtonSize: 40,     // Standard size for circular header buttons
   
