@@ -303,9 +303,9 @@ const styles = StyleSheet.create({
   },
   meditationCategory: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: colors.primary,
-    letterSpacing: 1,
+    letterSpacing: 0,
   },
   bulletSeparator: {
     fontSize: 14,
