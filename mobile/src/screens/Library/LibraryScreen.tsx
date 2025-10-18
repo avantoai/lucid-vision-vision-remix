@@ -140,10 +140,11 @@ export default function LibraryScreen() {
       disabled={item.status !== 'completed'}
     >
       <View style={styles.meditationHeader}>
-        <Text style={styles.meditationTitle}>{item.title}</Text>
+        <Text style={styles.meditationCategory}>{item.category.toUpperCase()}</Text>
+        <Text style={styles.bulletSeparator}> • </Text>
         <Text style={styles.meditationDuration}>{item.duration} min</Text>
       </View>
-      <Text style={styles.meditationCategory}>{item.category}</Text>
+      <Text style={styles.meditationTitle}>{item.title}</Text>
       {item.status === 'generating' && (
         <View style={styles.generatingBadge}>
           <ActivityIndicator size="small" color={colors.primary} />
@@ -295,24 +296,29 @@ const styles = StyleSheet.create({
   },
   meditationHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  meditationTitle: {
-    fontSize: 18,
+  meditationCategory: {
+    fontSize: 14,
     fontWeight: '600',
-    color: colors.text,
-    flex: 1,
+    color: colors.primary,
+    letterSpacing: 1,
+  },
+  bulletSeparator: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginHorizontal: 4,
   },
   meditationDuration: {
     fontSize: 14,
     color: colors.textSecondary,
   },
-  meditationCategory: {
-    fontSize: 14,
-    color: colors.primary,
-    textTransform: 'capitalize',
+  meditationTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 8,
   },
   pinnedBadge: {
     flexDirection: 'row',
