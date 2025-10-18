@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     margin: 20,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
     position: 'absolute',
     bottom: 0,
