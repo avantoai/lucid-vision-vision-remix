@@ -271,6 +271,7 @@ Guidelines:
 - Include important, specific details and concrete elements from their responses
 - Weave in the emotions and meaningful moments from their responses
 - Capture what makes their vision uniquely theirs - their words, their feelings, their specific aspirations
+- When responses conflict, use the most recent information
 - Make it feel inspiring and alive, like they're already living this vision
 
 Return only the vision statement.`;
