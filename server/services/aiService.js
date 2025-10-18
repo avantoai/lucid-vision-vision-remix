@@ -235,6 +235,8 @@ async function generateTagline(visionStatement) {
 
 "${visionStatement}"
 
+Write the tagline in first person using "I" and "we" where contextually appropriate. Make it personal and empowering.
+
 Return only the tagline, nothing else.`;
 
   const completion = await openai.chat.completions.create({
