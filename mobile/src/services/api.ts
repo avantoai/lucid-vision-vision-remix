@@ -161,11 +161,11 @@ class ApiService {
   async getNextPrompt(
     category: string,
     previousResponses: Array<{ question: string; answer: string }>
-  ): Promise<string[]> {
+  ): Promise<string> {
     const params = new URLSearchParams({
       responses: JSON.stringify(previousResponses),
     });
-    const data = await this.request<{ prompt: string[] }>(
+    const data = await this.request<{ prompt: string }>(
       `/vision/next-prompt/${category}?${params.toString()}`
     );
     return data.prompt;

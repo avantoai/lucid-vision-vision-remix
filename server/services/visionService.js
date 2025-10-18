@@ -9,66 +9,39 @@ const CATEGORIES = [
 const FIXED_PROMPTS = {
   health: [
     "What does vibrant health feel like in your body?",
-    "What daily practices support your optimal wellbeing?",
-    "How do you want to move and energize yourself?",
-    "What nourishment truly serves you?",
-    "How does your healthiest self show up each day?"
+    "What daily practices support your optimal wellbeing?"
   ],
   wealth: [
     "What does financial abundance mean to you?",
-    "How do you want to feel about money and resources?",
-    "What becomes possible with true abundance?",
-    "How do you share your wealth with others?",
-    "What does prosperity feel like in your life?"
+    "How do you want to feel about money and resources?"
   ],
   relationships: [
     "What qualities do you embody in your most fulfilling connections?",
-    "How do you want to show up in your relationships?",
-    "What does authentic connection feel like?",
-    "How do you create space for deeper intimacy?",
-    "What relationships nourish your soul?"
+    "How do you want to show up in your relationships?"
   ],
   play: [
     "When do you feel most alive and joyful?",
-    "What forms of play call to your spirit?",
-    "How do you create space for pure fun?",
-    "What makes you lose track of time?",
-    "When do you feel most like yourself?"
+    "What forms of play call to your spirit?"
   ],
   love: [
     "What does love feel like when it flows freely through you?",
-    "How do you express and receive love?",
-    "What opens your heart most fully?",
-    "How does self-love transform your experience?",
-    "What does unconditional love mean to you?"
+    "How do you express and receive love?"
   ],
   purpose: [
     "What impact do you want to create in the world?",
-    "What lights you up and gives your life meaning?",
-    "What's your unique contribution to offer?",
-    "How do you want to be remembered?",
-    "What calls you toward your highest expression?"
+    "What lights you up and gives your life meaning?"
   ],
   spirit: [
     "How do you experience your connection to something greater?",
-    "What spiritual practices nourish your soul?",
-    "When do you feel most connected?",
-    "What does divine guidance feel like for you?",
-    "How does spirituality shape your daily life?"
+    "What spiritual practices nourish your soul?"
   ],
   healing: [
     "What are you ready to release or transform?",
-    "What does wholeness feel like for you?",
-    "What patterns no longer serve you?",
-    "How do you nurture your inner healing?",
-    "What emerges when you let go?"
+    "What does wholeness feel like for you?"
   ],
   freeform: [
     "If you could shift or create one thing in your life right now, what would it be?",
-    "Who do you get to be to create this shift in your life?",
-    "What's possible when you step fully into this?",
-    "How will this vision transform you?",
-    "What's the next step on this journey?"
+    "Who do you get to be to create this shift in your life?"
   ]
 };
 
@@ -418,20 +391,20 @@ async function generateNextPrompt(userId, category, previousResponses) {
   const hasContext = existingVision && (existingVision.summary || existingVision.statement || existingVision.tagline);
   
   if (hasContext) {
-    console.log(`🧠 Generating 5 context-aware prompts for ${category} (has existing vision)`);
+    console.log(`🧠 Generating context-aware prompt for ${category} (has existing vision)`);
     return await aiService.generateNextPrompt(category, previousResponses, existingVision);
   }
 
-  // If NO existing context, use fixed prompts for the first set of questions
+  // If NO existing context, use fixed prompts for the first few questions
   const fixedPrompts = FIXED_PROMPTS[category] || FIXED_PROMPTS.freeform;
   
-  if (previousResponses.length === 0) {
-    console.log(`📝 Using fixed prompts for ${category} (first time)`);
-    return fixedPrompts;
+  if (previousResponses.length < fixedPrompts.length) {
+    console.log(`📝 Using fixed prompt ${previousResponses.length + 1}/${fixedPrompts.length} for ${category}`);
+    return fixedPrompts[previousResponses.length];
   }
 
-  // After user has made responses, use AI to generate more contextual prompts
-  console.log(`🤖 Generating 5 AI prompts for ${category}`);
+  // After fixed prompts are exhausted (and still no vision context), use AI
+  console.log(`🤖 Generating AI prompt for ${category} (no vision context)`);
   return await aiService.generateNextPrompt(category, previousResponses, null);
 }
 
