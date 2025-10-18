@@ -307,7 +307,7 @@ export default function MeditationPlayerScreen() {
           activeOpacity={1} 
           onPress={() => setShowOptionsMenu(false)}
         >
-          <View style={styles.optionsMenu}>
+          <View style={[styles.optionsMenu, { top: insets.top + 50 }]}>
             <TouchableOpacity style={styles.menuItem} onPress={handleEditTitle}>
               <Text style={styles.menuItemText}>Edit Title</Text>
             </TouchableOpacity>
