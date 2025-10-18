@@ -235,7 +235,11 @@ async function generateTagline(visionStatement) {
 
 "${visionStatement}"
 
-Write the tagline in first person using "I" and "we" where contextually appropriate. Make it personal and empowering.
+Requirements:
+- MUST use first person ("I" or "we" where appropriate) - never third person
+- Reference potent, specific points from their vision - make it personal to their unique vision
+- Make it empowering and memorable
+- Capture the emotional core and specific details of what they're creating
 
 Return only the tagline, nothing else.`;
 
