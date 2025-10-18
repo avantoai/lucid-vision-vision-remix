@@ -266,7 +266,14 @@ async function synthesizeVisionStatement(category, responses) {
 
 ${responseSummary}
 
-Create a powerful, present-tense statement that captures their vision. Use "I" language. Make it inspiring and specific.`;
+Guidelines:
+- Write in first person, present tense using "I" language
+- Include important, specific details and concrete elements from their responses
+- Weave in the emotions and meaningful moments from their responses
+- Capture what makes their vision uniquely theirs - their words, their feelings, their specific aspirations
+- Make it feel inspiring and alive, like they're already living this vision
+
+Return only the vision statement.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
