@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, TabParamList, Meditation } from '../../types';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 type LibraryScreenRouteProp = RouteProp<TabParamList, 'Library'>;
@@ -252,8 +252,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 60,
+    padding: layout.screenHorizontal,
+    paddingTop: layout.screenTopBase,
   },
   title: {
     fontSize: 28,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   listContainer: {
-    padding: 20,
+    padding: layout.screenHorizontal,
   },
   meditationCard: {
     backgroundColor: colors.surface,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     backgroundColor: colors.errorLight,
-    margin: 20,
+    margin: layout.screenHorizontal,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   },
   createButton: {
     backgroundColor: colors.primary,
-    margin: 20,
+    margin: layout.screenHorizontal,
     paddingVertical: 16,
     borderRadius: 999,
     alignItems: 'center',
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   notificationBanner: {
     backgroundColor: colors.surfaceLight,
-    marginHorizontal: 20,
+    marginHorizontal: layout.screenHorizontal,
     marginBottom: 12,
     padding: 16,
     borderRadius: 12,

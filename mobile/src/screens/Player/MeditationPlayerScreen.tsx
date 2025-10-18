@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type MeditationPlayerRouteProp = RouteProp<RootStackParamList, 'MeditationPlayer'>;
 type MeditationPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'MeditationPlayer'>;
@@ -224,11 +224,11 @@ export default function MeditationPlayerScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.backButton, { top: insets.top + 10 }]} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.optionsButton, { top: insets.top + 10 }]} onPress={() => setShowOptionsMenu(true)}>
+      <TouchableOpacity style={styles.optionsButton} onPress={() => setShowOptionsMenu(true)}>
         <Text style={styles.optionsText}>•••</Text>
       </TouchableOpacity>
 
@@ -316,7 +316,7 @@ export default function MeditationPlayerScreen() {
           activeOpacity={1} 
           onPress={() => setShowOptionsMenu(false)}
         >
-          <View style={[styles.optionsMenu, { top: insets.top + 50 }]}>
+          <View style={[styles.optionsMenu, { top: layout.headerTop + layout.headerButtonSize + 10 }]}>
             <TouchableOpacity style={styles.menuItem} onPress={handleEditTitle}>
               <Text style={styles.menuItemText}>Edit Title</Text>
             </TouchableOpacity>
@@ -404,8 +404,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 50,
-    left: 20,
+    top: layout.headerTop,
+    left: layout.headerSide,
     zIndex: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -417,8 +417,8 @@ const styles = StyleSheet.create({
   },
   optionsButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: layout.headerTop,
+    right: layout.headerSide,
     zIndex: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: layout.screenHorizontal,
   },
   title: {
     fontSize: 28,

@@ -6,7 +6,7 @@ import * as Clipboard from 'expo-clipboard';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
 import { VOICE_OPTIONS } from '../../constants/config';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type CreateGiftNavigationProp = StackNavigationProp<RootStackParamList, 'CreateGift'>;
 
@@ -133,12 +133,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: layout.headerTop,
+    right: layout.headerSide,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   content: {
-    padding: 20,
+    padding: layout.screenHorizontal,
     paddingTop: 100,
   },
   title: {

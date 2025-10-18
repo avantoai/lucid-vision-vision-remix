@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type VisionRecordRouteProp = RouteProp<RootStackParamList, 'VisionRecord'>;
 type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'VisionRecord'>;
@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: layout.headerTop,
+    right: layout.headerSide,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     top: 100,
     left: 0,
     right: 0,
-    paddingHorizontal: 20,
+    paddingHorizontal: layout.screenHorizontal,
     alignItems: 'center',
   },
   bottomSection: {

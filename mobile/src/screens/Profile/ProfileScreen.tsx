@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { SubscriptionStatus, QuotaUsage } from '../../types';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 60,
+    padding: layout.screenHorizontal,
+    paddingTop: layout.screenTopBase,
   },
   title: {
     fontSize: 28,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.surface,
-    margin: 20,
+    margin: layout.screenHorizontal,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     backgroundColor: colors.error,
-    margin: 20,
+    margin: layout.screenHorizontal,
     paddingVertical: 16,
     borderRadius: 999,
     alignItems: 'center',

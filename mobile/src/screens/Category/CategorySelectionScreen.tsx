@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type CategorySelectionNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 60,
+    padding: layout.screenHorizontal,
+    paddingTop: layout.screenTopBase,
   },
   backButton: {
     marginBottom: 16,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   categoriesContainer: {
-    padding: 20,
+    padding: layout.screenHorizontal,
     paddingTop: 0,
   },
   categoryCard: {

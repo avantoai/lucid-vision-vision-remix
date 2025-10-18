@@ -33,6 +33,21 @@ export const colors = {
   overlay: 'rgba(0, 0, 0, 0.7)',
 };
 
+// Standardized screen layout spacing
+export const layout = {
+  // Screen padding (consistent with primary screens: Library, Vision, Profile)
+  screenHorizontal: 20,     // Horizontal padding for all screens
+  screenTopBase: 60,         // Top padding for content (includes safe area consideration)
+  
+  // Header element positioning (back buttons, close buttons, menu buttons)
+  headerTop: 50,            // Top position for header buttons
+  headerSide: 20,           // Side position for header buttons (left/right)
+  headerButtonSize: 40,     // Standard size for circular header buttons
+  
+  // Safe area adjustments
+  safeAreaTopOffset: 10,    // Additional offset for devices with notch
+};
+
 export const theme = {
   colors,
   borderRadius: {
@@ -49,4 +64,5 @@ export const theme = {
     xl: 20,
     xxl: 24,
   },
+  layout,
 };

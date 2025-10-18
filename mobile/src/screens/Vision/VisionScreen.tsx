@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/config';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type VisionScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 60,
+    padding: layout.screenHorizontal,
+    paddingTop: layout.screenTopBase,
   },
   title: {
     fontSize: 28,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   categoriesContainer: {
-    padding: 20,
+    padding: layout.screenHorizontal,
   },
   categoryCard: {
     backgroundColor: colors.surface,

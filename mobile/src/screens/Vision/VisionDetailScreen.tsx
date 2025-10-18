@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type VisionDetailRouteProp = RouteProp<RootStackParamList, 'VisionDetail'>;
 type VisionDetailNavigationProp = StackNavigationProp<RootStackParamList, 'VisionDetail'>;
@@ -120,12 +120,12 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 50,
-    left: 20,
+    top: layout.headerTop,
+    left: layout.headerSide,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: layout.screenHorizontal,
     paddingTop: 100,
     paddingBottom: 120,
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
+    padding: layout.screenHorizontal,
     backgroundColor: colors.background,
     borderTopWidth: 1,
     borderTopColor: colors.border,

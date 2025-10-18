@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type GiftPlayerRouteProp = RouteProp<RootStackParamList, 'GiftPlayer'>;
 type GiftPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'GiftPlayer'>;
@@ -110,12 +110,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: layout.headerTop,
+    right: layout.headerSide,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',

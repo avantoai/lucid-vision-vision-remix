@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type VisionEditRouteProp = RouteProp<RootStackParamList, 'VisionEdit'>;
 type VisionEditNavigationProp = StackNavigationProp<RootStackParamList, 'VisionEdit'>;
@@ -177,18 +177,18 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: layout.headerTop,
+    right: layout.headerSide,
     zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   content: {
-    padding: 20,
+    padding: layout.screenHorizontal,
     paddingTop: 100,
   },
   category: {
