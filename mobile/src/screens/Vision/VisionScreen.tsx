@@ -72,16 +72,18 @@ export default function VisionScreen() {
                 <Text style={styles.categoryName}>{category.name}</Text>
                 {hasSummary && (
                   <View style={styles.summaryBadge}>
-                    <Ionicons name="sparkles" size={16} color={colors.primary} />
+                    <Ionicons name="sparkles" size={16} color={colors.white} />
                   </View>
                 )}
               </View>
               {categoryData?.tagline && (
                 <Text style={styles.categoryTagline}>{categoryData.tagline}</Text>
               )}
-              <Text style={styles.categoryStatus}>
-                {hasSummary ? 'Vision Created' : status === 'in_progress' ? 'In Progress' : 'Not Started'}
-              </Text>
+              {!hasSummary && (
+                <Text style={styles.categoryStatus}>
+                  {status === 'in_progress' ? 'In Progress' : 'Not Started'}
+                </Text>
+              )}
             </TouchableOpacity>
           );
         })}
