@@ -235,18 +235,19 @@ async function generateTagline(visionStatement) {
 
 "${visionStatement}"
 
-CRITICAL REQUIREMENTS:
-1. The tagline MUST start with the word "I" or "we"
-2. Use potent, specific details from their vision
-3. Write as if you ARE the person speaking about YOUR OWN vision
+Guidelines:
+- Write in first person, beginning with "I" or "we"
+- Draw from the specific, meaningful details in their vision
+- Imagine you're speaking as this person about their own vision
 
-WRONG: "Empowering abundance through generous sharing"
-RIGHT: "I create abundant wealth and share it generously"
+Examples to inspire:
+Instead of: "Empowering abundance through generous sharing"
+Try: "I create abundant wealth and share it generously"
 
-WRONG: "Building a legacy of health and vitality"  
-RIGHT: "I embody vibrant health and inspire my family"
+Instead of: "Building a legacy of health and vitality"  
+Try: "I embody vibrant health and inspire my family"
 
-Return ONLY the tagline starting with "I" or "we". Nothing else.`;
+Return only the tagline, starting with "I" or "we".`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
