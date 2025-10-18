@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: layout.screenHorizontal,
-    paddingTop: layout.screenTopBase + layout.headerButtonSize,
+    paddingTop: layout.screenTopBase + layout.headerButtonSize + 20,
     paddingBottom: 120,
   },
   category: {
@@ -218,24 +218,16 @@ const styles = StyleSheet.create({
   },
   floatingButtonContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     left: 0,
     right: 0,
     padding: layout.screenHorizontal,
-    backgroundColor: colors.background,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   exploreButton: {
     backgroundColor: colors.primary,
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 999,
     alignItems: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
   },
   exploreButtonText: {
     color: colors.white,
