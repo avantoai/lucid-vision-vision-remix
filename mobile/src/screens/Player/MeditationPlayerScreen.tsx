@@ -261,12 +261,13 @@ export default function MeditationPlayerScreen() {
             disabled={!audioReady}
           >
             <View style={styles.rewindIconContainer}>
-              <Ionicons 
-                name="refresh-outline" 
-                size={32} 
-                color={!audioReady ? colors.textTertiary : colors.primary}
-                style={{ transform: [{ scaleX: -1 }] }}
-              />
+              <View style={{ transform: [{ scaleX: -1 }] }}>
+                <Ionicons 
+                  name="refresh-outline" 
+                  size={32} 
+                  color={!audioReady ? colors.textTertiary : colors.primary}
+                />
+              </View>
               <Text style={[styles.rewindLabel, !audioReady && styles.controlTextDisabled]}>15</Text>
             </View>
           </TouchableOpacity>
