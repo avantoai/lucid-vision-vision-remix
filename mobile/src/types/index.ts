@@ -79,7 +79,7 @@ export type RootStackParamList = {
   CategorySelection: undefined;
   VisionFlow: { category: string };
   VisionDetail: { category: string };
-  VisionRecord: { category: string; prompt: string; responses: Array<{ question: string; answer: string }> };
+  VisionRecord: { category: string; prompts: string[]; currentPromptIndex: number; responses: Array<{ question: string; answer: string }> };
   VisionEdit: { category: string; prompt: string; responses: Array<{ question: string; answer: string }>; audioUri: string | null; recordingDuration: number };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
   MeditationPlayer: { meditationId: string };
