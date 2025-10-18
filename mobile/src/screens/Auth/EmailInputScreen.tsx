@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type EmailInputNavigationProp = StackNavigationProp<RootStackParamList, 'EmailInput'>;
 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: layout.screenHorizontal,
     backgroundColor: colors.background,
   },
   title: {

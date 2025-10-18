@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: layout.screenHorizontal,
   },
   optionButtonSelected: {
     borderColor: colors.primary,

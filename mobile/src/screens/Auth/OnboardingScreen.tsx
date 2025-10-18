@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { colors } from '../../theme';
+import { colors, layout } from '../../theme';
 
 type OnboardingRouteProp = RouteProp<RootStackParamList, 'Onboarding'>;
 type OnboardingNavigationProp = StackNavigationProp<RootStackParamList, 'Onboarding'>;
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: layout.screenHorizontal,
     backgroundColor: colors.background,
   },
   title: {

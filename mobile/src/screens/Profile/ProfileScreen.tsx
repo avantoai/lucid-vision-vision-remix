@@ -48,7 +48,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: 20 }]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
         {user?.full_name && (
