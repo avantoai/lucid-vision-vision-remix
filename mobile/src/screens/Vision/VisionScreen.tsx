@@ -71,9 +71,7 @@ export default function VisionScreen() {
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryName}>{category.name}</Text>
                 {hasSummary && (
-                  <View style={styles.summaryBadge}>
-                    <Ionicons name="sparkles" size={16} color={colors.white} />
-                  </View>
+                  <Ionicons name="sparkles" size={20} color={colors.warning} />
                 )}
               </View>
               {categoryData?.tagline && (
@@ -135,14 +133,6 @@ const styles = StyleSheet.create({
   categoryCardWithSummary: {
     borderColor: colors.primaryLight,
     backgroundColor: colors.surfaceLight,
-  },
-  summaryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   categoryHeader: {
     flexDirection: 'row',
