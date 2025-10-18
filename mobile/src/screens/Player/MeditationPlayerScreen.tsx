@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, Meditation } from '../../types';
 import api from '../../services/api';
@@ -16,6 +17,7 @@ type MeditationPlayerNavigationProp = StackNavigationProp<RootStackParamList, 'M
 export default function MeditationPlayerScreen() {
   const navigation = useNavigation<MeditationPlayerNavigationProp>();
   const route = useRoute<MeditationPlayerRouteProp>();
+  const insets = useSafeAreaInsets();
   const [meditation, setMeditation] = useState<Meditation | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -222,11 +224,11 @@ export default function MeditationPlayerScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={[styles.backButton, { top: insets.top + 10 }]} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.optionsButton} onPress={() => setShowOptionsMenu(true)}>
+      <TouchableOpacity style={[styles.optionsButton, { top: insets.top + 10 }]} onPress={() => setShowOptionsMenu(true)}>
         <Text style={styles.optionsText}>•••</Text>
       </TouchableOpacity>
 
@@ -504,7 +506,7 @@ const styles = StyleSheet.create({
   },
   optionsMenu: {
     position: 'absolute',
-    top: 90,
+    top: 80,
     right: 20,
     backgroundColor: colors.surface,
     borderRadius: 12,
