@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.successLight,
   },
   categoryCardWithSummary: {
-    borderColor: colors.primaryLight,
+    borderColor: colors.border,
     backgroundColor: colors.surfaceLight,
   },
   categoryHeader: {
