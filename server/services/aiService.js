@@ -231,15 +231,22 @@ Return only the question, nothing else.`;
 }
 
 async function generateTagline(visionStatement) {
-  const prompt = `Generate a tagline (8-12 words) that captures the essence of this vision statement:
+  const prompt = `Create a personal tagline (8-12 words) from this vision statement:
 
 "${visionStatement}"
 
-Requirements:
-- MUST begin with "I" (or "we" if appropriate) - never third person
-- Reference potent, specific details from their vision summary
+CRITICAL REQUIREMENTS:
+1. The tagline MUST start with the word "I" or "we"
+2. Use potent, specific details from their vision
+3. Write as if you ARE the person speaking about YOUR OWN vision
 
-Return only the tagline, nothing else.`;
+WRONG: "Empowering abundance through generous sharing"
+RIGHT: "I create abundant wealth and share it generously"
+
+WRONG: "Building a legacy of health and vitality"  
+RIGHT: "I embody vibrant health and inspire my family"
+
+Return ONLY the tagline starting with "I" or "we". Nothing else.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
