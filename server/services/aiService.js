@@ -333,10 +333,81 @@ Example formats:
   }
 }
 
+async function generateMultiplePrompts(category, previousResponses, existingVision = null, count = 5) {
+  const responseHistory = previousResponses.map((r, i) => `${i + 1}. ${r.question}\nAnswer: ${r.answer}`).join('\n\n');
+
+  let contextSection = '';
+  if (existingVision) {
+    const contextParts = [];
+    if (existingVision.tagline) contextParts.push(`Tagline: "${existingVision.tagline}"`);
+    if (existingVision.statement) contextParts.push(`Statement: "${existingVision.statement}"`);
+    if (existingVision.summary) contextParts.push(`Summary: ${existingVision.summary}`);
+    
+    if (contextParts.length > 0) {
+      contextSection = `
+**Existing Vision Context:**
+The user already has a vision for ${category}:
+${contextParts.join('\n\n')}
+
+Generate questions that BUILD on this existing vision - help them expand, deepen, or evolve what they've already created.
+`;
+    }
+  }
+
+  const prompt = `You're guiding someone to deepen their vision for: ${category}
+
+Previous conversation:
+${responseHistory}
+${contextSection}
+
+Generate ${count} simple, focused questions that either:
+- Go deeper (70% probability): Explores feelings, beliefs, or embodiment
+- Expand context (30% probability): Explores related life areas or future possibilities
+
+${existingVision ? 'Remember to build on their existing vision context above.' : ''}
+
+STYLE REQUIREMENTS:
+- Keep each question SHORT (10-15 words maximum)
+- Use simple, conversational language
+- Focus on ONE specific thing per question
+- Avoid compound questions (no "and", "or", "but also")
+- Make them feel natural and easy to answer
+- Vary the questions - don't make them all sound the same
+
+Return ONLY a JSON array of ${count} questions, with no additional text:
+["Question 1?", "Question 2?", ...]`;
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.8,
+  });
+
+  const content = response.choices[0].message.content.trim();
+  
+  try {
+    const questions = JSON.parse(content);
+    if (Array.isArray(questions) && questions.length === count) {
+      return questions;
+    }
+  } catch (error) {
+    console.error('Failed to parse multiple prompts, falling back to individual generation');
+  }
+
+  // Fallback: Generate prompts individually
+  const prompts = [];
+  for (let i = 0; i < count; i++) {
+    const singlePrompt = await generateNextPrompt(category, previousResponses, existingVision);
+    prompts.push(singlePrompt);
+  }
+  return prompts;
+}
+
 module.exports = {
   generateScript,
   generateTitle,
   generateNextPrompt,
+  generateMultiplePrompts,
   generateTagline,
   synthesizeVisionStatement,
   generateVisionSummary,

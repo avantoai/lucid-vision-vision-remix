@@ -171,6 +171,21 @@ class ApiService {
     return data.prompt;
   }
 
+  async getMultiplePrompts(
+    category: string,
+    previousResponses: Array<{ question: string; answer: string }>,
+    count: number = 5
+  ): Promise<string[]> {
+    const params = new URLSearchParams({
+      responses: JSON.stringify(previousResponses),
+      count: count.toString(),
+    });
+    const data = await this.request<{ prompts: string[] }>(
+      `/vision/multiple-prompts/${category}?${params.toString()}`
+    );
+    return data.prompts;
+  }
+
   async submitVisionFlow(
     category: string,
     responses: Array<{ question: string; answer: string }>
