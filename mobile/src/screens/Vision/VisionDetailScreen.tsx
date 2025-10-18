@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: layout.screenHorizontal,
-    paddingTop: 100,
+    paddingTop: layout.screenTopBase + layout.headerButtonSize,
     paddingBottom: 120,
   },
   category: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: layout.screenHorizontal,
   },
   responsesContainer: {
     marginTop: 24,

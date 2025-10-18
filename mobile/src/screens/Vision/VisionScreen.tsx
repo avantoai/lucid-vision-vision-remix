@@ -41,7 +41,7 @@ export default function VisionScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: layout.screenHorizontal }}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Living Vision</Text>
         <Text style={styles.subtitle}>Track and evolve your vision across all life categories</Text>

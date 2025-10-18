@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   topContent: {
     position: 'absolute',
-    top: 100,
+    top: layout.screenTopBase + layout.headerButtonSize,
     left: 0,
     right: 0,
     paddingHorizontal: layout.screenHorizontal,
