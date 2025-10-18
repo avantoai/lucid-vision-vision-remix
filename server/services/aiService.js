@@ -188,7 +188,7 @@ async function generateNextPrompt(category, previousResponses, existingVision = 
 The user already has a vision for ${category}:
 ${contextParts.join('\n\n')}
 
-Generate a question that BUILDS on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your question to show continuity.
+Generate questions that BUILD on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your questions to show continuity.
 `;
     }
   }
@@ -199,18 +199,19 @@ Previous conversation:
 ${responseHistory}
 ${contextSection}
 
-Generate ONE simple, focused follow-up question that either:
-- Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
-- Expands context (30% probability): Explores related life areas or future possibilities
+Generate FIVE simple, focused follow-up questions that either:
+- Go deeper (70% probability): Explores feelings, beliefs, or embodiment
+- Expand context (30% probability): Explores related life areas or future possibilities
 
 ${existingVision ? 'Remember to build on their existing vision context above.' : ''}
 
 STYLE REQUIREMENTS:
-- Keep it SHORT (10-15 words maximum)
+- Keep EACH question SHORT (10-15 words maximum)
 - Use simple, conversational language
-- Focus on ONE specific thing only
+- Each question focuses on ONE specific thing only
 - Avoid compound questions (no "and", "or", "but also")
-- Make it feel natural and easy to answer
+- Make them feel natural and easy to answer
+- Ensure variety - don't repeat similar questions
 
 BAD: "How does embodying this financial abundance influence not only your daily choices but also the legacy you wish to create for your family and community in the years to come?"
 
@@ -218,16 +219,33 @@ GOOD: "What does abundance feel like in your body?"
 GOOD: "How do you want to experience wealth daily?"
 GOOD: "What legacy matters most to you?"
 
-Return only the question, nothing else.`;
+Return ONLY a JSON array of 5 questions, nothing else. Format: ["question1", "question2", "question3", "question4", "question5"]`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.9,
-    max_tokens: 100
+    max_tokens: 300
   });
 
-  return completion.choices[0].message.content.trim();
+  try {
+    const result = JSON.parse(completion.choices[0].message.content.trim());
+    if (Array.isArray(result) && result.length === 5) {
+      return result;
+    }
+    // If parsing fails or doesn't return 5 questions, fall back to a default set
+    throw new Error('Invalid prompt format');
+  } catch (error) {
+    console.error('Failed to parse AI-generated prompts, using fallback:', error);
+    // Fallback to simple follow-up questions
+    return [
+      `What does this vision feel like in your body?`,
+      `How will this transform your daily life?`,
+      `What becomes possible when you embody this?`,
+      `What's the deepest truth about this for you?`,
+      `Who are you becoming through this vision?`
+    ];
+  }
 }
 
 async function generateTagline(visionStatement) {
