@@ -49,8 +49,14 @@ router.get('/next-prompt/:category', authenticateUser, async (req, res) => {
   try {
     const { responses } = req.query;
     const parsedResponses = responses ? JSON.parse(responses) : [];
-    const nextPrompt = await visionService.generateNextPrompt(req.user.id, req.params.category, parsedResponses);
-    res.json({ success: true, prompt: nextPrompt });
+    const result = await visionService.generateNextPrompt(req.user.id, req.params.category, parsedResponses);
+    
+    // Handle both string (legacy fixed prompts) and object (new AI prompts) formats
+    if (typeof result === 'string') {
+      res.json({ success: true, prompt: result, microTag: null });
+    } else {
+      res.json({ success: true, prompt: result.question, microTag: result.microTag });
+    }
   } catch (error) {
     console.error('Next prompt error:', error);
     res.status(500).json({ error: 'Failed to generate next prompt' });

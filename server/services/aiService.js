@@ -172,53 +172,128 @@ The title should reflect the specific vision and themes, not generic meditation 
 }
 
 async function generateNextPrompt(category, previousResponses, existingVision = null) {
-  const responseHistory = previousResponses.map((r, i) => `${i + 1}. ${r.question}\nAnswer: ${r.answer}`).join('\n\n');
+  const { MICRO_TAGS } = require('../config/microTags');
+  
+  // Determine current dimension based on response count
+  const responseCount = previousResponses.length;
+  let dimension, dimensionCoaching;
+  
+  if (responseCount < 2) {
+    dimension = 'Clarity';
+    dimensionCoaching = `Focus: Help them get SPECIFIC about what they want to create.
+Ask questions that evoke concrete details, clear outcomes, and tangible visions.
+Examples: "What does success look like in [category]?" "What specific outcome would make you feel proud?"`;
+  } else if (responseCount < 4) {
+    dimension = 'Embodiment';
+    // Extract specific outcomes from previous responses for personalized questions
+    const outcomes = extractSpecificOutcomes(previousResponses);
+    const outcomeExamples = outcomes.length > 0 
+      ? `\nReference their specific outcomes: ${outcomes.join(', ')}`
+      : '';
+    dimensionCoaching = `Focus: Help them FEEL what it's like when their vision manifests.
+Ask how specific outcomes they've shared will feel in their body and emotions.${outcomeExamples}
+Examples: "How does [specific outcome] feel in your body?" "What emotions arise when [vision] is real?"`;
+  } else if (responseCount < 6) {
+    dimension = 'Identity';
+    // Extract specific outcomes for identity questions
+    const outcomes = extractSpecificOutcomes(previousResponses);
+    const outcomeExamples = outcomes.length > 0 
+      ? `\nReference their specific outcomes: ${outcomes.join(', ')}`
+      : '';
+    dimensionCoaching = `Focus: Help them embody WHO THEY NEED TO BE to create this vision.
+Ask about the beliefs, mindset, and identity required to manifest what they've shared.${outcomeExamples}
+Examples: "What beliefs do you have when [outcome] is your reality?" "What type of person creates [vision]?"`;
+  } else {
+    dimension = 'Action';
+    dimensionCoaching = `Focus: Help them identify ACTIONS and next steps.
+Ask what they need to do, start, or commit to in order to create their vision.
+Examples: "What's one action you can take this week?" "What needs to change for this to happen?"`;
+  }
 
-  let contextSection = '';
+  // Get covered micro-tags from previous responses
+  // Handle both micro_tag (snake_case from DB) and microTag (camelCase from API)
+  const coveredTags = previousResponses
+    .map(r => r.micro_tag || r.microTag)
+    .filter(tag => tag); // Filter out null/undefined
+  
+  const availableTags = MICRO_TAGS[category] || [];
+  const uncoveredTags = availableTags.filter(tag => !coveredTags.includes(tag));
+  
+  // Determine if this should be deepening (50%) or expansion (50%)
+  const isDeepening = Math.random() < 0.5;
+  
+  let selectedTag, approachGuidance;
+  if (isDeepening && coveredTags.length > 0) {
+    // Deepening: Pick a random covered tag
+    selectedTag = coveredTags[Math.floor(Math.random() * coveredTags.length)];
+    approachGuidance = `Approach: DEEPENING
+You're building on the micro-tag "${selectedTag}" which they've already explored.
+Go deeper - reference their previous responses and help them expand on what they've already shared.`;
+  } else if (uncoveredTags.length > 0) {
+    // Expansion: Pick a random uncovered tag
+    selectedTag = uncoveredTags[Math.floor(Math.random() * uncoveredTags.length)];
+    approachGuidance = `Approach: EXPANSION
+You're exploring a new micro-tag: "${selectedTag}".
+Introduce this fresh angle while staying connected to their overall ${category} vision.`;
+  } else {
+    // Fallback: all tags covered, pick any tag
+    selectedTag = availableTags[Math.floor(Math.random() * availableTags.length)];
+    approachGuidance = `Approach: DEEPENING (all micro-tags covered)
+Revisit the micro-tag "${selectedTag}" from a new angle.`;
+  }
+
+  // Build response history
+  const responseHistory = previousResponses.length > 0
+    ? previousResponses.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answer}`).join('\n\n')
+    : 'No previous responses yet - this is their first question.';
+
+  // Build existing vision context if available
+  let visionContext = '';
   if (existingVision) {
-    // Build context from whatever fields are available
     const contextParts = [];
     if (existingVision.tagline) contextParts.push(`Tagline: "${existingVision.tagline}"`);
     if (existingVision.statement) contextParts.push(`Statement: "${existingVision.statement}"`);
     if (existingVision.summary) contextParts.push(`Summary: ${existingVision.summary}`);
     
     if (contextParts.length > 0) {
-      contextSection = `
-**Existing Vision Context:**
-The user already has a vision for ${category}:
-${contextParts.join('\n\n')}
-
-Generate a question that BUILDS on this existing vision - help them expand, deepen, or evolve what they've already created. Reference their existing vision tastefully in your question to show continuity.
-`;
+      visionContext = `\n**Existing Vision:**
+${contextParts.join('\n')}`;
     }
   }
 
-  const prompt = `You're guiding someone to deepen their vision for: ${category}
+  const prompt = `You are a masterful vision coach helping someone articulate and embody their future across the life category: ${category}.
 
-Previous conversation:
-${responseHistory}
-${contextSection}
+Your task is to generate ONE short, powerful follow-up question that supports the user's current visioning process.
 
-Generate ONE simple, focused follow-up question that either:
-- Goes deeper (70% probability): Explores feelings, beliefs, or embodiment
-- Expands context (30% probability): Explores related life areas or future possibilities
+**Previous Responses:**
+${responseHistory}${visionContext}
 
-${existingVision ? 'Remember to build on their existing vision context above.' : ''}
+**Current Dimension:** ${dimension}
+${dimensionCoaching}
+
+${approachGuidance}
+
+**Micro-Tag Focus:** "${selectedTag}"
+Craft your question to explore this specific aspect of their ${category} vision.
 
 STYLE REQUIREMENTS:
-- Keep it SHORT (10-15 words maximum)
-- Use simple, conversational language
-- Focus on ONE specific thing only
-- Avoid compound questions (no "and", "or", "but also")
-- Make it feel natural and easy to answer
+- Ask ONLY ONE short, focused question (10–15 words max).
+- Avoid fluff, filler words, or complex syntax.
+- Avoid "and", "or", "but also".
+- Speak naturally, like a coach or trusted friend.
+- Prioritize clarity over cleverness.
+- Feel free to use plain, direct language (e.g. "What do you really want?").
+- Do NOT repeat the user's words or ask vague, abstract questions.
 
-BAD: "How does embodying this financial abundance influence not only your daily choices but also the legacy you wish to create for your family and community in the years to come?"
+DO NOT:
+✗ Return multiple questions.  
+✗ Use academic, robotic, or overly spiritual language.  
+✗ Repeat their own words back at them.  
+✗ Include anything outside of the question itself.
 
-GOOD: "What does abundance feel like in your body?"
-GOOD: "How do you want to experience wealth daily?"
-GOOD: "What legacy matters most to you?"
+Your goal: unlock their next layer of clarity, embodiment, identity, or momentum — within the scope of the selected micro-tag.
 
-Return only the question, nothing else.`;
+Return only the question.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -227,7 +302,38 @@ Return only the question, nothing else.`;
     max_tokens: 100
   });
 
-  return completion.choices[0].message.content.trim();
+  const question = completion.choices[0].message.content.trim();
+  
+  // Return both the question and the selected micro-tag
+  return { question, microTag: selectedTag };
+}
+
+// Helper function to extract specific outcomes from user responses
+function extractSpecificOutcomes(responses) {
+  const outcomes = [];
+  
+  responses.forEach(r => {
+    const answer = r.answer || '';
+    
+    // Look for dollar amounts
+    const moneyMatch = answer.match(/\$[\d,]+[KMB]?/gi);
+    if (moneyMatch) outcomes.push(...moneyMatch);
+    
+    // Look for specific role/identity mentions
+    const rolePatterns = [
+      /married (to|with) [^,.!?]+/gi,
+      /father of \d+/gi,
+      /mother of \d+/gi,
+      /CEO of [^,.!?]+/gi,
+      /founder of [^,.!?]+/gi,
+    ];
+    rolePatterns.forEach(pattern => {
+      const matches = answer.match(pattern);
+      if (matches) outcomes.push(...matches);
+    });
+  });
+  
+  return outcomes.slice(0, 3); // Return max 3 outcomes
 }
 
 async function generateTagline(visionStatement) {

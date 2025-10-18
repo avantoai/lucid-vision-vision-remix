@@ -180,6 +180,7 @@ async function processPromptFlow(userId, category, responses) {
         category,
         question: response.question,
         answer: response.answer,
+        micro_tag: response.microTag || response.micro_tag || null,
         created_at: new Date().toISOString()
       });
   }
@@ -400,7 +401,8 @@ async function generateNextPrompt(userId, category, previousResponses) {
   
   if (previousResponses.length < fixedPrompts.length) {
     console.log(`📝 Using fixed prompt ${previousResponses.length + 1}/${fixedPrompts.length} for ${category}`);
-    return fixedPrompts[previousResponses.length];
+    // Fixed prompts don't have micro-tags, so return as object for consistency
+    return { question: fixedPrompts[previousResponses.length], microTag: null };
   }
 
   // After fixed prompts are exhausted (and still no vision context), use AI

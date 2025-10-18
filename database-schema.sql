@@ -53,6 +53,7 @@ CREATE TABLE vision_responses (
   category TEXT NOT NULL,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
+  micro_tag TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
