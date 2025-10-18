@@ -143,7 +143,11 @@ export default function LibraryScreen() {
         <Ionicons name="heart" size={18} color="#EF4444" style={styles.favoriteIcon} />
       )}
       <View style={styles.meditationHeader}>
-        <Text style={styles.meditationCategory}>{item.category.toUpperCase()}</Text>
+        <Text style={styles.meditationCategory}>
+          {item.category.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          ).join(' ')}
+        </Text>
         <Text style={styles.bulletSeparator}> • </Text>
         <Text style={styles.meditationDuration}>{item.duration} min</Text>
       </View>
@@ -292,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -303,9 +307,9 @@ const styles = StyleSheet.create({
   },
   meditationCategory: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: colors.primary,
-    letterSpacing: 1,
+    letterSpacing: 0,
   },
   bulletSeparator: {
     fontSize: 14,
