@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.error,
     margin: 20,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
   },
   logoutText: {

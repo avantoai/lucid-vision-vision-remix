@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: colors.success,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
     marginBottom: 24,
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
   },
   buttonDisabled: {

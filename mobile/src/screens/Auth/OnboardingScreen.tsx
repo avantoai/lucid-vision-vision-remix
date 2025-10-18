@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
   },
   buttonDisabled: {

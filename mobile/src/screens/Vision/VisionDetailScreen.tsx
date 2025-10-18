@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   exploreButton: {
     backgroundColor: colors.primary,
     paddingVertical: 18,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },

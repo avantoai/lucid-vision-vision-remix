@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 20,
+    borderRadius: 999,
     backgroundColor: colors.surfaceLight,
     transform: [
       { translateX: -60 },  // Approximate half of button width to center

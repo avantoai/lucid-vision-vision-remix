@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
   },
   nextButton: {
