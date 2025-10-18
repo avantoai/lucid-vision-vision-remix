@@ -139,6 +139,9 @@ export default function LibraryScreen() {
       }}
       disabled={item.status !== 'completed'}
     >
+      {item.is_favorite && (
+        <Ionicons name="heart" size={18} color="#EF4444" style={styles.favoriteIcon} />
+      )}
       <View style={styles.meditationHeader}>
         <Text style={styles.meditationCategory}>{item.category.toUpperCase()}</Text>
         <Text style={styles.bulletSeparator}> • </Text>
@@ -163,7 +166,6 @@ export default function LibraryScreen() {
           <Text style={styles.pinnedBadgeText}>Pinned</Text>
         </View>
       )}
-      {item.is_favorite && <Ionicons name="heart" size={18} color="#EF4444" style={{ marginTop: 4 }} />}
     </TouchableOpacity>
   );
 
@@ -315,10 +317,15 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   meditationTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 8,
+  },
+  favoriteIcon: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
   },
   pinnedBadge: {
     flexDirection: 'row',
