@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@octokit/rest": "^22.0.0",
     "@react-native-community/slider": "^5.0.1",
     "@supabase/supabase-js": "^2.58.0",
     "axios": "^1.12.2",
