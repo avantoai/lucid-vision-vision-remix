@@ -10,7 +10,7 @@ import OnboardingScreen from '../screens/Auth/OnboardingScreen';
 import MainTabNavigator from './MainTabNavigator';
 import CategorySelectionScreen from '../screens/Category/CategorySelectionScreen';
 import VisionFlowScreen from '../screens/Vision/VisionFlowScreen';
-import VisionDetailScreen from '../screens/Vision/VisionDetailScreen';
+import VisionDetailNewScreen from '../screens/Vision/VisionDetailNewScreen';
 import VisionRecordScreen from '../screens/Vision/VisionRecordScreen';
 import VisionEditScreen from '../screens/Vision/VisionEditScreen';
 import MeditationSetupScreen from '../screens/Meditation/MeditationSetupScreen';
@@ -67,7 +67,7 @@ export default function RootNavigator() {
             />
             <Stack.Screen 
               name="VisionDetail" 
-              component={VisionDetailScreen}
+              component={VisionDetailNewScreen}
             />
             <Stack.Screen 
               name="VisionRecord" 

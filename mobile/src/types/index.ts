@@ -82,7 +82,6 @@ export type RootStackParamList = {
   VisionDetail: { visionId: string };
   VisionRecord: { visionId: string; question: string; stage: string; stageIndex: number };
   VisionEdit: { visionId: string; question: string; stage: string; stageIndex: number; audioUri: string | null; recordingDuration: number };
-  CreateMeditation: { visionId: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;

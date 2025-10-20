@@ -87,7 +87,11 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   };
 
   const handleCreateMeditation = () => {
-    navigation.navigate('CreateMeditation', { visionId });
+    navigation.navigate('MeditationSetup', { 
+      category: vision?.categories[0] || 'personal',
+      responses: [],
+      visionId 
+    });
   };
 
   const handleDelete = () => {

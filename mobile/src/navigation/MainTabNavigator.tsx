@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { TabParamList } from '../types';
 import LibraryScreen from '../screens/Library/LibraryScreen';
-import VisionScreen from '../screens/Vision/VisionScreen';
+import MyVisionsScreen from '../screens/Vision/MyVisionsScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import { colors } from '../theme';
 
@@ -35,9 +35,9 @@ export default function MainTabNavigator() {
       />
       <Tab.Screen 
         name="Vision" 
-        component={VisionScreen}
+        component={MyVisionsScreen}
         options={{ 
-          tabBarLabel: 'Vision',
+          tabBarLabel: 'My Visions',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flower" size={size} color={color} />
           ),
