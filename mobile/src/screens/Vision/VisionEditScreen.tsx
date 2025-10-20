@@ -82,23 +82,6 @@ export default function VisionEditScreen() {
     }
   };
 
-  const handleFinishLater = async () => {
-    if (!currentAnswer.trim()) {
-      navigation.navigate('MyVisions');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await api.submitVisionResponse(visionId, stage, question, currentAnswer);
-      navigation.navigate('MyVisions');
-    } catch (error) {
-      console.error('Failed to save response:', error);
-      Alert.alert('Error', 'Failed to save your response');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isTranscribing) {
     return (
@@ -133,25 +116,15 @@ export default function VisionEditScreen() {
           editable={!isLoading}
         />
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.continueButton, isLoading && styles.buttonDisabled]}
-            onPress={handleContinue}
-            disabled={isLoading}
-          >
-            <Text style={styles.actionButtonText}>
-              {isLoading ? 'Saving...' : 'Continue'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.laterButton, isLoading && styles.buttonDisabled]}
-            onPress={handleFinishLater}
-            disabled={isLoading}
-          >
-            <Text style={styles.laterButtonText}>Finish Later</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.continueButton, isLoading && styles.buttonDisabled]}
+          onPress={handleContinue}
+          disabled={isLoading}
+        >
+          <Text style={styles.continueButtonText}>
+            {isLoading ? 'Saving...' : 'Continue'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -211,36 +184,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: colors.text,
   },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
   continueButton: {
     backgroundColor: colors.primary,
-  },
-  laterButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: 18,
+    borderRadius: 999,
+    alignItems: 'center',
+    marginBottom: 32,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
-  actionButtonText: {
+  continueButtonText: {
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  laterButtonText: {
-    color: colors.text,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
 });
