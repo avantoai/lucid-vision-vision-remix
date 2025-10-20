@@ -285,6 +285,63 @@ class ApiService {
     const data = await response.json();
     return data.transcript;
   }
+
+  async getAllVisions(): Promise<any[]> {
+    const data = await this.request<{ visions: any[] }>('/vision/visions');
+    return data.visions;
+  }
+
+  async getVision(visionId: string): Promise<any> {
+    const data = await this.request<{ vision: any }>(`/vision/visions/${visionId}`);
+    return data.vision;
+  }
+
+  async createVision(): Promise<any> {
+    const data = await this.request<{ vision: any }>('/vision/visions', {
+      method: 'POST',
+    });
+    return data.vision;
+  }
+
+  async generateNextQuestion(visionId: string): Promise<{ question: string; stage: string; stageIndex: number }> {
+    const data = await this.request<{ question: string; stage: string; stageIndex: number }>(
+      `/vision/visions/${visionId}/next-question`,
+      { method: 'POST' }
+    );
+    return data;
+  }
+
+  async submitVisionResponse(visionId: string, stage: string, question: string, answer: string): Promise<{ stage_progress: number }> {
+    const data = await this.request<{ stage_progress: number }>(
+      `/vision/visions/${visionId}/response`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ stage, question, answer }),
+      }
+    );
+    return data;
+  }
+
+  async processVisionSummary(visionId: string): Promise<{ status: string }> {
+    const data = await this.request<{ status: string }>(
+      `/vision/visions/${visionId}/process`,
+      { method: 'POST' }
+    );
+    return data;
+  }
+
+  async deleteVision(visionId: string): Promise<void> {
+    await this.request(`/vision/visions/${visionId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async updateVisionTitle(visionId: string, title: string): Promise<void> {
+    await this.request(`/vision/visions/${visionId}/title`, {
+      method: 'PATCH',
+      body: JSON.stringify({ title }),
+    });
+  }
 }
 
 export default new ApiService();
