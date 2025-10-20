@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 32,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 999,
   },
   emptyButtonText: {
     color: colors.white,

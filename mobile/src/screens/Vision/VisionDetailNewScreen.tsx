@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: 'center',
     marginBottom: 12,
   },
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.surface,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 999,
     gap: 8,
   },
   secondaryButtonText: {
