@@ -7,13 +7,14 @@ function stripBreakTags(script) {
   return script.replace(/<break\s+time=['"][\d.]+s['"]\s*\/>/g, '');
 }
 
-async function createMeditationPlaceholder({ userId, category, duration, voiceId, background, isGift }) {
+async function createMeditationPlaceholder({ userId, category, duration, voiceId, background, visionId, isGift }) {
   console.log(`🎨 Creating meditation placeholder for user: ${userId}`);
   
   const { data: meditation, error } = await supabaseAdmin
     .from('meditations')
     .insert({
       user_id: userId,
+      vision_id: visionId || null,
       category,
       duration,
       voice_id: voiceId,
@@ -37,7 +38,7 @@ async function createMeditationPlaceholder({ userId, category, duration, voiceId
   return meditation;
 }
 
-async function completeMeditationGeneration({ meditationId, userId, category, duration, voiceId, background, responses, isGift }) {
+async function completeMeditationGeneration({ meditationId, userId, category, duration, voiceId, background, responses, visionId, isGift }) {
   console.log(`🎵 Starting background generation for meditation: ${meditationId}`);
   console.log(`   Category: ${category}, Duration: ${duration}min, Voice: ${voiceId}, Background: ${background}`);
   
@@ -50,23 +51,44 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
       .single();
     console.log(`✓ [${meditationId}] User: ${user?.full_name || 'friend'}`);
 
+    let finalResponses = responses;
+    if (visionId) {
+      console.log(`⏳ [${meditationId}] Fetching vision responses from vision: ${visionId}...`);
+      const { data: visionResponses } = await supabaseAdmin
+        .from('vision_responses')
+        .select('question, answer, stage')
+        .eq('vision_id', visionId)
+        .order('created_at', { ascending: true });
+      
+      if (visionResponses && visionResponses.length > 0) {
+        finalResponses = visionResponses;
+        console.log(`✓ [${meditationId}] Loaded ${visionResponses.length} responses from vision`);
+      }
+    }
+
     console.log(`⏳ [${meditationId}] Step 2/5: Generating AI script (110 WPM, ~${duration * 110} words)...`);
     
-    // Fetch all active vision statements for enrichment
-    const { data: visionStatements } = await supabaseAdmin
-      .from('vision_statements')
-      .select('category, statement, tagline, summary')
+    // Fetch all visions for enrichment
+    const { data: visions } = await supabaseAdmin
+      .from('visions')
+      .select('categories, summary, tagline')
       .eq('user_id', userId)
-      .eq('is_active', true);
+      .eq('status', 'completed');
+    
+    const visionStatements = visions?.map(v => ({
+      category: v.categories?.[0] || 'general',
+      summary: v.summary,
+      tagline: v.tagline
+    })) || [];
     
     const scriptStart = Date.now();
     const script = await aiService.generateScript({
       category,
       duration,
       background,
-      responses,
+      responses: finalResponses,
       userName: user?.full_name || 'friend',
-      visionStatements: visionStatements || []
+      visionStatements
     });
     console.log(`✓ [${meditationId}] Script generated in ${((Date.now() - scriptStart) / 1000).toFixed(1)}s (${script.length} chars)`);
 

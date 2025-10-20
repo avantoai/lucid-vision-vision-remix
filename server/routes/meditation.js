@@ -6,7 +6,7 @@ const quotaService = require('../services/quotaService');
 
 router.post('/generate', authenticateUser, async (req, res) => {
   try {
-    const { category, duration, voiceId, background, responses, isGift } = req.body;
+    const { category, duration, voiceId, background, responses, visionId, isGift } = req.body;
 
     if (!isGift) {
       const canCreate = await quotaService.canCreatePersonalMeditation(req.user.id);
@@ -26,6 +26,7 @@ router.post('/generate', authenticateUser, async (req, res) => {
       duration,
       voiceId,
       background,
+      visionId,
       isGift
     });
 
@@ -37,6 +38,7 @@ router.post('/generate', authenticateUser, async (req, res) => {
       voiceId,
       background,
       responses,
+      visionId,
       isGift
     }).catch(error => {
       console.error('Background generation error:', error);
