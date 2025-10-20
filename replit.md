@@ -5,8 +5,9 @@ Lucid Vision is a mobile-first meditation platform that generates personalized g
 
 ## User Preferences
 - Mobile-first design approach
-- Unlimited AI follow-up prompts for vision deepening (no artificial limits)
-- Living Vision Statements evolve over time per category
+- Outcome-first vision system with Coach Cal AI persona
+- 5-stage evocation flow for each vision (Vision → Belief → Identity → Embodiment → Action)
+- Grounding screen shown at start of every vision flow session
 
 ## System Architecture
 Lucid Vision employs a microservices-oriented architecture with a clear separation between its backend API and frontend mobile application.
@@ -40,7 +41,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
     - Auto-generated meditation titles based on user vision responses
     - **Async UX Flow:** Users click "Generate Meditation" → immediately navigate to Library with dismissible notification → meditation generates in background → alert when ready
 - **Library & Organization:** Two filter tabs (All, Favorites). Pinned meditations appear at top of "All" list (max 3 pins).
-- **Living Vision System:** Supports 8 life categories (health, wealth, relationships, play, love, purpose, spirit, healing) with intelligent AI-generated follow-up prompts. **Dimension Arc System:** Prompts follow a structured progression based on response count: Clarity (responses 1-2: specific outcomes), Embodiment (responses 3-4: feelings/emotions when vision manifests), Identity (responses 5-6: beliefs/mindset to create vision), Action (responses 7+: concrete steps). **Micro-Tag Taxonomy:** Each category has 10 micro-tags (sub-themes) that guide prompt generation. **Deepening vs Expansion:** 50/50 split between deepening (exploring covered micro-tags) and expansion (introducing new micro-tags). **Response Analyzer:** Extracts specific outcomes (dollar amounts, roles, relationships) from user responses to personalize Embodiment and Identity questions. **Vision Coach Persona:** AI uses natural, direct coaching language (10-15 words max, no fluff, plain language encouraged). Prompts reference specific user details and avoid repeating user's words. Auto-generated taglines, detailed vision summaries (8-12 sentences), version history. Vision processing is async - users can immediately proceed to meditation customization while AI generates their vision statement in the background. Cross-category topic detection allows responses in one category to update related life areas automatically. Navigation flow: VisionScreen → VisionDetailScreen (shows comprehensive summary) → "Explore Vision" button → VisionFlowScreen → VisionRecordScreen (speech-to-text, 28px bold prompt text) → VisionEditScreen (review/edit). Each response tracked with its micro-tag in database for intelligent deepening.
+- **My Visions System:** Outcome-first vision system where users create individual vision outcomes that evolve through a structured 5-stage evocation flow guided by Coach Cal, a natural coaching AI persona. **5-Stage Evocation:** Each vision progresses through (1) Vision - what you want, (2) Belief - why you deserve it, (3) Identity - who you must become, (4) Embodiment - how it feels, (5) Action - concrete steps. **Coach Cal AI:** Generates personalized questions using natural, direct coaching language (10-15 words max, no spiritual jargon). Questions reference specific user details from previous responses. **Auto-Generated Content:** AI automatically generates vision titles, categories (multiple allowed per vision), summaries, and taglines based on user responses. **Deepening Logic:** When all 5 stages are complete (5/5 progress), AI determines which stage needs deepening and generates new questions for that stage. **Progress Tracking:** Visual progress bar with color gradient (red→yellow→green) based on stage completion. Users can exit mid-flow and resume later. **Grounding Screen:** Contemplative grounding screen shown at start of every vision flow session, regardless of stage. **Navigation Flow:** MyVisionsScreen (vision cards with progress) → VisionDetail (summary, tagline, Q&A history, progress bar) → "Continue Flow" → Grounding → VisionFlow → VisionRecord (speech-to-text with stage indicator) → VisionEdit (review/edit with "Continue" or "Finish Later" options). **Database Schema:** `visions` table (title, categories array, stage_progress, summary, tagline, micro_tags), `vision_responses` table (with stage field tracking which of 5 stages each response belongs to).
 - **Gift Meditations:** Enables creation of shareable, permanent gift meditation links with a public web player.
 - **Subscription Tiers:** Implements Basic and Advanced tiers with differing limits on meditation generation, duration, voice options, and features like background playback and offline downloads. Quotas reset weekly.
 - **Audio:** Uses expo-av (Audio.Sound API) for reliable dynamic audio loading and playback. Previews for voices and background audio are supported. Async generation with status tracking (generating/completed/failed) and background polling.
@@ -48,7 +49,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **3. Feature Specifications:**
 - **Authentication:** Email magic link, full name collection, trial period tracking, backend `/auth/me` endpoint.
 - **Meditation Generation:** Personalized script, voice (ElevenLabs), background audio (FFmpeg mixing), storage.
-- **Living Vision System:** 8 categories (health, wealth, relationships, play, love, purpose, spirit, healing), AI follow-ups with dimension arc and micro-tag tracking, taglines, version history.
+- **My Visions System:** Individual vision outcomes with 5-stage evocation flow (Vision, Belief, Identity, Embodiment, Action), Coach Cal AI questions, auto-generated titles/categories/summaries, deepening logic, progress tracking (X/5 stages with color gradient), grounding screen.
 - **Gift Meditations:** Max 15 minutes, public web player, permanent links, recipient saving, quota-based.
 - **Subscription Tiers:**
     - **Basic:** 3 personal/gift meditations/week, max 15 min, 3 voices, no background playback/offline.
@@ -67,7 +68,7 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
     - **API Service:** Centralized API client in `mobile/src/services/api.ts`.
     - **Auth Context:** Session management via `AuthContext` and `AsyncStorage`.
 - **Database (Supabase PostgreSQL):**
-    - **Schema:** Defined in `database-schema.sql` including `users`, `meditations`, `vision_statements`, `vision_responses`, `gifts`, `quota_tracking`.
+    - **Schema:** Defined in `database-schema.sql` including `users`, `meditations`, `visions`, `vision_responses`, `gifts`, `quota_tracking`.
     - **Security:** All tables utilize Row Level Security (RLS).
 - **Web Player:** Static HTML (`public/gift-player.html`) for public gift meditation sharing.
 
