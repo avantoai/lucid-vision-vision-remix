@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
-import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 interface Vision {
