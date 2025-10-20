@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenHorizontal,
+    paddingTop: layout.screenTopBase,
     marginBottom: 20,
   },
   headerTitle: {
