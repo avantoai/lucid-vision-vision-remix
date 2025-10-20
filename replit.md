@@ -23,10 +23,14 @@ Lucid Vision employs a microservices-oriented architecture with a clear separati
 **2. Technical Implementations:**
 - **Authentication:** Email magic link with deep linking via Supabase Auth and Expo AuthSession. This handles both cold-start and foreground scenarios, parsing tokens from URLs and managing user sessions with AsyncStorage. Initial URL checking validates auth tokens before processing to prevent false "Invalid authentication link" errors on Expo Go launch. Auth flow optimized to prevent duplicate API calls by skipping `checkAuth()` when processing fresh deep link authentication.
 - **Dev Mode:** Optional `EXPO_PUBLIC_DEV_MODE` flag in `.env` enables session persistence across app reloads/restarts. After logging in once, session is backed up and auto-restored, eliminating repetitive logins during testing.
-- **Local Development:** User develops locally on Mac at `/Users/alan/code/lucidvision/`, pulls from Replit, runs Expo locally. Requires:
-  - `REDIRECT_URL` secret in Replit set to current Expo CLI address (e.g., `exp://192.168.128.119:8081`)
-  - Matching URL added to Supabase Auth → URL Configuration → Redirect URLs with wildcard (e.g., `exp://192.168.128.119:8081/**`)
-  - Update both when local IP address changes (WiFi reconnection)
+- **Local Development:** User develops locally on Mac at `/Users/alan/code/lucidvision/`, pulls from Replit, runs Expo locally. Current IP: `192.168.1.150`. When IP changes (WiFi reconnection), user will request updated configuration table with all URLs. Required configuration:
+
+  | Location | Setting | Value |
+  |----------|---------|-------|
+  | Supabase → Auth → URL Configuration | Site URL | `exp://[IP]:8081` |
+  | Supabase → Auth → URL Configuration | Redirect URLs | `exp://[IP]:8081/**` |
+  | Replit → Secrets | REDIRECT_URL | `exp://[IP]:8081` |
+  | mobile/.env | EXPO_PUBLIC_API_URL | `http://[IP]:5000/api` |
 - **Meditation Generation:** A multi-step async process involving:
     - **Speech-to-Text Input:** Primary input method using Expo AV audio recording with OpenAI Whisper transcription. Users can tap microphone to record responses (with timer), stop to transcribe, then review/edit transcript. Alternative "Write ✏️" button provides direct text input.
     - User vision responses collected through AI-guided prompt flow (VisionFlow → VisionRecord → VisionEdit)
