@@ -3,73 +3,91 @@ const router = express.Router();
 const { authenticateUser } = require('../middleware/auth');
 const visionService = require('../services/visionService');
 
-router.get('/categories', authenticateUser, async (req, res) => {
+router.get('/visions', authenticateUser, async (req, res) => {
   try {
-    const categories = await visionService.getUserCategories(req.user.id);
-    res.json({ success: true, categories });
+    const visions = await visionService.getAllVisions(req.user.id);
+    res.json({ success: true, visions });
   } catch (error) {
-    console.error('Get categories error:', error);
-    res.status(500).json({ error: 'Failed to fetch categories' });
+    console.error('Get visions error:', error);
+    res.status(500).json({ error: 'Failed to fetch visions' });
   }
 });
 
-router.get('/category/:category', authenticateUser, async (req, res) => {
+router.get('/visions/:visionId', authenticateUser, async (req, res) => {
   try {
-    const visionData = await visionService.getCategoryVision(req.user.id, req.params.category);
-    res.json({ success: true, vision: visionData });
+    const vision = await visionService.getVision(req.params.visionId, req.user.id);
+    res.json({ success: true, vision });
   } catch (error) {
-    console.error('Get category vision error:', error);
-    res.status(500).json({ error: 'Failed to fetch category vision' });
+    console.error('Get vision error:', error);
+    res.status(500).json({ error: 'Failed to fetch vision' });
   }
 });
 
-router.post('/update-statement', authenticateUser, async (req, res) => {
+router.post('/visions', authenticateUser, async (req, res) => {
   try {
-    const { category, statement } = req.body;
-    await visionService.updateVisionStatement(req.user.id, category, statement);
-    res.json({ success: true });
+    const vision = await visionService.createVision(req.user.id);
+    res.json({ success: true, vision });
   } catch (error) {
-    console.error('Update statement error:', error);
-    res.status(500).json({ error: 'Failed to update vision statement' });
+    console.error('Create vision error:', error);
+    res.status(500).json({ error: 'Failed to create vision' });
   }
 });
 
-router.post('/prompt-flow', authenticateUser, async (req, res) => {
+router.post('/visions/:visionId/next-question', authenticateUser, async (req, res) => {
   try {
-    const { category, responses } = req.body;
-    const result = await visionService.processPromptFlow(req.user.id, category, responses);
+    const result = await visionService.generateNextQuestion(req.params.visionId, req.user.id);
     res.json({ success: true, ...result });
   } catch (error) {
-    console.error('Prompt flow error:', error);
-    res.status(500).json({ error: 'Failed to process prompt flow' });
+    console.error('Next question error:', error);
+    res.status(500).json({ error: 'Failed to generate next question' });
   }
 });
 
-router.get('/next-prompt/:category', authenticateUser, async (req, res) => {
+router.post('/visions/:visionId/response', authenticateUser, async (req, res) => {
   try {
-    const { responses } = req.query;
-    const parsedResponses = responses ? JSON.parse(responses) : [];
-    const result = await visionService.generateNextPrompt(req.user.id, req.params.category, parsedResponses);
-    
-    // Handle both string (legacy fixed prompts) and object (new AI prompts) formats
-    if (typeof result === 'string') {
-      res.json({ success: true, prompt: result, microTag: null });
-    } else {
-      res.json({ success: true, prompt: result.question, microTag: result.microTag });
-    }
+    const { stage, question, answer } = req.body;
+    const result = await visionService.submitResponse(
+      req.params.visionId,
+      req.user.id,
+      stage,
+      question,
+      answer
+    );
+    res.json({ success: true, ...result });
   } catch (error) {
-    console.error('Next prompt error:', error);
-    res.status(500).json({ error: 'Failed to generate next prompt' });
+    console.error('Submit response error:', error);
+    res.status(500).json({ error: 'Failed to submit response' });
   }
 });
 
-router.get('/status/:visionId', authenticateUser, async (req, res) => {
+router.post('/visions/:visionId/process', authenticateUser, async (req, res) => {
   try {
-    const status = await visionService.getVisionStatus(req.user.id, req.params.visionId);
-    res.json({ success: true, ...status });
+    const result = await visionService.processVisionSummary(req.params.visionId, req.user.id);
+    res.json({ success: true, ...result });
   } catch (error) {
-    console.error('Vision status error:', error);
-    res.status(500).json({ error: 'Failed to get vision status' });
+    console.error('Process vision error:', error);
+    res.status(500).json({ error: 'Failed to process vision' });
+  }
+});
+
+router.delete('/visions/:visionId', authenticateUser, async (req, res) => {
+  try {
+    await visionService.deleteVision(req.params.visionId, req.user.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete vision error:', error);
+    res.status(500).json({ error: 'Failed to delete vision' });
+  }
+});
+
+router.patch('/visions/:visionId/title', authenticateUser, async (req, res) => {
+  try {
+    const { title } = req.body;
+    await visionService.updateVisionTitle(req.params.visionId, req.user.id, title);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update title error:', error);
+    res.status(500).json({ error: 'Failed to update vision title' });
   }
 });
 
