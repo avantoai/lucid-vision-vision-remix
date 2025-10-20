@@ -509,7 +509,6 @@ async function generateVisionQuestion(stage, previousResponses) {
         'What do you want?',
         'What\'s your vision?',
         'What do you want to create?',
-        'What do you envision?',
         'What are you calling in?'
       ];
       return VISION_STARTERS[Math.floor(Math.random() * VISION_STARTERS.length)];
