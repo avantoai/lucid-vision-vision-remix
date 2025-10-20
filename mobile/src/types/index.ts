@@ -76,11 +76,13 @@ export type RootStackParamList = {
   EmailInput: undefined;
   Onboarding: { isNewUser: boolean };
   MainTabs: undefined;
+  MyVisions: undefined;
   CategorySelection: undefined;
-  VisionFlow: { category: string };
-  VisionDetail: { category: string };
-  VisionRecord: { category: string; prompt: string; responses: Array<{ question: string; answer: string }> };
-  VisionEdit: { category: string; prompt: string; responses: Array<{ question: string; answer: string }>; audioUri: string | null; recordingDuration: number };
+  VisionFlow: { visionId: string; isNewVision: boolean };
+  VisionDetail: { visionId: string };
+  VisionRecord: { visionId: string; question: string; stage: string; stageIndex: number };
+  VisionEdit: { visionId: string; question: string; stage: string; stageIndex: number; audioUri: string | null; recordingDuration: number };
+  CreateMeditation: { visionId: string };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;

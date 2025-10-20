@@ -10,9 +10,12 @@ import { colors, layout } from '../../theme';
 type VisionRecordRouteProp = RouteProp<RootStackParamList, 'VisionRecord'>;
 type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'VisionRecord'>;
 
+const STAGE_NAMES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
+
 export default function VisionRecordScreen() {
   const navigation = useNavigation<VisionRecordNavigationProp>();
   const route = useRoute<VisionRecordRouteProp>();
+  const { visionId, question, stage, stageIndex } = route.params;
   const { height } = useWindowDimensions();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -76,9 +79,10 @@ export default function VisionRecordScreen() {
       }
 
       navigation.navigate('VisionEdit', {
-        category: route.params.category,
-        prompt: route.params.prompt,
-        responses: route.params.responses,
+        visionId,
+        question,
+        stage,
+        stageIndex,
         audioUri: uri,
         recordingDuration: recordingTime
       });
@@ -94,9 +98,10 @@ export default function VisionRecordScreen() {
 
   const handleWriteMode = () => {
     navigation.navigate('VisionEdit', {
-      category: route.params.category,
-      prompt: route.params.prompt,
-      responses: route.params.responses,
+      visionId,
+      question,
+      stage,
+      stageIndex,
       audioUri: null,
       recordingDuration: 0
     });
@@ -108,11 +113,10 @@ export default function VisionRecordScreen() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Calculate pixel-based positions using actual screen height
   const centerY = height / 2;
-  const micButtonTop = centerY - 70; // Center the 140px button
-  const textTop = centerY - 130; // Position text above button
-  const writeButtonTop = centerY + 94; // Position write button below
+  const micButtonTop = centerY - 70;
+  const textTop = centerY - 130;
+  const writeButtonTop = centerY + 94;
 
   return (
     <View style={styles.container}>
@@ -122,11 +126,12 @@ export default function VisionRecordScreen() {
 
       <View style={styles.content}>
         <View style={styles.topContent}>
-          <Text style={styles.category}>{route.params.category}</Text>
-          <Text style={styles.prompt}>{route.params.prompt}</Text>
+          <Text style={styles.stageIndicator}>
+            {STAGE_NAMES[stageIndex]} ({stageIndex + 1}/5)
+          </Text>
+          <Text style={styles.prompt}>{question}</Text>
         </View>
 
-        {/* Mic button - absolutely centered at 50% screen height */}
         <TouchableOpacity
           style={[styles.micButton, isRecording && styles.micButtonRecording, { top: micButtonTop }]}
           onPress={isRecording ? stopRecording : startRecording}
@@ -141,28 +146,19 @@ export default function VisionRecordScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Timer - fixed position above mic button */}
         {isRecording && (
           <Text style={[styles.timer, { top: textTop }]}>{formatTime(recordingTime)}</Text>
         )}
 
-        {/* Help text - fixed position above mic button */}
         {!isRecording && !isLoading && (
           <Text style={[styles.helpText, { top: textTop }]}>Tap to Record</Text>
         )}
 
-        {/* Write button - fixed position below mic button */}
         {!isRecording && !isLoading && (
           <TouchableOpacity style={[styles.writeButton, { top: writeButtonTop }]} onPress={handleWriteMode}>
             <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
             <Text style={styles.writeButtonText}>Write</Text>
           </TouchableOpacity>
-        )}
-
-        {route.params.responses.length > 0 && (
-          <View style={styles.bottomSection}>
-            <Text style={styles.responsesCount}>{route.params.responses.length} previous responses</Text>
-          </View>
         )}
       </View>
     </View>
@@ -197,16 +193,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenHorizontal,
     alignItems: 'center',
   },
-  bottomSection: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
-  },
-  category: {
+  stageIndicator: {
     fontSize: 16,
     fontWeight: '400',
     color: colors.primary,
-    textTransform: 'capitalize',
     marginBottom: 20,
   },
   prompt: {
@@ -225,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     transform: [
-      { translateX: -70 },  // Half of width to center horizontally
+      { translateX: -70 },
     ],
   },
   helpText: {
@@ -264,16 +254,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: colors.surfaceLight,
     transform: [
-      { translateX: -60 },  // Approximate half of button width to center
+      { translateX: -60 },
     ],
   },
   writeButtonText: {
     fontSize: 16,
     color: colors.text,
     fontWeight: '600',
-  },
-  responsesCount: {
-    fontSize: 14,
-    color: colors.textSecondary,
   },
 });

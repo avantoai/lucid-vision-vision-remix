@@ -10,9 +10,12 @@ import { colors, layout } from '../../theme';
 type VisionEditRouteProp = RouteProp<RootStackParamList, 'VisionEdit'>;
 type VisionEditNavigationProp = StackNavigationProp<RootStackParamList, 'VisionEdit'>;
 
+const STAGE_NAMES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
+
 export default function VisionEditScreen() {
   const navigation = useNavigation<VisionEditNavigationProp>();
   const route = useRoute<VisionEditRouteProp>();
+  const { visionId, question, stage, stageIndex } = route.params;
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -38,55 +41,60 @@ export default function VisionEditScreen() {
     }
   };
 
-  const handleNextPrompt = async () => {
+  const handleContinue = async () => {
     if (!currentAnswer.trim()) {
       Alert.alert('Error', 'Please provide an answer');
       return;
     }
 
-    const newResponses = [...route.params.responses, { 
-      question: route.params.prompt, 
-      answer: currentAnswer 
-    }];
-
     setIsLoading(true);
     try {
-      const prompt = await api.getNextPrompt(route.params.category, newResponses);
+      const { stage_progress } = await api.submitVisionResponse(visionId, stage, question, currentAnswer);
       
-      navigation.replace('VisionRecord', {
-        category: route.params.category,
-        prompt: prompt,
-        responses: newResponses,
-      });
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load next prompt');
+      try {
+        const { question: nextQuestion, stage: nextStage, stageIndex: nextStageIndex } = await api.generateNextQuestion(visionId);
+        
+        navigation.replace('VisionRecord', {
+          visionId,
+          question: nextQuestion,
+          stage: nextStage,
+          stageIndex: nextStageIndex,
+        });
+      } catch (error: any) {
+        if (error.message?.includes('all stages complete')) {
+          await api.processVisionSummary(visionId);
+          Alert.alert(
+            'Vision Complete!',
+            'Your vision has been fully explored across all 5 stages. You can now create a meditation or continue deepening.',
+            [
+              { text: 'View Vision', onPress: () => navigation.navigate('VisionDetail', { visionId }) },
+            ]
+          );
+        } else {
+          throw error;
+        }
+      }
+    } catch (error: any) {
+      console.error('Failed to submit response:', error);
+      Alert.alert('Error', error.message || 'Failed to submit response');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreateMeditation = async () => {
+  const handleFinishLater = async () => {
     if (!currentAnswer.trim()) {
-      Alert.alert('Error', 'Please provide an answer for the current prompt');
+      navigation.navigate('MyVisions');
       return;
     }
 
-    const finalResponses = [...route.params.responses, { 
-      question: route.params.prompt, 
-      answer: currentAnswer 
-    }];
-
     setIsLoading(true);
     try {
-      const result = await api.submitVisionFlow(route.params.category, finalResponses);
-      
-      navigation.navigate('MeditationSetup', { 
-        category: route.params.category, 
-        responses: finalResponses,
-        visionId: result.visionId
-      });
+      await api.submitVisionResponse(visionId, stage, question, currentAnswer);
+      navigation.navigate('MyVisions');
     } catch (error) {
-      Alert.alert('Error', 'Failed to start vision processing');
+      console.error('Failed to save response:', error);
+      Alert.alert('Error', 'Failed to save your response');
     } finally {
       setIsLoading(false);
     }
@@ -108,8 +116,10 @@ export default function VisionEditScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.category}>{route.params.category}</Text>
-        <Text style={styles.prompt}>{route.params.prompt}</Text>
+        <Text style={styles.stageIndicator}>
+          {STAGE_NAMES[stageIndex]} ({stageIndex + 1}/5)
+        </Text>
+        <Text style={styles.prompt}>{question}</Text>
 
         <TextInput
           style={styles.input}
@@ -125,35 +135,23 @@ export default function VisionEditScreen() {
 
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.nextButton, isLoading && styles.buttonDisabled]}
-            onPress={handleNextPrompt}
+            style={[styles.actionButton, styles.continueButton, isLoading && styles.buttonDisabled]}
+            onPress={handleContinue}
             disabled={isLoading}
           >
             <Text style={styles.actionButtonText}>
-              {isLoading ? 'Loading...' : 'Next Prompt'}
+              {isLoading ? 'Saving...' : 'Continue'}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.completeButton, isLoading && styles.buttonDisabled]}
-            onPress={handleCreateMeditation}
+            style={[styles.actionButton, styles.laterButton, isLoading && styles.buttonDisabled]}
+            onPress={handleFinishLater}
             disabled={isLoading}
           >
-            <Text style={styles.actionButtonText}>Create Meditation</Text>
+            <Text style={styles.laterButtonText}>Finish Later</Text>
           </TouchableOpacity>
         </View>
-
-        {route.params.responses.length > 0 && (
-          <View style={styles.responsesContainer}>
-            <Text style={styles.responsesTitle}>Previous Responses ({route.params.responses.length}):</Text>
-            {route.params.responses.map((r, index) => (
-              <View key={index} style={styles.responseCard}>
-                <Text style={styles.responseQuestion}>{r.question}</Text>
-                <Text style={styles.responseAnswer}>{r.answer}</Text>
-              </View>
-            ))}
-          </View>
-        )}
       </View>
     </ScrollView>
   );
@@ -191,11 +189,10 @@ const styles = StyleSheet.create({
     padding: layout.screenHorizontal,
     paddingTop: layout.screenTopBase + layout.headerButtonSize,
   },
-  category: {
+  stageIndicator: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.primary,
-    textTransform: 'capitalize',
     marginBottom: 16,
   },
   prompt: {
@@ -222,14 +219,16 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
     paddingVertical: 16,
-    borderRadius: 999,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  nextButton: {
+  continueButton: {
     backgroundColor: colors.primary,
   },
-  completeButton: {
-    backgroundColor: colors.success,
+  laterButton: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -239,29 +238,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  responsesContainer: {
-    marginTop: 32,
-  },
-  responsesTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+  laterButtonText: {
     color: colors.text,
-    marginBottom: 12,
-  },
-  responseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-  },
-  responseQuestion: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  responseAnswer: {
-    fontSize: 14,
-    color: colors.text,
   },
 });
