@@ -501,14 +501,29 @@ Example formats:
 }
 
 async function generateVisionQuestion(stage, previousResponses) {
+  // For the first Vision stage question, use simple starter prompts
+  if (stage === 'Vision') {
+    const visionResponses = previousResponses.filter(r => r.stage === 'Vision');
+    if (visionResponses.length === 0) {
+      const VISION_STARTERS = [
+        'What do you want?',
+        'What\'s your vision?',
+        'What do you want to create?',
+        'What do you envision?',
+        'What are you calling in?'
+      ];
+      return VISION_STARTERS[Math.floor(Math.random() * VISION_STARTERS.length)];
+    }
+  }
+
   const STAGE_GUIDANCE = {
     'Vision': {
       focus: 'Help the user see, feel, and articulate a high, soul-aligned outcome.',
       prompts: [
-        'Start with a broad question that invites them to share what they want to create.',
-        'Invite imagination, emotion, and sensory detail.',
+        'Invite imagination, emotion, and sensory detail about what they want to create.',
         'Encourage them to describe what their ideal reality looks, feels, and sounds like.',
-        'Use language that lifts them beyond current constraints into pure possibility.'
+        'Use language that lifts them beyond current constraints into pure possibility.',
+        'Help them get more specific and vivid about their vision.'
       ]
     },
     'Belief': {
