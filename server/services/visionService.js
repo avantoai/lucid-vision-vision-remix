@@ -13,7 +13,10 @@ const STAGE_ORDER = {
 async function getAllVisions(userId) {
   const { data: visions, error } = await supabaseAdmin
     .from('visions')
-    .select('*')
+    .select(`
+      *,
+      vision_responses(id)
+    `)
     .eq('user_id', userId)
     .order('updated_at', { ascending: false });
 
@@ -21,7 +24,13 @@ async function getAllVisions(userId) {
     throw new Error('Failed to fetch visions: ' + error.message);
   }
 
-  return visions || [];
+  // Filter out visions with no responses (empty visions created but never used)
+  const visionsWithContent = (visions || []).filter(vision => 
+    vision.vision_responses && vision.vision_responses.length > 0
+  );
+
+  // Remove the joined responses field from the return data
+  return visionsWithContent.map(({ vision_responses, ...vision }) => vision);
 }
 
 async function getVision(visionId, userId) {
