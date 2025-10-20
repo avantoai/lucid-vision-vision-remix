@@ -1,0 +1,66 @@
+My Visions — Concept Overview (by Outcome)
+
+The “Living Vision” tab will become “My Visions”.   With this update, the key organizing container will be individual visions (like goals or outcomes), not categories (health, wealth, relationships, play, etc…) 
+Each card represents a specific dream or outcome (e.g., “Dream Partnership,” “Financial Freedom,” “Peak Health”).
+ Main Screen: “My Visions”
+* Shows all created visions as cards.
+* Each card has title, last update date, and category stamp (health, wealth, relationship, etc…)
+* Search, filter, and sort options for easy navigation.
+* “+ New Vision” button starts the evocation flow.
+* Empty state invites the user to start their first vision.
+ Vision Detail Screen
+* Displays the vision summary, tagline, and progress across stages.
+* Shows all previous question–answer turns from the evocation flow.
+* Lists meditations generated from that vision.
+* Actions include Continue Flow, Edit, Create Meditation, Share, Delete
+ Vision Evocation Flow
+Start with a grounding screen then introduce prompts that guide the user through five stages: Vision → Belief → Identity → Embodiment → Action  Grounding:
+Goal: Create a distinct opening into the experience that encourages a contemplative state for the user. 
+* The MVP of this looks like just a single screen with this text, and a button that says “let’s begin”
+
+Text:  
+“Breathe in.
+Arrive here.
+The world slows.
+Your vision awaits.”
+ For the prompt flow, each step can get 1 or 2 questions. The questions should use AI to create relevant questions based on the users previous responses. 
+Vision:  Goal: Help the user see, feel, and articulate a high, soul-aligned outcome.
+Prompt Focus:
+* Start with a broad question that invites the user to share what they want to create in the world.
+* Invite imagination, emotion, and sensory detail.
+* Encourage them to describe what their ideal reality looks, feels, and sounds like.
+* Use language that lifts them beyond current constraints into pure possibility.
+
+Belief: 
+Goal: Surface the beliefs, fears, and subconscious stories that shape or limit their reality.
+Prompt Focus:
+* Ask questions that expose assumptions, patterns, or inner dialogue.
+* Normalize resistance and invite compassionate honesty.
+* Transition from awareness to empowerment (ie what new beliefs would better serve them?)
+
+Identity
+Goal: Anchor into who they must become to live that vision effortlessly.
+Prompt Focus:
+* Help them connect to the emotional, behavioral, and energetic qualities of that self.
+* Guide them to describe how this version thinks, decides, and acts.
+* Encourage identification with that state as already true.
+
+Embodiment 
+Goal: Bring the future self into the present moment — emotionally and somatically.
+Prompt Focus:
+* Invite them to feel, visualize, or sense the energy of that future self now.
+* Anchor new beliefs into the body through visualization, breath, or sensory awareness.
+* Reinforce that transformation happens through state repetition, not distant striving.
+
+Action
+Goal: Channel clarity and embodiment into tangible movement.
+Prompt Focus:
+* Help them define aligned, exciting actions that bring their vision into form.
+* Encourage simplicity, consistency, and momentum.
+* Reinforce that aligned action is the natural expression of identity.
+
+After the “Action” step, we can invite the user to generate a meditation (present them the customize meditation screen)
+
+Notes
+* Let’s clean up/get rid of any of the logic and system prompts from the previous structure that won’t be used in this flow. 
+* Let’s use the existing vision prompt screen UI with the mic button/text input, etc…
