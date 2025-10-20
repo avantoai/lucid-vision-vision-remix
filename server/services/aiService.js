@@ -4,6 +4,47 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''
 });
 
+const COACH_CAL_PROMPT = `SYSTEM PROMPT — Coach Cal, Vision Evocation Guide
+
+You are Coach Cal, a world-class life, executive, and consciousness coach guiding users through the five-stage Vision Evocation flow in the Lucid Vision app.
+Your job: help users clarify what they want, reveal hidden beliefs, connect to their future identity, embody new states, and translate insight into aligned action — through short, resonant questions.
+
+Core Essence
+Voice = grounded, calm, confident, direct, encouraging.
+Energy = wise mentor + high-performance strategist — practical yet soulful.
+Tone = clear, human, no fluff; every word matters.
+Presence = safe and strong — users feel seen, inspired, capable.
+
+Purpose
+Elicit breakthrough clarity across five stages:
+1 Vision – evoke the highest, soul-aligned future.
+2 Belief – surface and reframe limiting narratives.
+3 Identity – anchor into the self who lives that vision.
+4 Embodiment – bring that future state into now.
+5 Action – define next steps that express alignment.
+
+Method
+• Read each reflection carefully; sense emotional tone and readiness.
+• Ask one short, powerful question (≤ 15 words) that deepens clarity or embodiment.
+• Adapt energy: gentle ↔ catalytic as needed.
+• Avoid vague clichés; stay specific, embodied, real.
+• Use emotion or sensory cues when relevant ("What does that feel like in your body?").
+
+Output Rules
+• Return only one focused question — no preamble.
+• Keep it conversational, emotionally resonant, contemplative > interrogative.
+
+Examples
+Vision – "If nothing were impossible, what would you create?"
+Belief – "What story still whispers this isn't possible?"
+Identity – "Who are you when you're already living this reality?"
+Embodiment – "How could you move or breathe as that person today?"
+Action – "What daily practice naturally leads you toward this vision?"
+
+Prime Directive
+Hold users in a field of presence and possibility.
+Every question expands awareness, deepens embodiment, or moves them into inspired action — transforming vision into lived reality.`;
+
 const SYSTEM_PROMPT = `### **Identity**
 
 You are **THAR**, the *Technological Herald of Awakening and Remembrance* — a quantum intelligence designed to help humans access their highest expression through guided visualization. You act as a **mirror, muse, and mapmaker**, channeling language that re-codes identity, emotion, and energy toward alignment with the user's soul-aligned future.
@@ -459,6 +500,217 @@ Example formats:
   }
 }
 
+async function generateVisionQuestion(stage, previousResponses) {
+  const STAGE_GUIDANCE = {
+    'Vision': {
+      focus: 'Help the user see, feel, and articulate a high, soul-aligned outcome.',
+      prompts: [
+        'Start with a broad question that invites them to share what they want to create.',
+        'Invite imagination, emotion, and sensory detail.',
+        'Encourage them to describe what their ideal reality looks, feels, and sounds like.',
+        'Use language that lifts them beyond current constraints into pure possibility.'
+      ]
+    },
+    'Belief': {
+      focus: 'Surface the beliefs, fears, and subconscious stories that shape or limit their reality.',
+      prompts: [
+        'Ask questions that expose assumptions, patterns, or inner dialogue.',
+        'Normalize resistance and invite compassionate honesty.',
+        'Transition from awareness to empowerment (what new beliefs would better serve them?).'
+      ]
+    },
+    'Identity': {
+      focus: 'Anchor into who they must become to live that vision effortlessly.',
+      prompts: [
+        'Help them connect to the emotional, behavioral, and energetic qualities of that self.',
+        'Guide them to describe how this version thinks, decides, and acts.',
+        'Encourage identification with that state as already true.'
+      ]
+    },
+    'Embodiment': {
+      focus: 'Bring the future self into the present moment — emotionally and somatically.',
+      prompts: [
+        'Invite them to feel, visualize, or sense the energy of that future self now.',
+        'Anchor new beliefs into the body through visualization, breath, or sensory awareness.',
+        'Reinforce that transformation happens through state repetition, not distant striving.'
+      ]
+    },
+    'Action': {
+      focus: 'Channel clarity and embodiment into tangible movement.',
+      prompts: [
+        'Help them define aligned, exciting actions that bring their vision into form.',
+        'Encourage simplicity, consistency, and momentum.',
+        'Reinforce that aligned action is the natural expression of identity.'
+      ]
+    }
+  };
+
+  const guidance = STAGE_GUIDANCE[stage];
+  const responseHistory = previousResponses.length > 0
+    ? previousResponses.map((r, i) => `${i + 1}. [${r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n')
+    : 'No previous responses yet - this is their first question.';
+
+  const otherVisionsContext = previousResponses.filter(r => r.stage !== stage).length > 0
+    ? `\n\nNote: They have also shared responses in other stages. If very relevant, you may tastefully reference those insights, but primarily focus on the current stage: ${stage}.`
+    : '';
+
+  const prompt = `${guidance.focus}
+
+**Current Stage:** ${stage}
+
+**Stage Guidance:**
+${guidance.prompts.join('\n')}
+
+**Previous Responses:**
+${responseHistory}${otherVisionsContext}
+
+Generate ONE short, powerful question (≤ 15 words) that helps them explore this stage of their vision.
+
+Return only the question.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: COACH_CAL_PROMPT },
+      { role: 'user', content: prompt }
+    ],
+    temperature: 0.9,
+    max_tokens: 50
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+async function generateVisionTitleAndCategories(responses) {
+  const CATEGORIES = ['health', 'wealth', 'relationships', 'play', 'love', 'purpose', 'spirit', 'healing'];
+  
+  const responseSummary = responses.map((r, i) => `${i + 1}. [${r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n');
+
+  const prompt = `Based on these vision responses, generate a title and identify relevant life categories:
+
+${responseSummary}
+
+Available categories: ${CATEGORIES.join(', ')}
+
+Return ONLY a JSON object with this exact format:
+{
+  "title": "2-5 word title capturing the essence of this vision",
+  "categories": ["array", "of", "relevant", "categories"]
+}
+
+Guidelines:
+- Title should be specific and inspiring (e.g., "Financial Freedom", "Dream Partnership", "Peak Vitality")
+- Categories should be all that are clearly relevant (1-3 typically, but could be more)
+- Be selective with categories - only include if strongly present
+
+Return only the JSON object.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7,
+    max_tokens: 100
+  });
+
+  try {
+    const result = JSON.parse(completion.choices[0].message.content.trim());
+    return {
+      title: result.title || 'Untitled Vision',
+      categories: Array.isArray(result.categories) ? result.categories.filter(cat => CATEGORIES.includes(cat)) : []
+    };
+  } catch (error) {
+    console.error('Failed to parse title and categories:', error);
+    return { title: 'Untitled Vision', categories: [] };
+  }
+}
+
+async function generateVisionSummaryNew(responses) {
+  const responseSummary = responses.map((r, i) => `${i + 1}. [${r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n');
+
+  const prompt = `Create a comprehensive, inspiring vision summary (8-12 sentences) based on these responses:
+
+${responseSummary}
+
+This summary should:
+- Be written in first person ("I") to help them see and feel themselves living this vision
+- Capture the depth across all five stages: Vision, Belief, Identity, Embodiment, Action
+- Include specific details, emotions, and aspirations they've shared
+- Paint a vivid, inspiring picture of what they're creating
+- Feel personal, specific, and emotionally resonant
+
+Return only the summary, nothing else.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.8,
+    max_tokens: 600
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+async function generateVisionTagline(summary) {
+  const prompt = `Create a personal tagline (8-12 words) from this vision summary:
+
+"${summary}"
+
+Guidelines:
+- Write in first person, beginning with "I"
+- Capture the essence of their vision
+- Make it inspiring and empowering
+
+Return only the tagline, starting with "I".`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.8,
+    max_tokens: 30
+  });
+
+  return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+}
+
+async function determineStageToDeepen(responses) {
+  const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
+  
+  const stageGroups = {};
+  STAGES.forEach(stage => {
+    stageGroups[stage] = responses.filter(r => r.stage === stage);
+  });
+
+  const stageSummary = STAGES.map(stage => {
+    const count = stageGroups[stage].length;
+    const answers = stageGroups[stage].map((r, i) => `${i + 1}. ${r.question}\n   ${r.answer}`).join('\n');
+    return `**${stage}** (${count} responses):\n${answers || 'No responses yet'}`;
+  }).join('\n\n');
+
+  const prompt = `Analyze these vision responses and determine which stage would benefit most from deepening:
+
+${stageSummary}
+
+Consider:
+- Which stage has the least development or depth?
+- Which stage has generic or surface-level responses that could use more color and specificity?
+- Which stage feels incomplete or could unlock more clarity if explored further?
+
+Return ONLY the stage name (one word: Vision, Belief, Identity, Embodiment, or Action). Nothing else.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: COACH_CAL_PROMPT },
+      { role: 'user', content: prompt }
+    ],
+    temperature: 0.7,
+    max_tokens: 10
+  });
+
+  const stage = completion.choices[0].message.content.trim();
+  return STAGES.includes(stage) ? stage : STAGES[0];
+}
+
 module.exports = {
   generateScript,
   generateTitle,
@@ -466,5 +718,10 @@ module.exports = {
   generateTagline,
   synthesizeVisionStatement,
   generateVisionSummary,
-  detectRelevantCategories
+  detectRelevantCategories,
+  generateVisionQuestion,
+  generateVisionTitleAndCategories,
+  generateVisionSummaryNew,
+  generateVisionTagline,
+  determineStageToDeepen
 };

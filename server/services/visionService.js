@@ -1,418 +1,32 @@
 const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
 
-const CATEGORIES = [
-  'health', 'wealth', 'relationships', 
-  'play', 'love', 'purpose', 'spirit', 'healing'
-];
-
-const FIXED_PROMPTS = {
-  health: [
-    "What does vibrant health feel like in your body?",
-    "What daily practices support your optimal wellbeing?"
-  ],
-  wealth: [
-    "What does financial abundance mean to you?",
-    "How do you want to feel about money and resources?"
-  ],
-  relationships: [
-    "What qualities do you embody in your most fulfilling connections?",
-    "How do you want to show up in your relationships?"
-  ],
-  play: [
-    "When do you feel most alive and joyful?",
-    "What forms of play call to your spirit?"
-  ],
-  love: [
-    "What does love feel like when it flows freely through you?",
-    "How do you express and receive love?"
-  ],
-  purpose: [
-    "What impact do you want to create in the world?",
-    "What lights you up and gives your life meaning?"
-  ],
-  spirit: [
-    "How do you experience your connection to something greater?",
-    "What spiritual practices nourish your soul?"
-  ],
-  healing: [
-    "What are you ready to release or transform?",
-    "What does wholeness feel like for you?"
-  ],
-  freeform: [
-    "If you could shift or create one thing in your life right now, what would it be?",
-    "Who do you get to be to create this shift in your life?"
-  ]
+const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
+const STAGE_ORDER = {
+  'Vision': 0,
+  'Belief': 1,
+  'Identity': 2,
+  'Embodiment': 3,
+  'Action': 4
 };
 
-async function getUserCategories(userId) {
-  const { data: visions } = await supabaseAdmin
-    .from('vision_statements')
-    .select('category, statement, tagline, summary')
-    .eq('user_id', userId)
-    .eq('is_active', true);
-
-  const visionMap = {};
-  visions?.forEach(v => {
-    visionMap[v.category] = { 
-      statement: v.statement, 
-      tagline: v.tagline,
-      summary: v.summary 
-    };
-  });
-
-  return CATEGORIES.map(category => ({
-    name: category,
-    status: visionMap[category] ? 'in_progress' : 'not_started',
-    tagline: visionMap[category]?.tagline || null,
-    hasSummary: !!visionMap[category]?.summary
-  }));
-}
-
-async function getCategoryVision(userId, category) {
-  const { data: vision } = await supabaseAdmin
-    .from('vision_statements')
+async function getAllVisions(userId) {
+  const { data: visions, error } = await supabaseAdmin
+    .from('visions')
     .select('*')
     .eq('user_id', userId)
-    .eq('category', category)
-    .eq('is_active', true)
-    .single();
+    .order('updated_at', { ascending: false });
 
-  const { data: responses } = await supabaseAdmin
-    .from('vision_responses')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('category', category)
-    .order('created_at', { ascending: true });
+  if (error) {
+    throw new Error('Failed to fetch visions: ' + error.message);
+  }
 
-  return {
-    statement: vision?.statement || null,
-    tagline: vision?.tagline || null,
-    summary: vision?.summary || null,
-    status: vision?.status || 'not_started',
-    responses: responses || []
-  };
+  return visions || [];
 }
 
-async function updateVisionStatement(userId, category, statement) {
-  const tagline = await aiService.generateTagline(statement);
-
-  const { error } = await supabaseAdmin
-    .from('vision_statements')
-    .update({ is_active: false })
-    .eq('user_id', userId)
-    .eq('category', category);
-
-  const { error: insertError } = await supabaseAdmin
-    .from('vision_statements')
-    .insert({
-      user_id: userId,
-      category,
-      statement,
-      tagline,
-      is_active: true,
-      created_at: new Date().toISOString()
-    });
-
-  if (insertError) {
-    throw new Error('Failed to update vision statement: ' + insertError.message);
-  }
-}
-
-async function processPromptFlow(userId, category, responses) {
-  const allResponses = [...responses];
-  
-  // Get the current active vision (if any) to potentially restore on failure
-  const { data: previousVision } = await supabaseAdmin
-    .from('vision_statements')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('category', category)
-    .eq('is_active', true)
-    .single();
-  
-  console.log(`📝 Processing prompt flow for user ${userId}, category: ${category}`);
-  console.log(`   Previous active vision: ${previousVision ? previousVision.id : 'none'}`);
-  
-  // Deactivate previous vision statements for this category using admin client
-  const { error: deactivateError } = await supabaseAdmin
-    .from('vision_statements')
-    .update({ is_active: false })
-    .eq('user_id', userId)
-    .eq('category', category)
-    .eq('is_active', true);
-
-  if (deactivateError) {
-    console.error('Failed to deactivate previous visions:', deactivateError);
-    throw new Error('Failed to deactivate previous visions: ' + deactivateError.message);
-  }
-  
-  console.log(`   Deactivated previous visions for ${category}`);
-
-  // Create a new vision statement with 'processing' status
-  const { data: visionData, error: insertError } = await supabaseAdmin
-    .from('vision_statements')
-    .insert({
-      user_id: userId,
-      category,
-      statement: null,
-      tagline: null,
-      status: 'processing',
-      is_active: true,
-      created_at: new Date().toISOString()
-    })
-    .select()
-    .single();
-
-  if (insertError) {
-    console.error('Failed to insert new vision:', insertError);
-    throw new Error('Failed to create vision statement: ' + insertError.message);
-  }
-  
-  console.log(`   Created new vision: ${visionData.id}`);
-
-  // Save responses
-  for (const response of allResponses) {
-    await supabaseAdmin
-      .from('vision_responses')
-      .insert({
-        user_id: userId,
-        category,
-        question: response.question,
-        answer: response.answer,
-        micro_tag: response.microTag || response.micro_tag || null,
-        created_at: new Date().toISOString()
-      });
-  }
-
-  // Process AI generation in the background (non-blocking)
-  processVisionInBackground(visionData.id, category, allResponses, previousVision?.id).catch(err => {
-    console.error('Background vision processing error:', err);
-  });
-
-  // Return immediately with the vision ID and processing status
-  return { 
-    visionId: visionData.id,
-    status: 'processing',
-    category
-  };
-}
-
-async function processVisionInBackground(visionId, category, responses, previousVisionId = null) {
-  try {
-    console.log(`🧠 Starting background vision processing for ${visionId}`);
-    
-    // Generate core vision content
-    console.log(`   Generating statement for ${category}...`);
-    const statement = await aiService.synthesizeVisionStatement(category, responses);
-    console.log(`   ✓ Statement generated (${statement.length} chars)`);
-    
-    console.log(`   Generating tagline...`);
-    const tagline = await aiService.generateTagline(statement);
-    console.log(`   ✓ Tagline: "${tagline}"`);
-    
-    console.log(`   Generating summary...`);
-    const summary = await aiService.generateVisionSummary(category, responses);
-    console.log(`   ✓ Summary generated (${summary.length} chars)`);
-
-    // Update the primary category vision
-    console.log(`   Saving to database...`);
-    const { data: updatedVision, error: updateError } = await supabaseAdmin
-      .from('vision_statements')
-      .update({
-        statement,
-        tagline,
-        summary,
-        status: 'completed'
-      })
-      .eq('id', visionId)
-      .select();
-
-    if (updateError) {
-      throw new Error(`Failed to update vision in database: ${updateError.message}`);
-    }
-
-    console.log(`✅ Vision processing completed for ${visionId}`);
-    console.log(`   Summary preview: ${summary.substring(0, 150)}...`);
-    
-    // Detect and update cross-category relevance
-    await detectAndUpdateCrossCategories(visionId, category, responses);
-  } catch (error) {
-    console.error(`❌ Vision processing failed for ${visionId}:`, error);
-    
-    // Mark the new vision as failed
-    await supabaseAdmin
-      .from('vision_statements')
-      .update({
-        status: 'failed',
-        is_active: false
-      })
-      .eq('id', visionId);
-
-    // Restore the previous vision if it exists
-    if (previousVisionId) {
-      console.log(`🔄 Restoring previous vision ${previousVisionId} after failure`);
-      await supabaseAdmin
-        .from('vision_statements')
-        .update({
-          is_active: true
-        })
-        .eq('id', previousVisionId);
-    }
-  }
-}
-
-async function detectAndUpdateCrossCategories(visionId, primaryCategory, responses) {
-  try {
-    console.log(`🔍 Detecting cross-category relevance for vision ${visionId}`);
-    
-    // Get user ID from vision
-    const { data: vision } = await supabaseAdmin
-      .from('vision_statements')
-      .select('user_id')
-      .eq('id', visionId)
-      .single();
-    
-    if (!vision) return;
-    
-    // Analyze each response for cross-category relevance
-    const allRelevantCategories = new Set([primaryCategory]);
-    
-    for (const response of responses) {
-      const categories = await aiService.detectRelevantCategories(response.answer);
-      categories.forEach(cat => {
-        if (cat !== primaryCategory) {
-          allRelevantCategories.add(cat);
-        }
-      });
-    }
-    
-    // Remove primary category from the set
-    allRelevantCategories.delete(primaryCategory);
-    
-    if (allRelevantCategories.size === 0) {
-      console.log(`No cross-category relevance detected`);
-      return;
-    }
-    
-    console.log(`📊 Found cross-category relevance: ${Array.from(allRelevantCategories).join(', ')}`);
-    
-    // Update or create vision summaries for each relevant category
-    for (const relatedCategory of allRelevantCategories) {
-      // Get existing vision responses for this category
-      const { data: existingResponses } = await supabaseAdmin
-        .from('vision_responses')
-        .select('question, answer')
-        .eq('user_id', vision.user_id)
-        .eq('category', relatedCategory)
-        .order('created_at', { ascending: true });
-      
-      // Combine existing responses with relevant new ones
-      const relevantResponses = [];
-      for (const r of responses) {
-        const cats = await aiService.detectRelevantCategories(r.answer);
-        if (cats.includes(relatedCategory)) {
-          relevantResponses.push(r);
-        }
-      }
-      
-      const allResponses = [...(existingResponses || []), ...relevantResponses];
-      
-      if (allResponses.length === 0) continue;
-      
-      console.log(`📝 Generating summary for ${relatedCategory} with ${allResponses.length} total responses (${relevantResponses.length} new)`);
-      
-      // Generate new summary for this category
-      const summary = await aiService.generateVisionSummary(relatedCategory, allResponses);
-      
-      // Check if vision statement exists for this category
-      const { data: existingVision } = await supabaseAdmin
-        .from('vision_statements')
-        .select('id')
-        .eq('user_id', vision.user_id)
-        .eq('category', relatedCategory)
-        .eq('is_active', true)
-        .single();
-      
-      if (existingVision) {
-        // Update existing vision summary
-        await supabaseAdmin
-          .from('vision_statements')
-          .update({ 
-            summary,
-            status: 'completed'
-          })
-          .eq('id', existingVision.id);
-        
-        console.log(`✨ Updated cross-category summary for: ${relatedCategory} (vision_id: ${existingVision.id})`);
-        console.log(`   Summary preview: ${summary.substring(0, 100)}...`);
-      } else {
-        // Create new vision statement with summary
-        const { data: newVision, error: insertError } = await supabaseAdmin
-          .from('vision_statements')
-          .insert({
-            user_id: vision.user_id,
-            category: relatedCategory,
-            statement: null,
-            tagline: null,
-            summary,
-            status: 'completed',
-            is_active: true,
-            created_at: new Date().toISOString()
-          })
-          .select()
-          .single();
-        
-        if (insertError) {
-          console.error(`❌ Failed to create cross-category vision for ${relatedCategory}:`, insertError);
-        } else {
-          console.log(`✨ Created new cross-category summary for: ${relatedCategory} (vision_id: ${newVision.id})`);
-          console.log(`   Summary preview: ${summary.substring(0, 100)}...`);
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Cross-category detection error:', error);
-    // Don't fail the whole process if cross-category detection fails
-  }
-}
-
-async function generateNextPrompt(userId, category, previousResponses) {
-  // FIRST: Check if user has existing vision context for this category
-  const { data: existingVision } = await supabaseAdmin
-    .from('vision_statements')
-    .select('statement, tagline, summary')
-    .eq('user_id', userId)
-    .eq('category', category)
-    .eq('is_active', true)
-    .single();
-
-  // If they have ANY existing vision context (summary, statement, or tagline),
-  // ALWAYS use context-aware AI prompts to build on their existing work
-  const hasContext = existingVision && (existingVision.summary || existingVision.statement || existingVision.tagline);
-  
-  if (hasContext) {
-    console.log(`🧠 Generating context-aware prompt for ${category} (has existing vision)`);
-    return await aiService.generateNextPrompt(category, previousResponses, existingVision);
-  }
-
-  // If NO existing context, use fixed prompts for the first few questions
-  const fixedPrompts = FIXED_PROMPTS[category] || FIXED_PROMPTS.freeform;
-  
-  if (previousResponses.length < fixedPrompts.length) {
-    console.log(`📝 Using fixed prompt ${previousResponses.length + 1}/${fixedPrompts.length} for ${category}`);
-    // Fixed prompts don't have micro-tags, so return as object for consistency
-    return { question: fixedPrompts[previousResponses.length], microTag: null };
-  }
-
-  // After fixed prompts are exhausted (and still no vision context), use AI
-  console.log(`🤖 Generating AI prompt for ${category} (no vision context)`);
-  return await aiService.generateNextPrompt(category, previousResponses, null);
-}
-
-async function getVisionStatus(userId, visionId) {
+async function getVision(visionId, userId) {
   const { data: vision, error } = await supabaseAdmin
-    .from('vision_statements')
+    .from('visions')
     .select('*')
     .eq('id', visionId)
     .eq('user_id', userId)
@@ -422,20 +36,213 @@ async function getVisionStatus(userId, visionId) {
     throw new Error('Vision not found');
   }
 
+  const { data: responses } = await supabaseAdmin
+    .from('vision_responses')
+    .select('*')
+    .eq('vision_id', visionId)
+    .order('created_at', { ascending: true });
+
+  const { data: meditations } = await supabaseAdmin
+    .from('meditations')
+    .select('id, title, duration, created_at, is_favorite, is_pinned')
+    .eq('vision_id', visionId)
+    .order('created_at', { ascending: false });
+
   return {
-    visionId: vision.id,
-    status: vision.status,
-    statement: vision.statement,
-    tagline: vision.tagline,
-    category: vision.category
+    ...vision,
+    responses: responses || [],
+    meditations: meditations || []
   };
 }
 
+async function createVision(userId) {
+  const { data: vision, error } = await supabaseAdmin
+    .from('visions')
+    .insert({
+      user_id: userId,
+      title: 'Untitled Vision',
+      categories: [],
+      micro_tags: [],
+      stage_progress: 0,
+      summary: null,
+      tagline: null,
+      status: 'processing',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error('Failed to create vision: ' + error.message);
+  }
+
+  return vision;
+}
+
+async function generateNextQuestion(visionId, userId) {
+  const vision = await getVision(visionId, userId);
+  
+  const responses = vision.responses.map(r => ({
+    stage: r.stage,
+    question: r.question,
+    answer: r.answer
+  }));
+
+  const currentStage = STAGES[vision.stage_progress];
+  
+  const question = await aiService.generateVisionQuestion(currentStage, responses);
+  
+  return {
+    question,
+    stage: currentStage,
+    stageIndex: vision.stage_progress
+  };
+}
+
+async function submitResponse(visionId, userId, stage, question, answer) {
+  const vision = await getVision(visionId, userId);
+
+  await supabaseAdmin
+    .from('vision_responses')
+    .insert({
+      user_id: userId,
+      vision_id: visionId,
+      stage,
+      question,
+      answer,
+      created_at: new Date().toISOString()
+    });
+
+  const stageIndex = STAGE_ORDER[stage];
+  
+  let newProgress = vision.stage_progress;
+  if (stageIndex >= vision.stage_progress) {
+    newProgress = stageIndex + 1;
+  }
+
+  await supabaseAdmin
+    .from('visions')
+    .update({
+      stage_progress: newProgress,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', visionId);
+
+  return { stage_progress: newProgress };
+}
+
+async function processVisionSummary(visionId, userId) {
+  const vision = await getVision(visionId, userId);
+  
+  if (vision.responses.length === 0) {
+    return;
+  }
+
+  processVisionInBackground(visionId, vision.responses).catch(err => {
+    console.error('Background vision summary processing error:', err);
+  });
+
+  return { status: 'processing' };
+}
+
+async function processVisionInBackground(visionId, responses) {
+  try {
+    console.log(`🧠 Starting background vision processing for ${visionId}`);
+    
+    console.log(`   Generating title and categories...`);
+    const { title, categories } = await aiService.generateVisionTitleAndCategories(responses);
+    console.log(`   ✓ Title: "${title}"`);
+    console.log(`   ✓ Categories: ${categories.join(', ')}`);
+    
+    console.log(`   Generating summary...`);
+    const summary = await aiService.generateVisionSummary(responses);
+    console.log(`   ✓ Summary generated (${summary.length} chars)`);
+    
+    console.log(`   Generating tagline...`);
+    const tagline = await aiService.generateVisionTagline(summary);
+    console.log(`   ✓ Tagline: "${tagline}"`);
+
+    const { error: updateError } = await supabaseAdmin
+      .from('visions')
+      .update({
+        title,
+        categories,
+        summary,
+        tagline,
+        status: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', visionId);
+
+    if (updateError) {
+      throw new Error(`Failed to update vision in database: ${updateError.message}`);
+    }
+
+    console.log(`✅ Vision processing completed for ${visionId}`);
+  } catch (error) {
+    console.error(`❌ Vision processing failed for ${visionId}:`, error);
+    
+    await supabaseAdmin
+      .from('visions')
+      .update({
+        status: 'failed'
+      })
+      .eq('id', visionId);
+  }
+}
+
+async function deleteVision(visionId, userId) {
+  const { error } = await supabaseAdmin
+    .from('visions')
+    .delete()
+    .eq('id', visionId)
+    .eq('user_id', userId);
+
+  if (error) {
+    throw new Error('Failed to delete vision: ' + error.message);
+  }
+
+  return { success: true };
+}
+
+async function updateVisionTitle(visionId, userId, newTitle) {
+  const { error } = await supabaseAdmin
+    .from('visions')
+    .update({
+      title: newTitle,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', visionId)
+    .eq('user_id', userId);
+
+  if (error) {
+    throw new Error('Failed to update vision title: ' + error.message);
+  }
+
+  return { success: true };
+}
+
+async function determineNextStageForDeepening(visionId, userId) {
+  const vision = await getVision(visionId, userId);
+  
+  if (vision.stage_progress < 5) {
+    return STAGES[vision.stage_progress];
+  }
+
+  const stageToDeepen = await aiService.determineStageToDeepen(vision.responses);
+  
+  return stageToDeepen;
+}
+
 module.exports = {
-  getUserCategories,
-  getCategoryVision,
-  updateVisionStatement,
-  processPromptFlow,
-  generateNextPrompt,
-  getVisionStatus
+  getAllVisions,
+  getVision,
+  createVision,
+  generateNextQuestion,
+  submitResponse,
+  processVisionSummary,
+  deleteVision,
+  updateVisionTitle,
+  determineNextStageForDeepening
 };
