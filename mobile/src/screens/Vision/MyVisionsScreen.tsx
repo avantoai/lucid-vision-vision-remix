@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   addButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
