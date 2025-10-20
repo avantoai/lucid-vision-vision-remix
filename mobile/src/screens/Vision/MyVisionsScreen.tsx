@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenHorizontal,
     paddingTop: layout.screenTopBase,
