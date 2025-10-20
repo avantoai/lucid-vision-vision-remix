@@ -24,10 +24,27 @@ async function getAllVisions(userId) {
     throw new Error('Failed to fetch visions: ' + error.message);
   }
 
-  // Filter out visions with no responses (empty visions created but never used)
-  const visionsWithContent = (visions || []).filter(vision => 
-    vision.vision_responses && vision.vision_responses.length > 0
-  );
+  // Separate visions with content from empty ones
+  const emptyVisions = [];
+  const visionsWithContent = [];
+  
+  (visions || []).forEach(vision => {
+    if (!vision.vision_responses || vision.vision_responses.length === 0) {
+      emptyVisions.push(vision.id);
+    } else {
+      visionsWithContent.push(vision);
+    }
+  });
+
+  // Delete empty visions from database
+  if (emptyVisions.length > 0) {
+    await supabaseAdmin
+      .from('visions')
+      .delete()
+      .in('id', emptyVisions);
+    
+    console.log(`🗑️ Deleted ${emptyVisions.length} empty vision(s)`);
+  }
 
   // Remove the joined responses field from the return data
   return visionsWithContent.map(({ vision_responses, ...vision }) => vision);
