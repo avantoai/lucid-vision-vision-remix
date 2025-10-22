@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
@@ -48,6 +49,7 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     loadVisionData();
@@ -95,7 +97,13 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
     });
   };
 
+  const handleEditTitle = () => {
+    setMenuVisible(false);
+    setEditingTitle(true);
+  };
+
   const handleDelete = () => {
+    setMenuVisible(false);
     Alert.alert(
       'Delete Vision',
       'Are you sure you want to delete this vision? This action cannot be undone.',
@@ -146,10 +154,35 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={20} color={colors.error} />
+        <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.menuButton}>
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setMenuVisible(false)}
+        >
+          <View style={styles.menuContainer}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleEditTitle}>
+              <Ionicons name="pencil-outline" size={20} color={colors.text} />
+              <Text style={styles.menuItemText}>Edit Title</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
+            <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
+              <Ionicons name="trash-outline" size={20} color={colors.error} />
+              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Delete Vision</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
@@ -175,12 +208,7 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
               </View>
             </View>
           ) : (
-            <TouchableOpacity onPress={() => setEditingTitle(true)} activeOpacity={0.7}>
-              <View style={styles.titleContainer}>
-                <Text style={styles.title}>{vision.title}</Text>
-                <Ionicons name="pencil" size={20} color={colors.textSecondary} />
-              </View>
-            </TouchableOpacity>
+            <Text style={styles.title}>{vision.title}</Text>
           )}
 
           {vision.categories.length > 0 && (
@@ -197,45 +225,9 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
             <Text style={styles.tagline}>{vision.tagline}</Text>
           )}
 
-          <View style={styles.progressSection}>
-            <Text style={styles.sectionTitle}>Progress</Text>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${(vision.stage_progress / 5) * 100}%`,
-                    backgroundColor: getProgressColor(vision.stage_progress),
-                  },
-                ]}
-              />
-            </View>
-            <View style={styles.stageLabels}>
-              {STAGES.map((stage, index) => (
-                <View key={stage} style={styles.stageLabel}>
-                  <View
-                    style={[
-                      styles.stageDot,
-                      index < vision.stage_progress && styles.stageDotComplete,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.stageLabelText,
-                      index < vision.stage_progress && styles.stageLabelTextComplete,
-                    ]}
-                  >
-                    {stage}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
           {vision.summary && (
-            <View style={styles.summarySection}>
-              <Text style={styles.sectionTitle}>Summary</Text>
-              <Text style={styles.summaryText}>{vision.summary}</Text>
+            <View style={styles.visionStatementSection}>
+              <Text style={styles.visionStatement}>{vision.summary}</Text>
             </View>
           )}
 
@@ -311,13 +303,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  deleteButton: {
+  menuButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: layout.headerTop + 50,
+    paddingRight: layout.headerSide,
+  },
+  menuContainer: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    minWidth: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
+  },
+  menuItemTextDanger: {
+    color: colors.error,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
   },
   scrollView: {
     flex: 1,
@@ -326,17 +354,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenHorizontal,
     paddingBottom: 120,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
-    flex: 1,
-    marginRight: 12,
+    marginBottom: 16,
   },
   titleEditContainer: {
     marginBottom: 16,
@@ -400,63 +422,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     fontStyle: 'italic',
-    marginBottom: 32,
+    marginBottom: 24,
     lineHeight: 24,
   },
-  progressSection: {
+  visionStatementSection: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 32,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.primary,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+  visionStatement: {
+    fontSize: 16,
     color: colors.text,
-    marginBottom: 16,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: colors.surfaceLight,
-    borderRadius: 4,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  stageLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  stageLabel: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  stageDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.surfaceLight,
-    marginBottom: 8,
-  },
-  stageDotComplete: {
-    backgroundColor: colors.success,
-  },
-  stageLabelText: {
-    fontSize: 11,
-    color: colors.textTertiary,
-    textAlign: 'center',
-  },
-  stageLabelTextComplete: {
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  summarySection: {
-    marginBottom: 32,
-  },
-  summaryText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 24,
+    lineHeight: 26,
+    fontWeight: '500',
   },
   stageSection: {
     marginBottom: 32,
