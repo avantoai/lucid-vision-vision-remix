@@ -23,7 +23,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const DarkTheme = {
   ...DefaultTheme,
-  dark: Boolean(true),
+  dark: true,
   colors: {
     ...DefaultTheme.colors,
     primary: colors.primary,
@@ -35,21 +35,8 @@ const DarkTheme = {
   },
 };
 
-console.log('🔍 Theme dark value:', { dark: DarkTheme.dark, type: typeof DarkTheme.dark });
-
 export default function RootNavigator() {
-  const authContext = useAuth();
-  const { isAuthenticated, needsOnboarding, isLoading } = authContext;
-
-  // DIAGNOSTIC: Log the actual values and types
-  console.log('🔍 Auth values:', {
-    isAuthenticated,
-    needsOnboarding,
-    isLoading,
-    isAuthenticatedType: typeof isAuthenticated,
-    needsOnboardingType: typeof needsOnboarding,
-    isLoadingType: typeof isLoading,
-  });
+  const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
 
   if (isLoading) {
     return null;
@@ -107,10 +94,7 @@ export default function RootNavigator() {
         <Stack.Screen 
           name="GiftPlayer" 
           component={GiftPlayerScreen}
-          options={{ 
-            presentation: 'modal',
-            headerShown: false 
-          }}
+          options={{ presentation: 'modal' }}
         />
         </Stack.Navigator>
       </NavigationContainer>

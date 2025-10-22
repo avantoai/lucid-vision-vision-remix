@@ -172,25 +172,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const needsOnboarding = !!user && !user.full_name;
-  const isAuthenticated = !!user;
-
-  // DIAGNOSTIC: Log values and types
-  console.log('🔍 AuthContext values:', {
-    user,
-    isLoading,
-    isAuthenticated,
-    needsOnboarding,
-    isAuthenticatedType: typeof isAuthenticated,
-    needsOnboardingType: typeof needsOnboarding,
-    isLoadingType: typeof isLoading,
-  });
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
-        isAuthenticated,
+        isAuthenticated: !!user,
         needsOnboarding,
         login,
         handleDeepLink,
