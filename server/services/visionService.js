@@ -155,6 +155,19 @@ async function submitResponse(visionId, userId, stage, question, answer) {
     })
     .eq('id', visionId);
 
+  // Generate title and categories after first Vision response
+  if (stage === 'Vision' && vision.responses.length === 0) {
+    const responses = [{
+      stage,
+      question,
+      answer
+    }];
+    
+    generateTitleAndCategoriesInBackground(visionId, responses).catch(err => {
+      console.error('Background title generation error:', err);
+    });
+  }
+
   return { stage_progress: newProgress };
 }
 
@@ -172,17 +185,39 @@ async function processVisionSummary(visionId, userId) {
   return { status: 'processing' };
 }
 
+async function generateTitleAndCategoriesInBackground(visionId, responses) {
+  try {
+    console.log(`🏷️ Generating title and categories for vision ${visionId}`);
+    
+    const { title, categories } = await aiService.generateVisionTitleAndCategories(responses);
+    console.log(`   ✓ Title: "${title}"`);
+    console.log(`   ✓ Categories: ${categories.join(', ')}`);
+
+    const { error: updateError } = await supabaseAdmin
+      .from('visions')
+      .update({
+        title,
+        categories,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', visionId);
+
+    if (updateError) {
+      throw new Error(`Failed to update vision title: ${updateError.message}`);
+    }
+
+    console.log(`✅ Title and categories updated for ${visionId}`);
+  } catch (error) {
+    console.error(`❌ Title generation failed for ${visionId}:`, error);
+  }
+}
+
 async function processVisionInBackground(visionId, responses) {
   try {
     console.log(`🧠 Starting background vision processing for ${visionId}`);
     
-    console.log(`   Generating title and categories...`);
-    const { title, categories } = await aiService.generateVisionTitleAndCategories(responses);
-    console.log(`   ✓ Title: "${title}"`);
-    console.log(`   ✓ Categories: ${categories.join(', ')}`);
-    
     console.log(`   Generating summary...`);
-    const summary = await aiService.generateVisionSummary(responses);
+    const summary = await aiService.generateVisionSummaryNew(responses);
     console.log(`   ✓ Summary generated (${summary.length} chars)`);
     
     console.log(`   Generating tagline...`);
@@ -192,8 +227,6 @@ async function processVisionInBackground(visionId, responses) {
     const { error: updateError } = await supabaseAdmin
       .from('visions')
       .update({
-        title,
-        categories,
         summary,
         tagline,
         status: 'completed',
