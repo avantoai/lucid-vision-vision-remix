@@ -107,7 +107,10 @@ export default function RootNavigator() {
         <Stack.Screen 
           name="GiftPlayer" 
           component={GiftPlayerScreen}
-          options={{ presentation: 'modal' }}
+          options={{ 
+            presentation: 'modal',
+            headerShown: false 
+          }}
         />
         </Stack.Navigator>
       </NavigationContainer>
