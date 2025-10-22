@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions, Animated } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
@@ -21,16 +21,60 @@ export default function VisionRecordScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let meteringInterval: NodeJS.Timeout;
+    
     if (isRecording) {
       interval = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
+      
+      // Audio-responsive pulsing animation
+      meteringInterval = setInterval(async () => {
+        if (recording) {
+          try {
+            const status = await recording.getStatusAsync();
+            if (status.isRecording && status.metering !== undefined) {
+              // Normalize metering value (-160 to 0) to scale (1.0 to 1.3)
+              const normalized = Math.max(0, (status.metering + 160) / 160);
+              const scale = 1.0 + (normalized * 0.3);
+              const opacity = 0.3 + (normalized * 0.4);
+              
+              Animated.parallel([
+                Animated.spring(pulseAnim, {
+                  toValue: scale,
+                  useNativeDriver: true,
+                  friction: 3,
+                  tension: 40,
+                }),
+                Animated.timing(opacityAnim, {
+                  toValue: opacity,
+                  duration: 100,
+                  useNativeDriver: true,
+                }),
+              ]).start();
+            }
+          } catch (error) {
+            // Ignore metering errors
+          }
+        }
+      }, 100);
+    } else {
+      // Reset animation when not recording
+      pulseAnim.setValue(1);
+      opacityAnim.setValue(0.3);
     }
-    return () => clearInterval(interval);
-  }, [isRecording]);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(meteringInterval);
+    };
+  }, [isRecording, recording]);
 
   useEffect(() => {
     return () => {
@@ -53,9 +97,10 @@ export default function VisionRecordScreen() {
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
+      const { recording } = await Audio.Recording.createAsync({
+        ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        isMeteringEnabled: true,
+      });
 
       setRecording(recording);
       setIsRecording(true);
@@ -120,28 +165,50 @@ export default function VisionRecordScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="close" size={24} color={colors.textSecondary} />
-      </TouchableOpacity>
-
       <View style={styles.content}>
         <View style={styles.topContent}>
           <Text style={styles.prompt}>{question}</Text>
         </View>
 
-        <TouchableOpacity
-          style={[styles.micButton, isRecording && styles.micButtonRecording, { top: micButtonTop }]}
-          onPress={isRecording ? stopRecording : startRecording}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="large" color={colors.white} />
-          ) : isRecording ? (
-            <View style={styles.stopIcon} />
-          ) : (
-            <Ionicons name="mic" size={64} color={colors.white} />
+        <View style={{ position: 'absolute', top: micButtonTop, left: '50%', transform: [{ translateX: -70 }] }}>
+          {isRecording && (
+            <>
+              <Animated.View 
+                style={[
+                  styles.pulseRing,
+                  {
+                    opacity: opacityAnim,
+                    transform: [{ scale: pulseAnim }]
+                  }
+                ]} 
+              />
+              <Animated.View 
+                style={[
+                  styles.pulseRing,
+                  styles.pulseRingOuter,
+                  {
+                    opacity: Animated.multiply(opacityAnim, 0.6),
+                    transform: [{ scale: Animated.multiply(pulseAnim, 1.15) }]
+                  }
+                ]} 
+              />
+            </>
           )}
-        </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.micButton, isRecording && styles.micButtonRecording]}
+            onPress={isRecording ? stopRecording : startRecording}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="large" color={colors.white} />
+            ) : isRecording ? (
+              <View style={styles.stopIcon} />
+            ) : (
+              <Ionicons name="mic" size={64} color={colors.white} />
+            )}
+          </TouchableOpacity>
+        </View>
 
         {isRecording && (
           <Text style={[styles.timer, { top: textTop }]}>{formatTime(recordingTime)}</Text>
@@ -167,18 +234,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  closeButton: {
-    position: 'absolute',
-    top: layout.headerTop,
-    right: layout.headerSide,
-    zIndex: 10,
-    width: layout.headerButtonSize,
-    height: layout.headerButtonSize,
-    borderRadius: layout.headerButtonSize / 2,
-    backgroundColor: colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   content: {
     flex: 1,
   },
@@ -197,17 +252,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   micButton: {
-    position: 'absolute',
-    left: '50%',
     width: 140,
     height: 140,
     borderRadius: 70,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    transform: [
-      { translateX: -70 },
-    ],
+    zIndex: 2,
+  },
+  pulseRing: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 3,
+    borderColor: '#EF4444',
+    zIndex: 1,
+  },
+  pulseRingOuter: {
+    borderWidth: 2,
+    borderColor: '#EF4444',
   },
   helpText: {
     position: 'absolute',
@@ -221,8 +285,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    fontSize: 32,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '400',
     color: '#EF4444',
     textAlign: 'center',
   },
