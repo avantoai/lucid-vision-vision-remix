@@ -23,7 +23,7 @@ export default function VisionRecordScreen() {
   const [isLoading, setIsLoading] = useState(false);
   
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const opacityAnim = useRef(new Animated.Value(0.3)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -40,10 +40,10 @@ export default function VisionRecordScreen() {
           try {
             const status = await recording.getStatusAsync();
             if (status.isRecording && status.metering !== undefined) {
-              // Normalize metering value (-160 to 0) to scale (1.0 to 1.3)
+              // Normalize metering value (-160 to 0) to scale (1.0 to 1.4)
               const normalized = Math.max(0, (status.metering + 160) / 160);
-              const scale = 1.0 + (normalized * 0.3);
-              const opacity = 0.3 + (normalized * 0.4);
+              const scale = 1.0 + (normalized * 0.4);
+              const opacity = normalized * 0.7;
               
               Animated.parallel([
                 Animated.spring(pulseAnim, {
@@ -67,7 +67,7 @@ export default function VisionRecordScreen() {
     } else {
       // Reset animation when not recording
       pulseAnim.setValue(1);
-      opacityAnim.setValue(0.3);
+      opacityAnim.setValue(0);
     }
     
     return () => {
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '400',
     color: '#EF4444',
     textAlign: 'center',
