@@ -180,6 +180,16 @@ async function submitResponse(visionId, userId, stage, question, answer) {
     });
   }
 
+  // Generate/update summary and tagline after every response
+  const allResponses = [
+    ...vision.responses.map(r => ({ stage: r.stage, question: r.question, answer: r.answer })),
+    { stage, question, answer }
+  ];
+  
+  generateSummaryAndTaglineInBackground(visionId, allResponses).catch(err => {
+    console.error('Background summary generation error:', err);
+  });
+
   return { stage_progress: newProgress };
 }
 
@@ -221,6 +231,35 @@ async function generateTitleAndCategoriesInBackground(visionId, responses) {
     console.log(`✅ Title and categories updated for ${visionId}`);
   } catch (error) {
     console.error(`❌ Title generation failed for ${visionId}:`, error);
+  }
+}
+
+async function generateSummaryAndTaglineInBackground(visionId, responses) {
+  try {
+    console.log(`✨ Generating summary and tagline for vision ${visionId}`);
+    
+    const summary = await aiService.generateVisionSummaryNew(responses);
+    console.log(`   ✓ Summary generated (${summary.length} chars)`);
+    
+    const tagline = await aiService.generateVisionTagline(summary);
+    console.log(`   ✓ Tagline: "${tagline}"`);
+
+    const { error: updateError } = await supabaseAdmin
+      .from('visions')
+      .update({
+        summary,
+        tagline,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', visionId);
+
+    if (updateError) {
+      throw new Error(`Failed to update vision summary: ${updateError.message}`);
+    }
+
+    console.log(`✅ Summary and tagline updated for ${visionId}`);
+  } catch (error) {
+    console.error(`❌ Summary generation failed for ${visionId}:`, error);
   }
 }
 
