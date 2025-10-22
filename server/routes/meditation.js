@@ -100,18 +100,15 @@ router.get('/voice-preview/:previewId', authenticateUser, async (req, res) => {
     const { previewId } = req.params;
     const filePath = `voice-previews/${previewId}.mp3`;
     
-    console.log(`🎤 Voice preview requested: ${previewId} → ${filePath}`);
-    
     const { data, error } = await supabaseAdmin.storage
       .from('meditations')
       .createSignedUrl(filePath, 3600); // 1 hour expiry
     
     if (error) {
-      console.error('❌ Error fetching voice preview:', error);
+      console.error('Error fetching voice preview:', error);
       return res.status(404).json({ error: 'Voice preview not found' });
     }
     
-    console.log(`✅ Voice preview URL generated for: ${previewId}`);
     res.json({ url: data.signedUrl });
   } catch (error) {
     console.error('Voice preview error:', error);
@@ -125,18 +122,15 @@ router.get('/background-preview/:fileName', authenticateUser, async (req, res) =
     const { fileName } = req.params;
     const filePath = `background-previews/${fileName}`;
     
-    console.log(`🎵 Background preview requested: ${fileName} → ${filePath}`);
-    
     const { data, error } = await supabaseAdmin.storage
       .from('meditations')
       .createSignedUrl(filePath, 3600); // 1 hour expiry
     
     if (error) {
-      console.error('❌ Error fetching background preview:', error);
+      console.error('Error fetching background preview:', error);
       return res.status(404).json({ error: 'Background preview not found' });
     }
     
-    console.log(`✅ Background preview URL generated for: ${fileName}`);
     res.json({ url: data.signedUrl });
   } catch (error) {
     console.error('Background preview error:', error);
