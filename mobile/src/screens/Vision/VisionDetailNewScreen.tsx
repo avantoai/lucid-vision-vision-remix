@@ -56,9 +56,10 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   const loadVisionData = async () => {
     try {
       const visionData = await api.getVision(visionId);
-      setVision(visionData.vision);
-      setResponses(visionData.responses || []);
-      setTitleInput(visionData.vision.title);
+      const { responses, meditations, ...visionFields } = visionData;
+      setVision(visionFields);
+      setResponses(responses || []);
+      setTitleInput(visionFields.title);
     } catch (error) {
       console.error('Failed to load vision:', error);
       Alert.alert('Error', 'Failed to load vision details');
