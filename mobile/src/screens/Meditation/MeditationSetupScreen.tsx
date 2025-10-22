@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 import { RootStackParamList } from '../../types';
-import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
+import { VOICE_OPTIONS, BACKGROUND_OPTIONS, API_BASE_URL } from '../../constants/config';
 import api from '../../services/api';
 import { colors, layout } from '../../theme';
 
@@ -22,6 +23,94 @@ export default function MeditationSetupScreen() {
   const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS.basic[0].id);
   const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_OPTIONS[0].id);
   const [isLoading, setIsLoading] = useState(false);
+  const [previewSound, setPreviewSound] = useState<Audio.Sound | null>(null);
+  const [playingPreview, setPlayingPreview] = useState<string | null>(null);
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      if (previewSound) {
+        previewSound.unloadAsync();
+      }
+    };
+  }, [previewSound]);
+
+  const stopCurrentPreview = async () => {
+    if (previewSound) {
+      await previewSound.stopAsync();
+      await previewSound.unloadAsync();
+      setPreviewSound(null);
+      setPlayingPreview(null);
+    }
+  };
+
+  const playVoicePreview = async (voiceId: string, previewId: string) => {
+    try {
+      // Stop any currently playing preview
+      await stopCurrentPreview();
+
+      // Don't play if clicking the same voice that's playing
+      if (playingPreview === voiceId) {
+        return;
+      }
+
+      setPlayingPreview(voiceId);
+
+      // Fetch the voice preview from the API
+      const previewUrl = `${API_BASE_URL}/meditation/voice-preview/${previewId}`;
+      
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: previewUrl },
+        { shouldPlay: true }
+      );
+
+      setPreviewSound(sound);
+
+      // Auto-stop when finished
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          stopCurrentPreview();
+        }
+      });
+    } catch (error) {
+      console.error('Error playing voice preview:', error);
+      setPlayingPreview(null);
+    }
+  };
+
+  const playBackgroundPreview = async (backgroundId: string, previewFileName: string) => {
+    try {
+      // Stop any currently playing preview
+      await stopCurrentPreview();
+
+      // Don't play if clicking the same background that's playing
+      if (playingPreview === backgroundId) {
+        return;
+      }
+
+      setPlayingPreview(backgroundId);
+
+      // Fetch the background preview from the API
+      const previewUrl = `${API_BASE_URL}/meditation/background-preview/${previewFileName}`;
+      
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: previewUrl },
+        { shouldPlay: true }
+      );
+
+      setPreviewSound(sound);
+
+      // Auto-stop when finished
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          stopCurrentPreview();
+        }
+      });
+    } catch (error) {
+      console.error('Error playing background preview:', error);
+      setPlayingPreview(null);
+    }
+  };
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -108,9 +197,16 @@ export default function MeditationSetupScreen() {
               style={[
                 styles.optionButton,
                 selectedVoice === voice.id && styles.optionButtonSelected,
+                playingPreview === voice.id && styles.optionButtonPlaying,
               ]}
-              onPress={() => setSelectedVoice(voice.id)}
+              onPress={() => {
+                setSelectedVoice(voice.id);
+                playVoicePreview(voice.id, voice.previewId);
+              }}
             >
+              {playingPreview === voice.id && (
+                <Ionicons name="volume-high" size={16} color={colors.primary} style={{ marginRight: 6 }} />
+              )}
               <Text
                 style={[
                   styles.optionText,
@@ -131,9 +227,16 @@ export default function MeditationSetupScreen() {
               style={[
                 styles.optionButton,
                 selectedBackground === bg.id && styles.optionButtonSelected,
+                playingPreview === bg.id && styles.optionButtonPlaying,
               ]}
-              onPress={() => setSelectedBackground(bg.id)}
+              onPress={() => {
+                setSelectedBackground(bg.id);
+                playBackgroundPreview(bg.id, bg.previewFileName);
+              }}
             >
+              {playingPreview === bg.id && (
+                <Ionicons name="volume-high" size={16} color={colors.primary} style={{ marginRight: 6 }} />
+              )}
               <Text
                 style={[
                   styles.optionText,
@@ -208,6 +311,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   optionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surface,
     borderWidth: 2,
     borderColor: colors.border,
@@ -218,6 +324,9 @@ const styles = StyleSheet.create({
   optionButtonSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.surfaceLight,
+  },
+  optionButtonPlaying: {
+    borderColor: colors.primary,
   },
   optionText: {
     fontSize: 16,

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const { authenticateUser } = require('../middleware/auth');
 const meditationService = require('../services/meditationService');
 const quotaService = require('../services/quotaService');
@@ -90,6 +91,30 @@ router.put('/:meditationId/title', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error('Update title error:', error);
     res.status(500).json({ error: 'Failed to update title' });
+  }
+});
+
+// Voice preview endpoint
+router.get('/voice-preview/:previewId', authenticateUser, async (req, res) => {
+  try {
+    const { previewId } = req.params;
+    const previewPath = path.join(__dirname, '..', 'assets', 'voice-previews', `${previewId}.mp3`);
+    res.sendFile(previewPath);
+  } catch (error) {
+    console.error('Voice preview error:', error);
+    res.status(500).json({ error: 'Failed to load voice preview' });
+  }
+});
+
+// Background preview endpoint
+router.get('/background-preview/:fileName', authenticateUser, async (req, res) => {
+  try {
+    const { fileName } = req.params;
+    const previewPath = path.join(__dirname, '..', 'assets', 'background-previews', fileName);
+    res.sendFile(previewPath);
+  } catch (error) {
+    console.error('Background preview error:', error);
+    res.status(500).json({ error: 'Failed to load background preview' });
   }
 });
 
