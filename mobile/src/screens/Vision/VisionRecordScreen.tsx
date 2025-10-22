@@ -165,6 +165,10 @@ export default function VisionRecordScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="close" size={24} color={colors.textSecondary} />
+      </TouchableOpacity>
+
       <View style={styles.content}>
         <View style={styles.topContent}>
           <Text style={styles.prompt}>{question}</Text>
@@ -233,6 +237,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: layout.headerTop,
+    right: layout.headerSide,
+    zIndex: 10,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
