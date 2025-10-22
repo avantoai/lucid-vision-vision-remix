@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { RootStackParamList } from '../../types';
-import { VOICE_OPTIONS, BACKGROUND_OPTIONS, API_BASE_URL } from '../../constants/config';
+import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
 import api from '../../services/api';
 import { colors, layout } from '../../theme';
 
@@ -56,11 +56,11 @@ export default function MeditationSetupScreen() {
 
       setPlayingPreview(voiceId);
 
-      // Fetch the voice preview from the API
-      const previewUrl = `${API_BASE_URL}/meditation/voice-preview/${previewId}`;
+      // Fetch the signed URL from the API
+      const response = await api.getVoicePreview(previewId);
       
       const { sound } = await Audio.Sound.createAsync(
-        { uri: previewUrl },
+        { uri: response.url },
         { shouldPlay: true }
       );
 
@@ -90,11 +90,11 @@ export default function MeditationSetupScreen() {
 
       setPlayingPreview(backgroundId);
 
-      // Fetch the background preview from the API
-      const previewUrl = `${API_BASE_URL}/meditation/background-preview/${previewFileName}`;
+      // Fetch the signed URL from the API
+      const response = await api.getBackgroundPreview(previewFileName);
       
       const { sound } = await Audio.Sound.createAsync(
-        { uri: previewUrl },
+        { uri: response.url },
         { shouldPlay: true }
       );
 

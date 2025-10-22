@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const { authenticateUser } = require('../middleware/auth');
 const meditationService = require('../services/meditationService');
 const quotaService = require('../services/quotaService');
+const { supabaseAdmin } = require('../config/supabase');
 
 router.post('/generate', authenticateUser, async (req, res) => {
   try {
@@ -98,8 +98,18 @@ router.put('/:meditationId/title', authenticateUser, async (req, res) => {
 router.get('/voice-preview/:previewId', authenticateUser, async (req, res) => {
   try {
     const { previewId } = req.params;
-    const previewPath = path.join(__dirname, '..', 'assets', 'voice-previews', `${previewId}.mp3`);
-    res.sendFile(previewPath);
+    const filePath = `voice-previews/${previewId}.mp3`;
+    
+    const { data, error } = await supabaseAdmin.storage
+      .from('meditations')
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
+    
+    if (error) {
+      console.error('Error fetching voice preview:', error);
+      return res.status(404).json({ error: 'Voice preview not found' });
+    }
+    
+    res.json({ url: data.signedUrl });
   } catch (error) {
     console.error('Voice preview error:', error);
     res.status(500).json({ error: 'Failed to load voice preview' });
@@ -110,8 +120,18 @@ router.get('/voice-preview/:previewId', authenticateUser, async (req, res) => {
 router.get('/background-preview/:fileName', authenticateUser, async (req, res) => {
   try {
     const { fileName } = req.params;
-    const previewPath = path.join(__dirname, '..', 'assets', 'background-previews', fileName);
-    res.sendFile(previewPath);
+    const filePath = `background-previews/${fileName}`;
+    
+    const { data, error } = await supabaseAdmin.storage
+      .from('meditations')
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
+    
+    if (error) {
+      console.error('Error fetching background preview:', error);
+      return res.status(404).json({ error: 'Background preview not found' });
+    }
+    
+    res.json({ url: data.signedUrl });
   } catch (error) {
     console.error('Background preview error:', error);
     res.status(500).json({ error: 'Failed to load background preview' });

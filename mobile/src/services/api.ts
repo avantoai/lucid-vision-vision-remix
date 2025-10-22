@@ -261,6 +261,14 @@ class ApiService {
     return data.url;
   }
 
+  async getVoicePreview(previewId: string): Promise<{ url: string }> {
+    return await this.request<{ url: string }>(`/meditation/voice-preview/${previewId}`);
+  }
+
+  async getBackgroundPreview(fileName: string): Promise<{ url: string }> {
+    return await this.request<{ url: string }>(`/meditation/background-preview/${fileName}`);
+  }
+
   async transcribeAudio(audioUri: string): Promise<string> {
     const formData = new FormData();
     formData.append('audio', {
