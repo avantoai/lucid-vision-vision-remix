@@ -22,57 +22,6 @@ export default function MeditationSetupScreen() {
   const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS.basic[0].id);
   const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_OPTIONS[0].id);
   const [isLoading, setIsLoading] = useState(false);
-  const [visionStatus, setVisionStatus] = useState<'processing' | 'completed' | 'failed' | null>(visionId ? 'processing' : null);
-  const [visionData, setVisionData] = useState<{ statement: string; tagline: string } | null>(null);
-
-  // Poll for vision status if visionId is present
-  React.useEffect(() => {
-    if (!visionId || visionStatus === 'completed' || visionStatus === 'failed') {
-      return;
-    }
-
-    let errorCount = 0;
-    const MAX_ERRORS = 10;
-
-    const checkVisionStatus = async () => {
-      try {
-        const status = await api.getVisionStatus(visionId);
-        errorCount = 0; // Reset error count on success
-        
-        if (status.status === 'completed') {
-          setVisionStatus('completed');
-          if (status.statement && status.tagline) {
-            setVisionData({ statement: status.statement, tagline: status.tagline });
-          }
-        } else if (status.status === 'failed') {
-          setVisionStatus('failed');
-          Alert.alert('Vision Processing Failed', 'There was an error creating your vision statement. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error checking vision status:', error);
-        errorCount++;
-        
-        // Stop polling after too many consecutive errors
-        if (errorCount >= MAX_ERRORS) {
-          console.log('Stopping vision status polling after too many errors');
-          setVisionStatus('failed');
-          Alert.alert(
-            'Connection Issue',
-            'Unable to verify vision processing status. You can still proceed to create your meditation - your vision may still be processing in the background.',
-            [{ text: 'OK' }]
-          );
-        }
-      }
-    };
-
-    // Check immediately
-    checkVisionStatus();
-
-    // Then poll every 2 seconds
-    const interval = setInterval(checkVisionStatus, 2000);
-
-    return () => clearInterval(interval);
-  }, [visionId, visionStatus]);
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -127,21 +76,6 @@ export default function MeditationSetupScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Create Meditation</Text>
         <Text style={styles.subtitle}>Customize your {category} meditation</Text>
-
-        {visionStatus === 'processing' && (
-          <View style={styles.visionProcessing}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Ionicons name="sparkles" size={18} color={colors.primary} style={{ marginLeft: 8, marginRight: 4 }} />
-            <Text style={styles.visionProcessingText}>Crafting your vision statement...</Text>
-          </View>
-        )}
-
-        {visionStatus === 'completed' && visionData && (
-          <View style={styles.visionCompleted}>
-            <Text style={styles.visionTagline}>{visionData.tagline}</Text>
-            <Text style={styles.visionStatement}>{visionData.statement}</Text>
-          </View>
-        )}
 
         <Text style={styles.label}>Duration</Text>
         <View style={styles.optionsGrid}>
@@ -308,40 +242,5 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 18,
     fontWeight: '600',
-  },
-  visionProcessing: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceLight,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    gap: 12,
-  },
-  visionProcessingText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  visionCompleted: {
-    backgroundColor: colors.successLight,
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: colors.success,
-  },
-  visionTagline: {
-    fontSize: 14,
-    color: colors.successDark,
-    fontWeight: '600',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  visionStatement: {
-    fontSize: 16,
-    color: colors.successDark,
-    lineHeight: 24,
   },
 });
