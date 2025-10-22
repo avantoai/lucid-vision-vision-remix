@@ -26,6 +26,24 @@ export default function MeditationSetupScreen() {
   const [previewSound, setPreviewSound] = useState<Audio.Sound | null>(null);
   const [playingPreview, setPlayingPreview] = useState<string | null>(null);
 
+  // Configure audio mode on component mount
+  useEffect(() => {
+    const configureAudio = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+        });
+        console.log('✅ Audio mode configured');
+      } catch (error) {
+        console.error('Failed to configure audio mode:', error);
+      }
+    };
+    
+    configureAudio();
+  }, []);
+
   // Clean up audio on unmount
   useEffect(() => {
     return () => {
