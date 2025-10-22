@@ -115,14 +115,26 @@ async function generateNextQuestion(visionId, userId) {
     answer: r.answer
   }));
 
-  const currentStage = STAGES[vision.stage_progress];
+  let currentStage;
+  let stageIndex;
+  
+  if (vision.stage_progress >= 5) {
+    // All 5 stages complete - determine which stage to deepen
+    currentStage = await aiService.determineStageToDeepen(responses);
+    stageIndex = STAGE_ORDER[currentStage];
+    console.log(`🔄 All stages complete. Deepening stage: ${currentStage}`);
+  } else {
+    // Continue with next stage in sequence
+    currentStage = STAGES[vision.stage_progress];
+    stageIndex = vision.stage_progress;
+  }
   
   const question = await aiService.generateVisionQuestion(currentStage, responses);
   
   return {
     question,
     stage: currentStage,
-    stageIndex: vision.stage_progress
+    stageIndex
   };
 }
 
