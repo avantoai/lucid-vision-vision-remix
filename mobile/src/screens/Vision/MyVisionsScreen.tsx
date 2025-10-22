@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TextInput,
   ActivityIndicator
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
 import api from '../../services/api';
@@ -58,9 +59,11 @@ export default function MyVisionsScreen({ navigation }: any) {
     }
   }, []);
 
-  useEffect(() => {
-    loadVisions();
-  }, [loadVisions]);
+  useFocusEffect(
+    useCallback(() => {
+      loadVisions();
+    }, [loadVisions])
+  );
 
   const handleCreateVision = async () => {
     try {
