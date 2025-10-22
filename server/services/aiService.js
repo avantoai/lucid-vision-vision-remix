@@ -526,11 +526,12 @@ async function generateVisionQuestion(stage, previousResponses) {
       ]
     },
     'Belief': {
-      focus: 'Surface the beliefs, fears, and subconscious stories that shape or limit their reality.',
+      focus: 'Explore what makes this vision feel true and possible for you.',
       prompts: [
-        'Ask questions that expose assumptions, patterns, or inner dialogue.',
-        'Normalize resistance and invite compassionate honesty.',
-        'Transition from awareness to empowerment (what new beliefs would better serve them?).'
+        'Ask what beliefs or inner knowing already supports this vision.',
+        'Invite them to identify what makes this feel achievable and deserved.',
+        'Help them articulate why this vision is meant for them.',
+        'If resistance appears, frame it as "what would help you believe in this more fully?"'
       ]
     },
     'Identity': {

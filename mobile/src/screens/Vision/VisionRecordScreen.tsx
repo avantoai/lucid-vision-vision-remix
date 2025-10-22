@@ -126,9 +126,6 @@ export default function VisionRecordScreen() {
 
       <View style={styles.content}>
         <View style={styles.topContent}>
-          <Text style={styles.stageIndicator}>
-            {STAGE_NAMES[stageIndex]} ({stageIndex + 1}/5)
-          </Text>
           <Text style={styles.prompt}>{question}</Text>
         </View>
 
@@ -192,12 +189,6 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: layout.screenHorizontal,
     alignItems: 'center',
-  },
-  stageIndicator: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.primary,
-    marginBottom: 20,
   },
   prompt: {
     fontSize: 28,

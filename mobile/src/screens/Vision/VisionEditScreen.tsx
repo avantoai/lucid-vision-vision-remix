@@ -99,9 +99,6 @@ export default function VisionEditScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.stageIndicator}>
-          {STAGE_NAMES[stageIndex]} ({stageIndex + 1}/5)
-        </Text>
         <Text style={styles.prompt}>{question}</Text>
 
         <TextInput
@@ -161,12 +158,6 @@ const styles = StyleSheet.create({
   content: {
     padding: layout.screenHorizontal,
     paddingTop: layout.screenTopBase + layout.headerButtonSize,
-  },
-  stageIndicator: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 16,
   },
   prompt: {
     fontSize: 20,
