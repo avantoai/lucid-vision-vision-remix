@@ -23,7 +23,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const DarkTheme = {
   ...DefaultTheme,
-  dark: true,
+  dark: Boolean(true),
   colors: {
     ...DefaultTheme.colors,
     primary: colors.primary,
@@ -34,6 +34,8 @@ const DarkTheme = {
     notification: colors.primary,
   },
 };
+
+console.log('🔍 Theme dark value:', { dark: DarkTheme.dark, type: typeof DarkTheme.dark });
 
 export default function RootNavigator() {
   const authContext = useAuth();

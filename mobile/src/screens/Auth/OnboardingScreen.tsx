@@ -17,6 +17,14 @@ export default function OnboardingScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const isNewUser = route.params?.isNewUser ?? false;
 
+  // DIAGNOSTIC
+  console.log('🔍 Onboarding values:', {
+    isNewUser,
+    isNewUserType: typeof isNewUser,
+    isLoading,
+    isLoadingType: typeof isLoading,
+  });
+
   const handleContinue = async () => {
     if (isNewUser && !fullName.trim()) {
       Alert.alert('Error', 'Please enter your name');
