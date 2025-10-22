@@ -46,68 +46,84 @@ export default function MeditationSetupScreen() {
 
   const playVoicePreview = async (voiceId: string, previewId: string) => {
     try {
+      console.log('🎤 Playing voice preview:', previewId);
+      
       // Stop any currently playing preview
       await stopCurrentPreview();
 
       // Don't play if clicking the same voice that's playing
       if (playingPreview === voiceId) {
+        console.log('Already playing this voice, skipping');
         return;
       }
 
       setPlayingPreview(voiceId);
 
       // Fetch the signed URL from the API
+      console.log('Fetching signed URL from API...');
       const response = await api.getVoicePreview(previewId);
+      console.log('Got signed URL:', response.url.substring(0, 100) + '...');
       
+      console.log('Creating audio sound...');
       const { sound } = await Audio.Sound.createAsync(
         { uri: response.url },
         { shouldPlay: true }
       );
+      console.log('Audio sound created and playing');
 
       setPreviewSound(sound);
 
       // Auto-stop when finished
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
+          console.log('Audio finished playing');
           stopCurrentPreview();
         }
       });
     } catch (error) {
-      console.error('Error playing voice preview:', error);
+      console.error('❌ Error playing voice preview:', error);
       setPlayingPreview(null);
     }
   };
 
   const playBackgroundPreview = async (backgroundId: string, previewFileName: string) => {
     try {
+      console.log('🎵 Playing background preview:', previewFileName);
+      
       // Stop any currently playing preview
       await stopCurrentPreview();
 
       // Don't play if clicking the same background that's playing
       if (playingPreview === backgroundId) {
+        console.log('Already playing this background, skipping');
         return;
       }
 
       setPlayingPreview(backgroundId);
 
       // Fetch the signed URL from the API
+      console.log('Fetching signed URL from API...');
       const response = await api.getBackgroundPreview(previewFileName);
+      console.log('Got signed URL:', response.url.substring(0, 100) + '...');
       
+      console.log('Creating audio sound...');
       const { sound } = await Audio.Sound.createAsync(
         { uri: response.url },
         { shouldPlay: true }
       );
+      console.log('Audio sound created and playing');
 
       setPreviewSound(sound);
 
       // Auto-stop when finished
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
+          console.log('Audio finished playing');
           stopCurrentPreview();
         }
       });
     } catch (error) {
-      console.error('Error playing background preview:', error);
+      console.error('❌ Error playing background preview:', error);
       setPlayingPreview(null);
     }
   };
