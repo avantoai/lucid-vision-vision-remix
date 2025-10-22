@@ -36,7 +36,18 @@ const DarkTheme = {
 };
 
 export default function RootNavigator() {
-  const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
+  const authContext = useAuth();
+  const { isAuthenticated, needsOnboarding, isLoading } = authContext;
+
+  // DIAGNOSTIC: Log the actual values and types
+  console.log('🔍 Auth values:', {
+    isAuthenticated,
+    needsOnboarding,
+    isLoading,
+    isAuthenticatedType: typeof isAuthenticated,
+    needsOnboardingType: typeof needsOnboarding,
+    isLoadingType: typeof isLoading,
+  });
 
   if (isLoading) {
     return null;
