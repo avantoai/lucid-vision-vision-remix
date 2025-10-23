@@ -836,15 +836,14 @@ async function generateNextCategoryQuestion(category, allResponses, cssAnalysis)
       'What peak emotional moments from your past resemble that feeling?'
     ],
     Belief: [
-      'What limiting beliefs or fears are you ready to release?',
-      'What new empowering belief would you like to embody?',
-      'What would someone who already lives this vision believe about themselves?'
+      'What do you believe about yourself when living this vision?',
+      'What beliefs support this vision being real?',
+      'What becomes true when you release doubt?'
     ],
     Identity: [
-      'Who is the version of you that naturally lives this reality?',
-      'How do you show up each day in this new identity?',
-      'How do others experience you?',
-      'What are your core traits or archetypal qualities?'
+      'Who are you when living this reality?',
+      'What qualities do you embody in this vision?',
+      'How do you show up when this is already true?'
     ],
     Embodiment: [
       'What actions or daily rituals support this vision coming true?',
