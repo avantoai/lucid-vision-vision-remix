@@ -40,10 +40,10 @@ export default function VisionRecordScreen() {
           try {
             const status = await recording.getStatusAsync();
             if (status.isRecording && status.metering !== undefined) {
-              // Normalize metering value (-160 to 0) to scale (1.0 to 1.4)
+              // Normalize metering value (-160 to 0) to scale (1.0 to 1.6)
               const normalized = Math.max(0, (status.metering + 160) / 160);
-              const scale = 1.0 + (normalized * 0.4);
-              const opacity = normalized * 0.7;
+              const scale = 1.0 + (normalized * 0.6);
+              const opacity = normalized * 0.8;
               
               Animated.parallel([
                 Animated.spring(pulseAnim, {
