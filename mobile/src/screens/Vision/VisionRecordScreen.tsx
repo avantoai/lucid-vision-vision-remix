@@ -15,7 +15,7 @@ export default function VisionRecordScreen() {
   const route = useRoute<VisionRecordRouteProp>();
   const { visionId, question, category } = route.params;
   const { height } = useWindowDimensions();
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const recordingRef = useRef<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,9 +34,9 @@ export default function VisionRecordScreen() {
       
       // Audio-responsive pulsing animation
       meteringInterval = setInterval(async () => {
-        if (recording) {
+        if (recordingRef.current) {
           try {
-            const status = await recording.getStatusAsync();
+            const status = await recordingRef.current.getStatusAsync();
             if (status.isRecording && status.metering !== undefined) {
               // Normalize metering value (-160 to 0) to scale (1.0 to 2.2)
               const normalized = Math.max(0, (status.metering + 160) / 160);
@@ -72,18 +72,25 @@ export default function VisionRecordScreen() {
       clearInterval(interval);
       clearInterval(meteringInterval);
     };
-  }, [isRecording, recording]);
+  }, [isRecording]);
 
   useEffect(() => {
     return () => {
-      if (recording) {
-        recording.stopAndUnloadAsync();
+      if (recordingRef.current) {
+        recordingRef.current.stopAndUnloadAsync();
+        recordingRef.current = null;
       }
     };
-  }, [recording]);
+  }, []);
 
   const startRecording = async () => {
     try {
+      // Clean up any existing recording first
+      if (recordingRef.current) {
+        await recordingRef.current.stopAndUnloadAsync();
+        recordingRef.current = null;
+      }
+
       const permission = await Audio.requestPermissionsAsync();
       if (!permission.granted) {
         Alert.alert('Permission Required', 'Please allow microphone access to record your response');
@@ -100,7 +107,7 @@ export default function VisionRecordScreen() {
         isMeteringEnabled: true,
       });
 
-      setRecording(recording);
+      recordingRef.current = recording;
       setIsRecording(true);
       setRecordingTime(0);
     } catch (error) {
@@ -110,12 +117,12 @@ export default function VisionRecordScreen() {
   };
 
   const stopRecording = async () => {
-    if (!recording) return;
+    if (!recordingRef.current) return;
 
     try {
       setIsLoading(true);
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await recordingRef.current.stopAndUnloadAsync();
+      const uri = recordingRef.current.getURI();
       
       if (!uri) {
         throw new Error('No recording URI');
@@ -132,7 +139,7 @@ export default function VisionRecordScreen() {
       console.error('Failed to stop recording:', error);
       Alert.alert('Error', 'Failed to process recording');
     } finally {
-      setRecording(null);
+      recordingRef.current = null;
       setIsRecording(false);
       setIsLoading(false);
     }
