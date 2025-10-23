@@ -758,21 +758,12 @@ Instructions:
    (e.g., "Lucid Vision", "my coaching business", "this app", "financial independence")
 
 2. Create a tagline (8-12 words) that:
-   - Starts with "I" (first person)
-   - MENTIONS the specific subject/project by name or clear reference
+   - Is written in first person and present tense (as if the user is living this vision now and it has already come true)
+   - Mentions the specific subject/project by name or clear reference
    - Captures their purpose or impact with that subject
    - Uses concrete details from their responses, not abstract language
 
-Good examples:
-- "I build Lucid Vision to help people manifest their dreams"
-- "I create transformative coaching experiences through my practice"
-- "I achieve financial freedom while inspiring my family"
-
-Bad examples (too vague):
-- "I empower transformation and healing" ❌ (no subject)
-- "I inspire lives to realize their potential" ❌ (what are you doing?)
-
-Return only the tagline, starting with "I".`;
+Return only the tagline.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
