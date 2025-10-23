@@ -349,14 +349,17 @@ export default function MeditationPlayerScreen() {
         >
           <View style={[styles.optionsMenu, { top: layout.headerTop + layout.headerButtonSize + 10 }]}>
             <TouchableOpacity style={styles.menuItem} onPress={handleEditTitle}>
+              <Ionicons name="create-outline" size={20} color={colors.text} />
               <Text style={styles.menuItemText}>Edit Title</Text>
             </TouchableOpacity>
             <View style={styles.menuDivider} />
             <TouchableOpacity style={styles.menuItem} onPress={handleViewTranscript}>
+              <Ionicons name="document-text-outline" size={20} color={colors.text} />
               <Text style={styles.menuItemText}>View Transcript</Text>
             </TouchableOpacity>
             <View style={styles.menuDivider} />
             <TouchableOpacity style={styles.menuItem} onPress={handleDeleteMeditation}>
+              <Ionicons name="trash-outline" size={20} color="#EF4444" />
               <Text style={styles.menuItemTextDelete}>Delete Meditation</Text>
             </TouchableOpacity>
           </View>
@@ -569,16 +572,17 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   menuItemText: {
     fontSize: 16,
     color: colors.text,
-    textAlign: 'center',
   },
   menuItemTextDelete: {
     fontSize: 16,
     color: '#EF4444',
-    textAlign: 'center',
     fontWeight: '600',
   },
   menuDivider: {
