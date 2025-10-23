@@ -257,12 +257,12 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
         <TouchableOpacity
           onPress={handleCreateMeditation}
           style={styles.secondaryButton}
-          disabled={vision.stage_progress === 0}
+          disabled={responses.length === 0}
         >
-          <Ionicons name="musical-notes" size={20} color={vision.stage_progress === 0 ? colors.textTertiary : colors.primary} />
+          <Ionicons name="musical-notes" size={20} color={responses.length === 0 ? colors.textTertiary : colors.primary} />
           <Text style={[
             styles.secondaryButtonText,
-            vision.stage_progress === 0 && styles.secondaryButtonTextDisabled
+            responses.length === 0 && styles.secondaryButtonTextDisabled
           ]}>
             Create Meditation
           </Text>
