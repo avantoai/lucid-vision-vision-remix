@@ -797,14 +797,19 @@ ${responseHistory}
 - Weakest signal: ${weakestSignal}
 - Coverage: ${coverageHits.length}/${coverageRequired} slots covered
 
-**Your task:**
-Generate ONE tailored question (can be multi-part if natural) that:
-1. References specific details from their previous responses
-2. ${decisionBand === 'EVOKE' ? 'Evokes deeper exploration - their responses are too brief/vague' : decisionBand === 'CLARIFY' ? 'Clarifies and deepens - ask for more specificity on ' + weakestSignal : 'Advances or deepens - they have good context, go deeper or move forward'}
-3. Feels responsive, alive, personal - not generic
-4. Stays focused on the ${category} dimension
+**CRITICAL CONSTRAINTS:**
+- Maximum 15 words total
+- Single question only (no "and", no follow-ups, no multi-part)
+- Direct and concise
 
-Return only the question. No preamble.`;
+**Your task:**
+Generate ONE brief question that:
+1. References specific details from their previous responses
+2. ${decisionBand === 'EVOKE' ? 'Evokes deeper exploration' : decisionBand === 'CLARIFY' ? 'Clarifies ' + weakestSignal : 'Advances or deepens their context'}
+3. Feels personal and responsive
+4. Stays focused on ${category}
+
+Return only the question. Maximum 15 words.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -813,7 +818,7 @@ Return only the question. No preamble.`;
       { role: 'user', content: prompt }
     ],
     temperature: 0.9,
-    max_tokens: 100
+    max_tokens: 35
   });
 
   return completion.choices[0].message.content.trim();
