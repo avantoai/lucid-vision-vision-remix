@@ -255,10 +255,16 @@ async function processVisionSummary(visionId, userId) {
 async function generateTitleAndCategoriesInBackground(visionId, responses) {
   try {
     console.log(`🏷️ Generating title and categories for vision ${visionId}`);
+    console.log(`   📝 Responses to process: ${responses.length}`);
+    
+    if (responses.length === 0) {
+      console.log(`   ⚠️ No responses provided, skipping title generation`);
+      return;
+    }
     
     const { title, categories } = await aiService.generateVisionTitleAndCategories(responses);
-    console.log(`   ✓ Title: "${title}"`);
-    console.log(`   ✓ Categories: ${categories.join(', ')}`);
+    console.log(`   ✓ AI generated title: "${title}"`);
+    console.log(`   ✓ AI generated categories: ${categories.join(', ')}`);
 
     const { error: updateError } = await supabaseAdmin
       .from('visions')
@@ -273,9 +279,10 @@ async function generateTitleAndCategoriesInBackground(visionId, responses) {
       throw new Error(`Failed to update vision title: ${updateError.message}`);
     }
 
-    console.log(`✅ Title and categories updated for ${visionId}`);
+    console.log(`✅ Title and categories updated in database for ${visionId}`);
   } catch (error) {
     console.error(`❌ Title generation failed for ${visionId}:`, error);
+    console.error(`   Error details:`, error.message, error.stack);
   }
 }
 
