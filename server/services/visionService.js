@@ -1,14 +1,8 @@
 const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
+const cssCalculator = require('./cssCalculator');
 
-const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
-const STAGE_ORDER = {
-  'Vision': 0,
-  'Belief': 1,
-  'Identity': 2,
-  'Embodiment': 3,
-  'Action': 4
-};
+const CATEGORIES = ['Vision', 'Emotion', 'Belief', 'Identity', 'Embodiment'];
 
 async function getAllVisions(userId) {
   const { data: visions, error } = await supabaseAdmin
@@ -89,7 +83,19 @@ async function createVision(userId) {
       title: 'Untitled Vision',
       categories: [],
       micro_tags: [],
-      stage_progress: 0,
+      context_depth: {
+        Vision: { css: 0, coverage: {}, subscores: {}, last_scored: null },
+        Emotion: { css: 0, coverage: {}, subscores: {}, last_scored: null },
+        Belief: { css: 0, coverage: {}, subscores: {}, last_scored: null },
+        Identity: { css: 0, coverage: {}, subscores: {}, last_scored: null },
+        Embodiment: { css: 0, coverage: {}, subscores: {}, last_scored: null }
+      },
+      css_vision: 0,
+      css_emotion: 0,
+      css_belief: 0,
+      css_identity: 0,
+      css_embodiment: 0,
+      overall_completeness: 0,
       summary: null,
       tagline: null,
       status: 'processing',
@@ -110,87 +116,119 @@ async function generateNextQuestion(visionId, userId) {
   const vision = await getVision(visionId, userId);
   
   const responses = vision.responses.map(r => ({
-    stage: r.stage,
+    category: r.category,
     question: r.question,
     answer: r.answer
   }));
 
-  let currentStage;
-  let stageIndex;
+  // Determine which category needs work based on CSS scores
+  const contextDepth = vision.context_depth || {};
+  const nextCategory = aiService.determineNextCategory(contextDepth);
   
-  if (vision.stage_progress >= 5) {
-    // All 5 stages complete - determine which stage to deepen
-    currentStage = await aiService.determineStageToDeepen(responses);
-    stageIndex = STAGE_ORDER[currentStage];
-    console.log(`🔄 All stages complete. Deepening stage: ${currentStage}`);
-  } else {
-    // Continue with next stage in sequence
-    currentStage = STAGES[vision.stage_progress];
-    stageIndex = vision.stage_progress;
-  }
+  console.log(`📊 CSS Scores: Vision=${contextDepth.Vision?.css || 0}, Emotion=${contextDepth.Emotion?.css || 0}, Belief=${contextDepth.Belief?.css || 0}, Identity=${contextDepth.Identity?.css || 0}, Embodiment=${contextDepth.Embodiment?.css || 0}`);
+  console.log(`🎯 Next category: ${nextCategory}`);
   
-  const question = await aiService.generateVisionQuestion(currentStage, responses);
+  // Get CSS analysis for this category
+  const categoryCSS = contextDepth[nextCategory] || { css: 0, coverage: {}, weakest_signal: 'specificity' };
+  
+  // Generate question using CSS context
+  const question = await aiService.generateNextCategoryQuestion(nextCategory, responses, categoryCSS);
   
   return {
     question,
-    stage: currentStage,
-    stageIndex
+    category: nextCategory
   };
 }
 
-async function submitResponse(visionId, userId, stage, question, answer) {
+async function submitResponse(visionId, userId, category, question, answer) {
   const vision = await getVision(visionId, userId);
+  const isFirstResponse = vision.responses.length === 0;
+  const wasFirstFlow = !vision.title || vision.title === 'Untitled Vision';
 
+  // Step 1: Calculate CSS for this response
+  console.log(`🧮 Calculating CSS for ${category} response...`);
+  const categoryResponses = vision.responses.filter(r => r.category === category);
+  const cssResult = await cssCalculator.calculateResponseCSS(category, question, answer, categoryResponses);
+  
+  console.log(`   ✓ CSS: ${cssResult.css} (${cssResult.decisionBand})`);
+  console.log(`   ✓ Categories addressed: ${cssResult.categoriesAddressed.join(', ')}`);
+  console.log(`   ✓ Weakest signal: ${cssResult.weakestSignal}`);
+
+  // Step 2: Insert the response with category tagging
   await supabaseAdmin
     .from('vision_responses')
     .insert({
       user_id: userId,
       vision_id: visionId,
-      stage,
+      category: category,
+      categories_addressed: cssResult.categoriesAddressed,
       question,
       answer,
       created_at: new Date().toISOString()
     });
 
-  const stageIndex = STAGE_ORDER[stage];
+  // Step 3: Update context_depth for all addressed categories
+  const updatedContextDepth = { ...(vision.context_depth || {}) };
+  const cssUpdates = {};
   
-  let newProgress = vision.stage_progress;
-  if (stageIndex >= vision.stage_progress) {
-    newProgress = stageIndex + 1;
+  for (const cat of cssResult.categoriesAddressed) {
+    // Recalculate CSS for this category with new response
+    const catResponses = vision.responses.filter(r => 
+      r.category === cat || (r.categories_addressed && r.categories_addressed.includes(cat))
+    );
+    catResponses.push({ category: cat, question, answer });
+    
+    const catCSS = await cssCalculator.calculateCategoryCSS(cat, catResponses);
+    updatedContextDepth[cat] = catCSS;
+    cssUpdates[`css_${cat.toLowerCase()}`] = catCSS.css;
   }
 
+  // Calculate overall completeness (average CSS * 100)
+  const avgCSS = CATEGORIES.reduce((sum, cat) => sum + (updatedContextDepth[cat]?.css || 0), 0) / 5;
+  const overallCompleteness = Math.round(avgCSS * 100);
+
+  // Step 4: Update vision with new CSS data
   await supabaseAdmin
     .from('visions')
     .update({
-      stage_progress: newProgress,
+      context_depth: updatedContextDepth,
+      ...cssUpdates,
+      overall_completeness: overallCompleteness,
+      last_scored_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
     .eq('id', visionId);
 
-  // Generate title and categories after first Vision response
-  if (stage === 'Vision' && vision.responses.length === 0) {
-    const responses = [{
-      stage,
-      question,
-      answer
-    }];
-    
-    generateTitleAndCategoriesInBackground(visionId, responses).catch(err => {
+  // Step 5: Auto-generate content based on flow detection
+  const allResponses = [
+    ...vision.responses.map(r => ({ category: r.category, question: r.question, answer: r.answer })),
+    { category, question, answer }
+  ];
+  
+  // Generate title only on first flow (after first response)
+  if (wasFirstFlow && isFirstResponse) {
+    console.log(`🏷️ First flow detected - generating title`);
+    generateTitleAndCategoriesInBackground(visionId, allResponses).catch(err => {
       console.error('Background title generation error:', err);
     });
   }
 
-  // Generate/update summary and tagline after every response
-  const allResponses = [
-    ...vision.responses.map(r => ({ stage: r.stage, question: r.question, answer: r.answer })),
-    { stage, question, answer }
-  ];
-  
+  // Always regenerate summary and tagline after each flow
+  console.log(`✨ Regenerating summary and tagline`);
   generateSummaryAndTaglineInBackground(visionId, allResponses).catch(err => {
     console.error('Background summary generation error:', err);
   });
 
-  return { stage_progress: newProgress };
+  return { 
+    overall_completeness: overallCompleteness,
+    css_scores: {
+      vision: updatedContextDepth.Vision?.css || 0,
+      emotion: updatedContextDepth.Emotion?.css || 0,
+      belief: updatedContextDepth.Belief?.css || 0,
+      identity: updatedContextDepth.Identity?.css || 0,
+      embodiment: updatedContextDepth.Embodiment?.css || 0
+    }
+  };
 }
 
 async function processVisionSummary(visionId, userId) {
@@ -333,18 +371,6 @@ async function updateVisionTitle(visionId, userId, newTitle) {
   return { success: true };
 }
 
-async function determineNextStageForDeepening(visionId, userId) {
-  const vision = await getVision(visionId, userId);
-  
-  if (vision.stage_progress < 5) {
-    return STAGES[vision.stage_progress];
-  }
-
-  const stageToDeepen = await aiService.determineStageToDeepen(vision.responses);
-  
-  return stageToDeepen;
-}
-
 module.exports = {
   getAllVisions,
   getVision,
@@ -353,6 +379,5 @@ module.exports = {
   submitResponse,
   processVisionSummary,
   deleteVision,
-  updateVisionTitle,
-  determineNextStageForDeepening
+  updateVisionTitle
 };

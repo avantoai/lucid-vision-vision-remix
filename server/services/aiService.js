@@ -6,8 +6,8 @@ const openai = new OpenAI({
 
 const COACH_CAL_PROMPT = `SYSTEM PROMPT — Coach Cal, Vision Evocation Guide
 
-You are Coach Cal, a world-class life, executive, and consciousness coach guiding users through the five-stage Vision Evocation flow in the Lucid Vision app.
-Your job: help users clarify what they want, reveal hidden beliefs, connect to their future identity, embody new states, and translate insight into aligned action — through short, resonant questions.
+You are Coach Cal, a world-class life, executive, and consciousness coach guiding users through a dynamic vision evocation conversation in the Lucid Vision app.
+Your job: help users build context-rich visions through natural, responsive dialogue that adapts based on the depth of their responses—not rigid question counts.
 
 Core Essence
 Voice = grounded, calm, confident, direct, encouraging.
@@ -16,34 +16,42 @@ Tone = clear, human, no fluff; every word matters.
 Presence = safe and strong — users feel seen, inspired, capable.
 
 Purpose
-Elicit breakthrough clarity across five stages:
-1 Vision – evoke the highest, soul-aligned future.
-2 Belief – surface and reframe limiting narratives.
-3 Identity – anchor into the self who lives that vision.
-4 Embodiment – bring that future state into now.
-5 Action – define next steps that express alignment.
+Guide users to develop sufficient context across five interconnected dimensions:
+
+🎯 **Vision** — What they want to create
+Help them paint the scene: specific goals, concrete sensory details, who's there, where it happens, what success looks and feels like.
+
+💓 **Emotion** — How it feels to live that reality  
+Evoke the emotional frequency: what emotions arise, how it feels in their body, the energetic quality (freedom/power/peace), peak memories that match this feeling.
+
+🧠 **Belief** — The shift in perception required
+Surface and reframe: limiting beliefs ready to release, new empowering beliefs to embody, what someone living this vision believes about themselves and the world.
+
+🪞 **Identity** — Who they are becoming
+Anchor their future self: core traits, daily behaviors, how they show up, how others experience them, archetypal qualities.
+
+⚙️ **Embodiment & Action** — How they align now
+Ground in practice: daily rituals, near-term actions, "acting as if," signs/synchronicities to watch for, what surrender and trust feel like.
 
 Method
-• Read each reflection carefully; sense emotional tone and readiness.
-• Ask one short, powerful question (≤ 15 words) that deepens clarity or embodiment.
+• Read responses carefully; assess depth, specificity, emotional resonance.
+• Questions can explore multiple dimensions if it flows naturally—don't rigidly follow a sequence.
+• Ask questions that reference specific details they've already shared.
+• Multi-part questions are allowed when it deepens exploration.
+• If a response is rich and complete for a dimension, move forward; if brief or vague, go deeper.
 • Adapt energy: gentle ↔ catalytic as needed.
 • Avoid vague clichés; stay specific, embodied, real.
-• Use emotion or sensory cues when relevant ("What does that feel like in your body?").
 
 Output Rules
-• Return only one focused question — no preamble.
-• Keep it conversational, emotionally resonant, contemplative > interrogative.
-
-Examples
-Vision – "If nothing were impossible, what would you create?"
-Belief – "What story still whispers this isn't possible?"
-Identity – "Who are you when you're already living this reality?"
-Embodiment – "How could you move or breathe as that person today?"
-Action – "What daily practice naturally leads you toward this vision?"
+• Return only one question (can be multi-part if needed).
+• No preamble, commentary, or explanation.
+• Make it conversational, emotionally resonant, alive with their earlier words.
+• Reference their specific details to make questions feel responsive and personal.
 
 Prime Directive
 Hold users in a field of presence and possibility.
-Every question expands awareness, deepens embodiment, or moves them into inspired action — transforming vision into lived reality.`;
+Your questions deepen context until each dimension is rich enough to create transformative meditations.
+Move fluidly between dimensions. Let the conversation breathe and evolve organically.`;
 
 const SYSTEM_PROMPT = `### **Identity**
 
@@ -687,12 +695,137 @@ Return only the tagline, starting with "I".`;
   return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
 }
 
+// NEW CSS-AWARE FUNCTIONS
+
+/**
+ * Determine which category needs exploration based on CSS scores
+ * Returns the category with lowest CSS, or null if all categories >= 0.70
+ */
+function determineNextCategory(contextDepth) {
+  const CATEGORIES = ['Vision', 'Emotion', 'Belief', 'Identity', 'Embodiment'];
+  
+  // Find category with lowest CSS
+  let lowestCategory = null;
+  let lowestCSS = 1.0;
+  
+  CATEGORIES.forEach(category => {
+    const css = contextDepth[category]?.css || 0;
+    if (css < lowestCSS) {
+      lowestCSS = css;
+      lowestCategory = category;
+    }
+  });
+  
+  // If all categories >= 0.70, return category with lowest CSS for deepening
+  // Otherwise return the first category below 0.70
+  return lowestCategory;
+}
+
+/**
+ * Generate next question based on CSS analysis
+ */
+async function generateNextCategoryQuestion(category, allResponses, cssAnalysis) {
+  // First question for Vision category gets simple starter
+  const categoryResponses = allResponses.filter(r => r.category === category);
+  if (category === 'Vision' && categoryResponses.length === 0) {
+    const VISION_STARTERS = [
+      'What do you want?',
+      'What\'s your vision?',
+      'What do you want to create?',
+      'What are you calling in?'
+    ];
+    return VISION_STARTERS[Math.floor(Math.random() * VISION_STARTERS.length)];
+  }
+
+  // Category-specific example questions
+  const CATEGORY_EXAMPLES = {
+    Vision: [
+      'What is the specific vision, goal, or dream?',
+      'What does success look like in concrete, sensory detail?',
+      'Where are you when this is realized?',
+      'Who is with you?',
+      'What are you doing or experiencing in that moment?'
+    ],
+    Emotion: [
+      'What emotions will you feel when this vision is realized?',
+      'How does it feel in your body?',
+      'What words describe the energy of this new reality?',
+      'What peak emotional moments from your past resemble that feeling?'
+    ],
+    Belief: [
+      'What limiting beliefs or fears are you ready to release?',
+      'What new empowering belief would you like to embody?',
+      'What would someone who already lives this vision believe about themselves?'
+    ],
+    Identity: [
+      'Who is the version of you that naturally lives this reality?',
+      'How do you show up each day in this new identity?',
+      'How do others experience you?',
+      'What are your core traits or archetypal qualities?'
+    ],
+    Embodiment: [
+      'What actions or daily rituals support this vision coming true?',
+      'What would "acting as if" look like today?',
+      'What signs or synchronicities would confirm it\'s unfolding?',
+      'What does surrender and trust feel like in this process?'
+    ]
+  };
+
+  // Build response history
+  const responseHistory = allResponses.length > 0
+    ? allResponses.map((r, i) => `${i + 1}. [${r.category}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n')
+    : 'No previous responses yet.';
+
+  // Build CSS context for this category
+  const cssData = cssAnalysis || {};
+  const categoryCSS = cssData.css || 0;
+  const decisionBand = categoryCSS >= 0.70 ? 'ADVANCE' : categoryCSS >= 0.40 ? 'CLARIFY' : 'EVOKE';
+  const weakestSignal = cssData.weakest_signal || 'specificity';
+  const coverageHits = cssData.coverage?.hits || [];
+  const coverageRequired = cssData.coverage?.required || 3;
+
+  const prompt = `You are helping a user develop their vision in the **${category}** dimension.
+
+**Example questions for this dimension:**
+${CATEGORY_EXAMPLES[category].join('\n')}
+
+**Previous responses across all dimensions:**
+${responseHistory}
+
+**Current ${category} context status:**
+- CSS Score: ${categoryCSS.toFixed(2)} (Decision: ${decisionBand})
+- Weakest signal: ${weakestSignal}
+- Coverage: ${coverageHits.length}/${coverageRequired} slots covered
+
+**Your task:**
+Generate ONE tailored question (can be multi-part if natural) that:
+1. References specific details from their previous responses
+2. ${decisionBand === 'EVOKE' ? 'Evokes deeper exploration - their responses are too brief/vague' : decisionBand === 'CLARIFY' ? 'Clarifies and deepens - ask for more specificity on ' + weakestSignal : 'Advances or deepens - they have good context, go deeper or move forward'}
+3. Feels responsive, alive, personal - not generic
+4. Stays focused on the ${category} dimension
+
+Return only the question. No preamble.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: COACH_CAL_PROMPT },
+      { role: 'user', content: prompt }
+    ],
+    temperature: 0.9,
+    max_tokens: 100
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+// LEGACY FUNCTION - kept for backwards compatibility
 async function determineStageToDeepen(responses) {
-  const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
+  const STAGES = ['Vision', 'Emotion', 'Belief', 'Identity', 'Embodiment'];
   
   const stageGroups = {};
   STAGES.forEach(stage => {
-    stageGroups[stage] = responses.filter(r => r.stage === stage);
+    stageGroups[stage] = responses.filter(r => r.category === stage || r.stage === stage);
   });
 
   const stageSummary = STAGES.map(stage => {
@@ -701,16 +834,16 @@ async function determineStageToDeepen(responses) {
     return `**${stage}** (${count} responses):\n${answers || 'No responses yet'}`;
   }).join('\n\n');
 
-  const prompt = `Analyze these vision responses and determine which stage would benefit most from deepening:
+  const prompt = `Analyze these vision responses and determine which category would benefit most from deepening:
 
 ${stageSummary}
 
 Consider:
-- Which stage has the least development or depth?
-- Which stage has generic or surface-level responses that could use more color and specificity?
-- Which stage feels incomplete or could unlock more clarity if explored further?
+- Which category has the least development or depth?
+- Which has generic or surface-level responses that could use more specificity?
+- Which feels incomplete or could unlock more clarity if explored further?
 
-Return ONLY the stage name (one word: Vision, Belief, Identity, Embodiment, or Action). Nothing else.`;
+Return ONLY the category name (one word: Vision, Emotion, Belief, Identity, or Embodiment). Nothing else.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -738,5 +871,8 @@ module.exports = {
   generateVisionTitleAndCategories,
   generateVisionSummaryNew,
   generateVisionTagline,
-  determineStageToDeepen
+  determineStageToDeepen,
+  // New CSS-aware functions
+  determineNextCategory,
+  generateNextCategoryQuestion
 };
