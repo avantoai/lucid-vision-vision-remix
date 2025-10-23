@@ -1,0 +1,14 @@
+Responses
+
+1. Progress & tracking
+    1. On our end, we will track progress across the 5 stages shared in the updated workflow (Vision, Emotion, Belief, Identity,  Embodiment/Action). We will use this to inform & guide the vision prompts we create for the user, BUT
+    2. Let’s keep progress more fluid and invisible to the user. We can show a vague progress bar that progresses towards 100% to the user, but we don’t need to show them the quantified progression (5/5) or the names of the steps.
+2. If all 5 categories have enough context, we allow the user to continue adding depth. This can effectively evolve the vision over time (ie if my vision for my wealth grows from a $10M portfolio to a $20M portfolio). In this case, when new context is introduced that conflicts with older context, we update the vision to the newest context shared. 
+3. How do we determine “enough context” see the attached paste “How the AI decides “enough context”
+4. Yes, a user can jump categories if their answer crosses multiple domains. We don’t have to stay rigidly to the flow - we can jump around if it feels in the flow of the conversation.
+5. Yes, when generating variations of questions, reference specific details the user mentions. Let’s see what it looks like to allow multi-part structure of questions for now (if it’s too much, we can repeal back to one focused question per prompt). 
+6. Let’s stick with the simple starters for now. I’m going to update this, but let’s get to that after this update. 
+7. Let’s have the title automatically generated after the first flow (series of responses) and stay consistent afterwards. Let’s have the tagline and summary auto-generate after the first flow, and regenerate after subsequent flows. 
+8. Yes, let’s rename it to context_depth, and lets track each categories completeness within each vision separately. 
+9. When a user taps “Continue Flow” on an existing vision, the AI should analyze all responses and decide which category needs more depth. 
+10. Keep category names invisible to the user. 

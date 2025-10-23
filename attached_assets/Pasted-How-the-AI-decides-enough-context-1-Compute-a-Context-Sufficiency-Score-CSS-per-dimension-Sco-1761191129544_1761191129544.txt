@@ -1,0 +1,73 @@
+How the AI decides “enough context”
+
+1) Compute a Context Sufficiency Score (CSS) per dimension
+
+Score = weighted blend of 5 signals. Normalize everything to 0–1.
+	•	Length & Coverage (w=0.20)
+Tokens/words + # of required fields mentioned for that dimension. (Short ≠ bad, but usually correlates.)
+	•	Specificity (w=0.25)
+Presence of concrete details: numbers, dates, places, names, durations, measurable outcomes, constraints.
+	•	Sensory/Emotional Richness (w=0.20)
+Sensory lexicon hit-rate (see/hear/feel/smell/taste/body sensations), emotion words, intensity adjectives.
+	•	Actionability/Identity Clarity (w=0.20)
+Verbs that imply behaviors/rituals; “I am” / archetypal traits; future orientation (“I will”, “by Q2”, etc.).
+	•	Coherence/Confidence (w=0.15)
+Low vagueness (“soon”, “more”, “better”), fewer hedges (“maybe”, “kinda”), consistent tense, few contradictions.
+
+Final CSS ∈ [0,1] = 0.20Len + 0.25Spec + 0.20Rich + 0.20Act/ID + 0.15*Coh
+
+Decision bands
+	•	CSS ≥ 0.70 → Advance (move to next dimension)
+	•	0.40 ≤ CSS < 0.70 → Clarify (ask 1 tailored follow-up to deepen weakest signal)
+	•	CSS < 0.40 → Evoke (ask 1 evocative prompt + 1 specificity prompt, max 2 turns before reframing)
+
+2) Dimension-specific “coverage checks”
+
+Each dimension has 3–5 “slots.” Hit-rate boosts the Length & Coverage subscore and gates advancement.
+
+Vision (need ≥3/5)
+	•	Specific goal/outcome
+	•	Scene/location/timeframe
+	•	Who’s involved
+	•	Sensory details (sights/sounds/feel)
+	•	Success criteria/metrics
+
+Emotion (need ≥2/4)
+	•	Named emotions (≥2)
+	•	Body sensations (where/how it feels)
+	•	Desired frequency words (e.g., freedom/power/peace)
+	•	Peak-memory anchor that matches the feeling
+
+Belief (need ≥2/3)
+	•	Limiting belief named
+	•	Replacement/empowering belief
+	•	Evidence or reframe language (why it’s true/possible)
+
+Identity (need ≥2/4)
+	•	“I am” traits/archetype
+	•	Daily behaviors/habits/posture/energy
+	•	How others experience them
+	•	Tone/energetic signature
+
+Embodiment & Action (need ≥3/5)
+	•	Daily/weekly rituals
+	•	Near-term actions (next 24–72h)
+	•	“Act as if” example
+	•	Signs/synchronicities to watch
+	•	Surrender/trust description
+
+3) What the AI asks next (based on weakest signal)
+
+Identify the lowest subscore among the 5 signals and the missing coverage slots. Generate exactly one tailored follow-up (or two if in Evoke band).
+	•	If Specificity low → ask for numbers, names, timelines, locations.
+	•	If Richness low → ask for sensory/body/emotion.
+	•	If Action/ID low → ask for 1 habit or 1 “I am” trait in practice.
+	•	If Coherence low → tighten or resolve contradictions (“Which of these two matters more?”).
+	•	If Coverage low → target the missing slot(s) from the dimension checklist.
+
+4) Threshold tuning (defaults you can ship now)
+	•	Token floor per answer: ≥50 tokens gets full Length credit; linear scale from 0–50.
+	•	Specificity cues: count of numerals, dates, named entities, place names, units (%, $, min, miles), proper nouns.
+	•	Richness cues: hits from sensory + emotion lexicons (keep small curated lists you can expand).
+	•	Action/ID cues: imperative/future verbs, schedule words (daily, morning, Mon/Wed), “I am” statements, archetype words.
+	•	Coherence cues: hedge/ambiguity/contradiction detectors; penalize if >2 hedges or conflicting goals appear.

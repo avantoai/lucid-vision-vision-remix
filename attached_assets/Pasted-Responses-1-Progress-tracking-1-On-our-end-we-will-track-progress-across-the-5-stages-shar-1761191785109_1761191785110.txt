@@ -1,0 +1,30 @@
+Responses
+
+1. Progress & tracking
+    1. On our end, we will track progress across the 5 stages shared in the updated workflow (Vision, Emotion, Belief, Identity,  Embodiment/Action). We will use this to inform & guide the vision prompts we create for the user, BUT
+    2. Let’s keep progress more fluid and invisible to the user. We can show a vague progress bar that progresses towards 100% to the user, but we don’t need to show them the quantified progression (5/5) or the names of the steps.
+2. If all 5 categories have enough context, we allow the user to continue adding depth. This can effectively evolve the vision over time (ie if my vision for my wealth grows from a $10M portfolio to a $20M portfolio). In this case, when new context is introduced that conflicts with older context, we update the vision to the newest context shared. 
+3. How do we determine “enough context” see the attached paste “How the AI decides “enough context”
+4. Yes, a user can jump categories if their answer crosses multiple domains. We don’t have to stay rigidly to the flow - we can jump around if it feels in the flow of the conversation.
+5. Yes, when generating variations of questions, reference specific details the user mentions. Let’s see what it looks like to allow multi-part structure of questions for now (if it’s too much, we can repeal back to one focused question per prompt). 
+6. Let’s stick with the simple starters for now. I’m going to update this, but let’s get to that after this update. 
+7. Let’s have the title automatically generated after the first flow (series of responses) and stay consistent afterwards. Let’s have the tagline and summary auto-generate after the first flow, and regenerate after subsequent flows. 
+8. Yes, let’s rename it to context_depth, and lets track each categories completeness within each vision separately. 
+9. When a user taps “Continue Flow” on an existing vision, the AI should analyze all responses and decide which category needs more depth. 
+10. Keep category names invisible to the user. 
+
+Responses
+1. For Category completeness storage, let’s go hybrid:
+    * JSONB to keep things flexible (store per-dimension CSS, sub-scores, slot hits, notes).
+    * Denormalized columns for the few fields you’ll query/sort/filter on a lot (e.g., css_vision, css_emotion, overall_complete, last_scored_at).
+    * Boolean “is_complete_*” flags derived from CSS thresholds for super-fast UI checks. 
+… This gives us evolution-friendly storage + great query performance.
+
+2. Let’s rename “stage” to “category” and update to new names. 
+3. For CSS calculation: let’s go hybrid:
+    * Backend does the math (deterministic CSS from simple, fast heuristics).
+    * AI does the tagging/understanding (extracts entities, sensory/emotion hits, coverage slots, contradictions, and proposes a draft score + rationale).
+    * Backend then reconciles: uses AI’s tags to compute CSS, optionally blends in the AI’s proposed score with a small weight, and clamps to thresholds.
+4. When a user's response crosses multiple categories (e.g., answers Vision but includes rich emotion) let’s let the AI tag which category/categories that response addressed.
+5. Yes, percentage of progress bar should be driven by the average CSS across all 5 categories.
+6. In this case, I was using “flow” to mean a prompt-answering session. So if a user answers 3 questions in a row before exiting, that is one flow. If a user just answers one question before exiting, that is a flow. If they don’t answer any questions, that is not a flow. 

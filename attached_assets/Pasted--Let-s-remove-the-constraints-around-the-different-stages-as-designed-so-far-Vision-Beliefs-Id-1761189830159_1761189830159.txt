@@ -1,0 +1,51 @@
+- Let’s remove the constraints around the different stages as designed so far (Vision > Beliefs > Identity > Embodiment > Action). Let’s scrap that logic everywhere it appears in app (logic, system prompts, etc…) and work around this updated flow. 
+- Remove he constraint that says we ask present one questions per stage in prompting flows. Going forward, we will not constrain based on # questions answered (ie one question per stage), but on the amount of context we’ve generated from the user on that stage. If a user provides “enough” context in their first answer (ie Vision), we can move on to the next section (ie Emotion). If the user is being brief or unclear and it takes 4-5 answers to get enough context on a category, we can keep evoking around that category until we feel we have enough context to work with. 
+    - Let’s use AI to generate tailored versions of the example questions below, based on the users earlier responses. The questions we provide the user should feel responsive and alive based on their earlier responses. 
+
+ 1. Vision — What they want to create
+	•	What is the specific vision, goal, or dream?
+	•	What does success look like in concrete, sensory detail? (sights, sounds, smells, sensations)
+	•	Where are they when this is realized?
+	•	Who is with them?
+	•	What are they doing or experiencing in that moment?
+
+(Purpose: paints the “scene” for the meditation to anchor into the quantum field.)
+
+⸻
+
+💓 2. Emotion — How it feels to live that reality
+	•	What emotions will they feel when this vision is realized?
+	•	How does it feel in their body?
+	•	What words describe the energy or frequency of this new reality (e.g., freedom, love, power, peace, joy)?
+	•	What are the peak emotional moments or memories that resemble that feeling now?
+
+(Purpose: gives you the emotional frequency to tune the meditation to — the magnetic signal.)
+
+⸻
+
+🧠 3. Belief — The shift in perception required
+	•	What limiting beliefs or fears are they ready to release?
+	•	What new empowering belief would they like to embody instead?
+	•	What would someone who already lives this vision believe about themselves and the world?
+
+(Purpose: integrates reprogramming language and affirmations aligned to their new mindset.)
+
+⸻
+
+🪞 4. Identity — Who they are becoming
+	•	Who is the version of them that naturally lives this reality?
+	•	How do they show up each day — thoughts, habits, posture, tone, energy?
+	•	How do others experience them?
+	•	What are their core traits or archetypal qualities (e.g., The Visionary, The Lover, The Healer, The Creator)?
+
+(Purpose: builds the embodiment and “I am” layer into the meditation.)
+
+⸻
+
+⚙️ 5. Embodiment & Action — How they align now
+	•	What actions or daily rituals support this vision coming true?
+	•	What would “acting as if” look like today?
+	•	What signs or synchronicities would confirm it’s unfolding?
+	•	What does surrender and trust feel like in this process?
+
+(Purpose: grounds the meditation in behavioral integration — manifestation through alignment.)
