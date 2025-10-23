@@ -171,16 +171,23 @@ async function submitResponse(visionId, userId, category, question, answer) {
   const updatedContextDepth = { ...(vision.context_depth || {}) };
   const cssUpdates = {};
   
+  // Reuse the CSS we already calculated instead of recalculating for each category
+  const cssData = {
+    css: cssResult.css,
+    coverage: {
+      hits: cssResult.coverageHits,
+      required: cssCalculator.COVERAGE_SLOTS[category]?.required || 0,
+      met: cssResult.coverageHits.length >= (cssCalculator.COVERAGE_SLOTS[category]?.required || 0)
+    },
+    subscores: cssResult.subscores,
+    decision_band: cssResult.decisionBand,
+    weakest_signal: cssResult.weakestSignal,
+    last_scored: new Date().toISOString()
+  };
+  
   for (const cat of cssResult.categoriesAddressed) {
-    // Recalculate CSS for this category with new response
-    const catResponses = vision.responses.filter(r => 
-      r.category === cat || (r.categories_addressed && r.categories_addressed.includes(cat))
-    );
-    catResponses.push({ category: cat, question, answer });
-    
-    const catCSS = await cssCalculator.calculateCategoryCSS(cat, catResponses);
-    updatedContextDepth[cat] = catCSS;
-    cssUpdates[`css_${cat.toLowerCase()}`] = catCSS.css;
+    updatedContextDepth[cat] = cssData;
+    cssUpdates[`css_${cat.toLowerCase()}`] = cssData.css;
   }
 
   // Calculate overall completeness (average CSS * 100)
