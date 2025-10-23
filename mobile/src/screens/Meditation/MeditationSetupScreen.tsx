@@ -34,6 +34,7 @@ export default function MeditationSetupScreen() {
           playsInSilentModeIOS: true,
           staysActiveInBackground: false,
           shouldDuckAndroid: true,
+          allowsRecordingIOS: false, // Routes to speaker instead of ear speaker when no headphones
         });
       } catch (error) {
         console.error('Failed to configure audio mode:', error);
