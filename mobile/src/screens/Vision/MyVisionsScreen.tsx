@@ -180,7 +180,6 @@ export default function MyVisionsScreen({ navigation }: any) {
                   ]}
                 />
               </View>
-              <Text style={styles.progressText}>{vision.stage_progress}/5</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -306,11 +305,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressBar: {
-    flex: 1,
+    width: 15,
     height: 6,
     backgroundColor: colors.surfaceLight,
     borderRadius: 3,
-    marginRight: 12,
     overflow: 'hidden',
   },
   progressFill: {
