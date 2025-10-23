@@ -115,7 +115,7 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
           onPress: async () => {
             try {
               await api.deleteVision(visionId);
-              navigation.goBack();
+              navigation.navigate('MainTabs', { screen: 'Vision' });
             } catch (error) {
               console.error('Failed to delete vision:', error);
               Alert.alert('Error', 'Failed to delete vision');
@@ -151,7 +151,7 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Vision' })} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.menuButton}>
