@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
 import api from '../../services/api';
@@ -52,12 +53,9 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   const [titleInput, setTitleInput] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
 
-  useEffect(() => {
-    loadVisionData();
-  }, [visionId]);
-
-  const loadVisionData = async () => {
+  const loadVisionData = useCallback(async () => {
     try {
+      setLoading(true);
       const visionData = await api.getVision(visionId);
       const { responses, meditations, ...visionFields } = visionData;
       setVision(visionFields);
@@ -69,7 +67,13 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [visionId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadVisionData();
+    }, [loadVisionData])
+  );
 
   const handleSaveTitle = async () => {
     if (!titleInput.trim()) {
