@@ -40,17 +40,17 @@ export default function VisionRecordScreen() {
           try {
             const status = await recording.getStatusAsync();
             if (status.isRecording && status.metering !== undefined) {
-              // Normalize metering value (-160 to 0) to scale (1.0 to 1.6)
+              // Normalize metering value (-160 to 0) to scale (1.0 to 2.2)
               const normalized = Math.max(0, (status.metering + 160) / 160);
-              const scale = 1.0 + (normalized * 0.6);
+              const scale = 1.0 + (normalized * 1.2);
               const opacity = normalized * 0.8;
               
               Animated.parallel([
                 Animated.spring(pulseAnim, {
                   toValue: scale,
                   useNativeDriver: true,
-                  friction: 3,
-                  tension: 40,
+                  friction: 4,
+                  tension: 50,
                 }),
                 Animated.timing(opacityAnim, {
                   toValue: opacity,
@@ -278,22 +278,22 @@ const styles = StyleSheet.create({
   },
   pulseRing: {
     position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 85,
+    height: 85,
+    borderRadius: 42.5,
     borderWidth: 3,
     borderColor: '#EF4444',
     zIndex: 1,
-    top: 20,
-    left: 20,
+    top: 27.5,
+    left: 27.5,
   },
   pulseRingOuter: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 85,
+    height: 85,
+    borderRadius: 42.5,
     borderWidth: 2,
-    top: 20,
-    left: 20,
+    top: 27.5,
+    left: 27.5,
   },
   helpText: {
     position: 'absolute',
