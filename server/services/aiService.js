@@ -727,8 +727,9 @@ This summary should:
 - Include specific details, emotions, and aspirations they've shared
 - Paint a vivid, inspiring picture of what they're creating
 - Feel personal, specific, and emotionally resonant
-- Be formatted with paragraph breaks (use double line breaks between paragraphs) for readability
-- Organize into 2-3 natural paragraph groupings
+- Be formatted with SHORT paragraph breaks for easy reading
+- Break into 3-4 shorter paragraphs (2-4 sentences each)
+- Use double line breaks between paragraphs
 
 Return only the summary with paragraph breaks, nothing else.`;
 

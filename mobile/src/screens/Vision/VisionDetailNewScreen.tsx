@@ -19,6 +19,7 @@ interface Vision {
   title: string;
   categories: string[];
   stage_progress: number;
+  overall_completeness: number;
   summary: string | null;
   tagline: string | null;
   created_at: string;
@@ -35,10 +36,10 @@ interface Response {
 
 const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
 
-function getProgressColor(progress: number): string {
-  if (progress === 0) return '#6b7280';
-  if (progress <= 2) return '#ef4444';
-  if (progress <= 4) return '#f59e0b';
+function getProgressColor(completeness: number): string {
+  if (completeness === 0) return '#6b7280';
+  if (completeness <= 40) return '#ef4444';
+  if (completeness <= 70) return '#f59e0b';
   return '#10b981';
 }
 
@@ -220,6 +221,22 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
               ))}
             </View>
           )}
+
+          {/* Progress Bar */}
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBarBackground}>
+              <View 
+                style={[
+                  styles.progressBarFill, 
+                  { 
+                    width: `${vision.overall_completeness}%`,
+                    backgroundColor: getProgressColor(vision.overall_completeness)
+                  }
+                ]} 
+              />
+            </View>
+            <Text style={styles.progressText}>{Math.round(vision.overall_completeness)}%</Text>
+          </View>
 
           {vision.tagline && (
             <Text style={styles.tagline}>{vision.tagline}</Text>
@@ -417,6 +434,30 @@ const styles = StyleSheet.create({
     color: colors.primaryLight,
     textTransform: 'capitalize',
     fontWeight: '500',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 12,
+  },
+  progressBarBackground: {
+    flex: 1,
+    height: 8,
+    backgroundColor: colors.surfaceLight,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    minWidth: 40,
+    textAlign: 'right',
   },
   tagline: {
     fontSize: 16,
