@@ -722,13 +722,12 @@ async function generateVisionSummaryNew(responses) {
 ${responseSummary}
 
 This summary should:
-- Be written in first person ("I") to help them see and feel themselves living this vision
+- Be written in first person and present tense (as if the user is living this vision now and it has already come true)
 - Capture the depth across all five stages: Vision, Belief, Identity, Embodiment, Action
 - Include specific details, emotions, and aspirations they've shared
 - Paint a vivid, inspiring picture of what they're creating
 - Feel personal, specific, and emotionally resonant
-- Be formatted with SHORT paragraph breaks for easy reading
-- Break into 3-4 shorter paragraphs (2-4 sentences each)
+- Be formatted with short paragraph breaks for easy reading - 1-2 sentences per paragraph.
 - Use double line breaks between paragraphs
 
 Return only the summary with paragraph breaks, nothing else.`;
