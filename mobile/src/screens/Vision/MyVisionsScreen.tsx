@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressBar: {
-    width: 15,
+    width: 30,
     height: 6,
     backgroundColor: colors.surfaceLight,
     borderRadius: 3,
