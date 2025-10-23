@@ -35,10 +35,12 @@ router.post('/visions', authenticateUser, async (req, res) => {
 
 router.post('/visions/:visionId/next-question', authenticateUser, async (req, res) => {
   try {
+    console.log(`🔮 Generating next question for vision: ${req.params.visionId}`);
     const result = await visionService.generateNextQuestion(req.params.visionId, req.user.id);
+    console.log(`✅ Next question generated: ${result.question.substring(0, 50)}...`);
     res.json({ success: true, ...result });
   } catch (error) {
-    console.error('Next question error:', error);
+    console.error('❌ Next question error:', error);
     res.status(500).json({ error: 'Failed to generate next question' });
   }
 });
