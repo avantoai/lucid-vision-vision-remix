@@ -130,6 +130,7 @@ export default function MeditationSetupScreen() {
         voiceId: selectedVoice,
         background: selectedBackground,
         responses,
+        visionId,
         isGift: false,
       });
 

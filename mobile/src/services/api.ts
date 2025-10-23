@@ -107,6 +107,7 @@ class ApiService {
     voiceId: string;
     background: string;
     responses: Array<{ question: string; answer: string }>;
+    visionId?: string;
     isGift?: boolean;
   }): Promise<Meditation> {
     const data = await this.request<{ meditation: Meditation }>('/meditation/generate', {
