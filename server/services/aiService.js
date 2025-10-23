@@ -307,9 +307,12 @@ Examples: "How does [specific outcome] feel in your body?" "What emotions arise 
     const outcomeExamples = outcomes.length > 0 
       ? `\nReference their specific outcomes: ${outcomes.join(', ')}`
       : '';
-    dimensionCoaching = `Focus: Help them embody WHO THEY NEED TO BE to create this vision.
-Ask about the beliefs, mindset, and identity required to manifest what they've shared.${outcomeExamples}
-Examples: "What beliefs do you have when [outcome] is your reality?" "What type of person creates [vision]?"`;
+    dimensionCoaching = `Focus: Help them CLAIM who they are as they live this vision.
+Ask about the internal qualities, beliefs, and ways of being they embody RIGHT NOW.
+This is about self-definition, NOT how others perceive them.${outcomeExamples}
+Examples: "Who are you as the leader of [vision]?" "What qualities do you embody when [outcome] is real?" "How do you show up when living this vision?"
+
+AVOID: Questions about how others see them, external validation, or future identity ("who will you become"). Focus on present-tense self-claiming.`;
   } else {
     dimension = 'Action';
     dimensionCoaching = `Focus: Help them identify ACTIONS and next steps.
