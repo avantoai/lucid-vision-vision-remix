@@ -185,17 +185,27 @@ async function submitResponse(visionId, userId, category, question, answer) {
     last_scored: new Date().toISOString()
   };
   
+  console.log(`🔄 Processing categories addressed: ${JSON.stringify(cssResult.categoriesAddressed)}`);
+  
   for (const cat of cssResult.categoriesAddressed) {
+    console.log(`   Updating category: ${cat} with CSS ${cssData.css}`);
     updatedContextDepth[cat] = cssData;
     cssUpdates[`css_${cat.toLowerCase()}`] = cssData.css;
   }
+  
+  console.log(`🔄 After loop - cssUpdates keys: ${Object.keys(cssUpdates).join(', ')}`);
 
   // Calculate overall completeness (average CSS * 100)
   const avgCSS = CATEGORIES.reduce((sum, cat) => sum + (updatedContextDepth[cat]?.css || 0), 0) / 5;
   const overallCompleteness = Math.round(avgCSS * 100);
 
   // Step 4: Update vision with new CSS data
-  await supabaseAdmin
+  console.log(`📝 Updating vision ${visionId}:`);
+  console.log(`   Overall completeness: ${overallCompleteness}%`);
+  console.log(`   CSS updates:`, cssUpdates);
+  console.log(`   Categories in context_depth:`, Object.keys(updatedContextDepth));
+  
+  const { data: updateData, error: updateError } = await supabaseAdmin
     .from('visions')
     .update({
       context_depth: updatedContextDepth,
@@ -205,6 +215,13 @@ async function submitResponse(visionId, userId, category, question, answer) {
       updated_at: new Date().toISOString()
     })
     .eq('id', visionId);
+  
+  if (updateError) {
+    console.error(`❌ Failed to update vision CSS:`, updateError);
+    throw new Error(`Failed to update vision CSS: ${updateError.message}`);
+  }
+  
+  console.log(`✅ Vision updated successfully`);
 
   // Step 5: Auto-generate content based on flow detection
   const allResponses = [
