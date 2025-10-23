@@ -103,7 +103,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     console.log(`✓ [${meditationId}] Audio generated in ${((Date.now() - audioStart) / 1000).toFixed(1)}s`);
 
     console.log(`⏳ [${meditationId}] Step 4/5: Generating title...`);
-    const title = await aiService.generateTitle(script, category, responses);
+    const title = await aiService.generateTitle(script, category, finalResponses);
     console.log(`✓ [${meditationId}] Title: "${title}"`);
 
     console.log(`⏳ [${meditationId}] Step 5/5: Saving to database...`);
