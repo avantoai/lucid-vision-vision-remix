@@ -56,7 +56,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
       console.log(`⏳ [${meditationId}] Fetching vision responses from vision: ${visionId}...`);
       const { data: visionResponses } = await supabaseAdmin
         .from('vision_responses')
-        .select('question, answer, stage')
+        .select('question, answer, category')
         .eq('vision_id', visionId)
         .order('created_at', { ascending: true });
       
