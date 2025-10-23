@@ -15,10 +15,13 @@ router.get('/visions', authenticateUser, async (req, res) => {
 
 router.get('/visions/:visionId', authenticateUser, async (req, res) => {
   try {
+    console.log(`📖 Fetching vision details for: ${req.params.visionId}, user: ${req.user.id}`);
     const vision = await visionService.getVision(req.params.visionId, req.user.id);
+    console.log(`✅ Vision details fetched successfully`);
     res.json({ success: true, vision });
   } catch (error) {
-    console.error('Get vision error:', error);
+    console.error('❌ Get vision error:', error);
+    console.error('Error details:', error.message, error.stack);
     res.status(500).json({ error: 'Failed to fetch vision' });
   }
 });
