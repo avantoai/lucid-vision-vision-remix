@@ -94,6 +94,16 @@ router.put('/:meditationId/title', authenticateUser, async (req, res) => {
   }
 });
 
+router.delete('/:meditationId', authenticateUser, async (req, res) => {
+  try {
+    await meditationService.deleteMeditation(req.user.id, req.params.meditationId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete meditation error:', error);
+    res.status(500).json({ error: error.message || 'Failed to delete meditation' });
+  }
+});
+
 // Voice preview endpoint
 router.get('/voice-preview/:previewId', authenticateUser, async (req, res) => {
   try {

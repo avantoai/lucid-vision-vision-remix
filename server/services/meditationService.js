@@ -323,6 +323,60 @@ async function updateTitle(userId, meditationId, title) {
   }
 }
 
+async function deleteMeditation(userId, meditationId) {
+  // First, get the meditation to extract the audio file name
+  const { data: meditation, error: fetchError } = await supabaseAdmin
+    .from('meditations')
+    .select('audio_url')
+    .eq('id', meditationId)
+    .eq('user_id', userId)
+    .single();
+
+  if (fetchError) {
+    throw new Error('Meditation not found or unauthorized');
+  }
+
+  // Extract the filename from the audio URL if it exists
+  if (meditation.audio_url) {
+    try {
+      // Parse the filename from the Supabase storage URL
+      // URL format: https://...supabase.co/storage/v1/object/public/meditations/meditation-XXXXX.mp3
+      const urlParts = meditation.audio_url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      
+      if (fileName) {
+        console.log(`🗑️ Deleting audio file from storage: ${fileName}`);
+        const { error: storageError } = await supabaseAdmin.storage
+          .from('meditations')
+          .remove([fileName]);
+        
+        if (storageError) {
+          console.error('Failed to delete audio file:', storageError);
+          // Continue with database deletion even if storage deletion fails
+        } else {
+          console.log(`✅ Audio file deleted: ${fileName}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing/deleting audio file:', error);
+      // Continue with database deletion even if storage deletion fails
+    }
+  }
+
+  // Delete the meditation record from the database
+  const { error: deleteError } = await supabaseAdmin
+    .from('meditations')
+    .delete()
+    .eq('id', meditationId)
+    .eq('user_id', userId);
+
+  if (deleteError) {
+    throw new Error('Failed to delete meditation: ' + deleteError.message);
+  }
+
+  console.log(`✅ Meditation deleted: ${meditationId}`);
+}
+
 module.exports = {
   generateMeditation,
   createMeditationPlaceholder,
@@ -330,5 +384,6 @@ module.exports = {
   getUserMeditations,
   pinMeditation,
   toggleFavorite,
-  updateTitle
+  updateTitle,
+  deleteMeditation
 };

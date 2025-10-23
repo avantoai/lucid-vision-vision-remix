@@ -143,6 +143,12 @@ class ApiService {
     });
   }
 
+  async deleteMeditation(meditationId: string): Promise<void> {
+    await this.request(`/meditation/${meditationId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async getVisionCategories(): Promise<Array<{ name: string; status: string; tagline: string | null; hasSummary: boolean }>> {
     const data = await this.request<{ categories: any[] }>('/vision/categories');
     return data.categories;

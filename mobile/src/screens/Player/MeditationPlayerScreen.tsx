@@ -209,6 +209,37 @@ export default function MeditationPlayerScreen() {
     setShowTranscript(true);
   };
 
+  const handleDeleteMeditation = () => {
+    setShowOptionsMenu(false);
+    Alert.alert(
+      'Delete Meditation',
+      'Are you sure you want to delete this meditation? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              if (soundRef.current) {
+                await soundRef.current.stopAsync();
+                await soundRef.current.unloadAsync();
+              }
+              await api.deleteMeditation(meditation!.id);
+              Alert.alert('Success', 'Meditation deleted successfully');
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete meditation');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const cleanTranscript = (script: string): string => {
     // Remove ElevenLabs break tags like <break time="2.5s" />
     return script.replace(/<break time="[^"]*"\s*\/>/g, '');
@@ -323,6 +354,10 @@ export default function MeditationPlayerScreen() {
             <View style={styles.menuDivider} />
             <TouchableOpacity style={styles.menuItem} onPress={handleViewTranscript}>
               <Text style={styles.menuItemText}>View Transcript</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
+            <TouchableOpacity style={styles.menuItem} onPress={handleDeleteMeditation}>
+              <Text style={styles.menuItemTextDelete}>Delete Meditation</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -539,6 +574,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     textAlign: 'center',
+  },
+  menuItemTextDelete: {
+    fontSize: 16,
+    color: '#EF4444',
+    textAlign: 'center',
+    fontWeight: '600',
   },
   menuDivider: {
     height: 1,
