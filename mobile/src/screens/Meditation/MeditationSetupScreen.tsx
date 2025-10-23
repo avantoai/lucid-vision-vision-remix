@@ -12,7 +12,7 @@ import { colors, layout } from '../../theme';
 type MeditationSetupRouteProp = RouteProp<RootStackParamList, 'MeditationSetup'>;
 type MeditationSetupNavigationProp = StackNavigationProp<RootStackParamList, 'MeditationSetup'>;
 
-const DURATION_OPTIONS = [5, 10, 15, 20, 30, 45, 60];
+const DURATION_OPTIONS = [5, 10, 15];
 
 export default function MeditationSetupScreen() {
   const navigation = useNavigation<MeditationSetupNavigationProp>();
