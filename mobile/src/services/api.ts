@@ -311,20 +311,20 @@ class ApiService {
     return data.vision;
   }
 
-  async generateNextQuestion(visionId: string): Promise<{ question: string; stage: string; stageIndex: number }> {
-    const data = await this.request<{ question: string; stage: string; stageIndex: number }>(
+  async generateNextQuestion(visionId: string): Promise<{ question: string; category: string }> {
+    const data = await this.request<{ question: string; category: string }>(
       `/vision/visions/${visionId}/next-question`,
       { method: 'POST' }
     );
     return data;
   }
 
-  async submitVisionResponse(visionId: string, stage: string, question: string, answer: string): Promise<{ stage_progress: number }> {
-    const data = await this.request<{ stage_progress: number }>(
+  async submitVisionResponse(visionId: string, category: string, question: string, answer: string): Promise<{ overall_completeness: number; css_scores: any }> {
+    const data = await this.request<{ overall_completeness: number; css_scores: any }>(
       `/vision/visions/${visionId}/response`,
       {
         method: 'POST',
-        body: JSON.stringify({ stage, question, answer }),
+        body: JSON.stringify({ category, question, answer }),
       }
     );
     return data;

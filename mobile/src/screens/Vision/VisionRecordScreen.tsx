@@ -10,12 +10,10 @@ import { colors, layout } from '../../theme';
 type VisionRecordRouteProp = RouteProp<RootStackParamList, 'VisionRecord'>;
 type VisionRecordNavigationProp = StackNavigationProp<RootStackParamList, 'VisionRecord'>;
 
-const STAGE_NAMES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
-
 export default function VisionRecordScreen() {
   const navigation = useNavigation<VisionRecordNavigationProp>();
   const route = useRoute<VisionRecordRouteProp>();
-  const { visionId, question, stage, stageIndex } = route.params;
+  const { visionId, question, category } = route.params;
   const { height } = useWindowDimensions();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -126,8 +124,7 @@ export default function VisionRecordScreen() {
       navigation.navigate('VisionEdit', {
         visionId,
         question,
-        stage,
-        stageIndex,
+        category,
         audioUri: uri,
         recordingDuration: recordingTime
       });
@@ -145,8 +142,7 @@ export default function VisionRecordScreen() {
     navigation.navigate('VisionEdit', {
       visionId,
       question,
-      stage,
-      stageIndex,
+      category,
       audioUri: null,
       recordingDuration: 0
     });

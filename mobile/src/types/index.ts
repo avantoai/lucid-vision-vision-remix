@@ -80,8 +80,8 @@ export type RootStackParamList = {
   CategorySelection: undefined;
   VisionFlow: { visionId: string; isNewVision: boolean };
   VisionDetail: { visionId: string };
-  VisionRecord: { visionId: string; question: string; stage: string; stageIndex: number };
-  VisionEdit: { visionId: string; question: string; stage: string; stageIndex: number; audioUri: string | null; recordingDuration: number };
+  VisionRecord: { visionId: string; question: string; category: string };
+  VisionEdit: { visionId: string; question: string; category: string; audioUri: string | null; recordingDuration: number };
   MeditationSetup: { category: string; responses: Array<{ question: string; answer: string }>; visionId?: string };
   MeditationPlayer: { meditationId: string };
   CreateGift: undefined;

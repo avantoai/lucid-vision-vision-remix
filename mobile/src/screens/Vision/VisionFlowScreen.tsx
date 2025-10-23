@@ -23,13 +23,12 @@ export default function VisionFlowScreen() {
     setIsLoading(true);
     
     try {
-      const { question, stage, stageIndex } = await api.generateNextQuestion(visionId);
+      const { question, category } = await api.generateNextQuestion(visionId);
       
       navigation.replace('VisionRecord', {
         visionId,
         question,
-        stage,
-        stageIndex,
+        category,
       });
     } catch (error: any) {
       console.error('Failed to generate question:', error);
