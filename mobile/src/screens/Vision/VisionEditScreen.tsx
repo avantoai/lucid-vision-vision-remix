@@ -10,12 +10,10 @@ import { colors, layout } from '../../theme';
 type VisionEditRouteProp = RouteProp<RootStackParamList, 'VisionEdit'>;
 type VisionEditNavigationProp = StackNavigationProp<RootStackParamList, 'VisionEdit'>;
 
-const STAGE_NAMES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
-
 export default function VisionEditScreen() {
   const navigation = useNavigation<VisionEditNavigationProp>();
   const route = useRoute<VisionEditRouteProp>();
-  const { visionId, question, stage, stageIndex } = route.params;
+  const { visionId, question, category } = route.params;
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -49,30 +47,26 @@ export default function VisionEditScreen() {
 
     setIsLoading(true);
     try {
-      const { stage_progress } = await api.submitVisionResponse(visionId, stage, question, currentAnswer);
+      const { overall_completeness } = await api.submitVisionResponse(visionId, category, question, currentAnswer);
       
       try {
-        const { question: nextQuestion, stage: nextStage, stageIndex: nextStageIndex } = await api.generateNextQuestion(visionId);
+        const { question: nextQuestion, category: nextCategory } = await api.generateNextQuestion(visionId);
         
         navigation.replace('VisionRecord', {
           visionId,
           question: nextQuestion,
-          stage: nextStage,
-          stageIndex: nextStageIndex,
+          category: nextCategory,
         });
       } catch (error: any) {
-        if (error.message?.includes('all stages complete')) {
-          await api.processVisionSummary(visionId);
-          Alert.alert(
-            'Vision Complete!',
-            'Your vision has been fully explored across all 5 stages. You can now create a meditation or continue deepening.',
-            [
-              { text: 'View Vision', onPress: () => navigation.navigate('VisionDetail', { visionId }) },
-            ]
-          );
-        } else {
-          throw error;
-        }
+        // If question generation fails, vision is likely complete
+        await api.processVisionSummary(visionId);
+        Alert.alert(
+          'Vision Updated!',
+          `Your vision is ${overall_completeness}% complete. You can continue deepening or create a meditation.`,
+          [
+            { text: 'View Vision', onPress: () => navigation.navigate('VisionDetail', { visionId }) },
+          ]
+        );
       }
     } catch (error: any) {
       console.error('Failed to submit response:', error);

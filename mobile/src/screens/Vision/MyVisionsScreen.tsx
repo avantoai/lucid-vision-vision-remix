@@ -17,16 +17,16 @@ interface Vision {
   id: string;
   title: string;
   categories: string[];
-  stage_progress: number;
+  overall_completeness: number;
   summary: string | null;
   tagline: string | null;
   updated_at: string;
 }
 
-function getProgressColor(progress: number): string {
-  if (progress === 0) return '#6b7280';
-  if (progress <= 2) return '#ef4444';
-  if (progress <= 4) return '#f59e0b'; 
+function getProgressColor(completeness: number): string {
+  if (completeness === 0) return '#6b7280';
+  if (completeness <= 40) return '#ef4444';
+  if (completeness <= 70) return '#f59e0b'; 
   return '#10b981';
 }
 
@@ -174,8 +174,8 @@ export default function MyVisionsScreen({ navigation }: any) {
                   style={[
                     styles.progressFill,
                     {
-                      width: `${(vision.stage_progress / 5) * 100}%`,
-                      backgroundColor: getProgressColor(vision.stage_progress)
+                      width: `${vision.overall_completeness}%`,
+                      backgroundColor: getProgressColor(vision.overall_completeness)
                     }
                   ]}
                 />
