@@ -314,7 +314,8 @@ class ApiService {
   async generateNextQuestion(visionId: string): Promise<{ question: string; category: string }> {
     const data = await this.request<{ question: string; category: string }>(
       `/vision/visions/${visionId}/next-question`,
-      { method: 'POST' }
+      { method: 'POST' },
+      30000 // 30 second timeout for AI question generation
     );
     return data;
   }
