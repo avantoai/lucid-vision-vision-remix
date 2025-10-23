@@ -677,8 +677,10 @@ This summary should:
 - Include specific details, emotions, and aspirations they've shared
 - Paint a vivid, inspiring picture of what they're creating
 - Feel personal, specific, and emotionally resonant
+- Be formatted with paragraph breaks (use double line breaks between paragraphs) for readability
+- Organize into 2-3 natural paragraph groupings
 
-Return only the summary, nothing else.`;
+Return only the summary with paragraph breaks, nothing else.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
