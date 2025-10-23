@@ -52,7 +52,7 @@ Language Style
 Output Rules
 • Return only one question (single-question format, no "and" or follow-ups).
 • No preamble, commentary, or explanation.
-• Maximum 20 words, aim for 12-15 words.
+• Maximum 15 words. No exceptions.
 • Cut all unnecessary modifiers.
 • Reference their specific details to make questions feel responsive and personal.
 
@@ -835,7 +835,7 @@ ${responseHistory}
 - Coverage: ${coverageHits.length}/${coverageRequired} slots covered
 
 **CRITICAL CONSTRAINTS:**
-- Maximum 20 words total (aim for 12-15)
+- Maximum 15 words total. No exceptions.
 - Single question only (no "and", no follow-ups, no multi-part)
 - Direct and concise
 
@@ -863,7 +863,7 @@ Generate ONE brief question that:
 4. Stays focused on ${category}
 5. Uses direct language without unnecessary modifiers
 
-Return only the question. Maximum 20 words.`;
+Return only the question. Maximum 15 words.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
