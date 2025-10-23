@@ -33,7 +33,7 @@ export default function VisionFlowScreen() {
     } catch (error: any) {
       console.error('Failed to generate question:', error);
       Alert.alert('Error', error.message || 'Failed to load question');
-      navigation.goBack();
+      navigation.navigate('VisionDetail', { visionId });
     }
   };
 

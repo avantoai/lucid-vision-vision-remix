@@ -88,7 +88,7 @@ export default function VisionEditScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.navigate('VisionDetail', { visionId })}>
         <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 

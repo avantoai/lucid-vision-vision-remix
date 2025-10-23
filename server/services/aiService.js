@@ -607,26 +607,35 @@ Return only the question.`;
 async function generateVisionTitleAndCategories(responses) {
   const CATEGORIES = ['health', 'wealth', 'relationships', 'play', 'love', 'purpose', 'spirit', 'healing'];
   
-  const responseSummary = responses.map((r, i) => `${i + 1}. [${r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n');
+  const responseSummary = responses.map((r, i) => `${i + 1}. [${r.category || r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n');
 
-  const prompt = `Based on these vision responses, generate a title and identify relevant life categories:
+  const prompt = `Analyze these vision responses and create a title:
 
 ${responseSummary}
 
-Available categories: ${CATEGORIES.join(', ')}
+Step 1: Identify the PRIMARY SUBJECT - What specific thing are they building/creating/achieving?
+- Look for proper nouns (app names, business names, project names)
+- Look for concrete goals (e.g., "financial freedom", "coaching business", "meditation app")
+- Extract the most important noun or phrase they mention
 
-Return ONLY a JSON object with this exact format:
+Step 2: Create a title (2-5 words) that:
+- MUST include the primary subject if it's a proper noun or specific project
+- Captures what they're actually doing, not generic inspiration
+- Is specific and grounded in their words
+
+Examples:
+- If building "Lucid Vision app" → "Building Lucid Vision"
+- If achieving financial freedom → "Path to Financial Freedom"
+- If launching coaching practice → "Transformative Coaching Practice"
+
+Return ONLY a JSON object:
 {
-  "title": "2-5 word title capturing the essence of this vision",
-  "categories": ["array", "of", "relevant", "categories"]
+  "title": "specific title with key subject included",
+  "categories": ["relevant", "categories"]
 }
 
-Guidelines:
-- Title should be specific and inspiring (e.g., "Financial Freedom", "Dream Partnership", "Peak Vitality")
-- Categories should be all that are clearly relevant (1-3 typically, but could be more)
-- Be selective with categories - only include if strongly present
-
-Return only the JSON object.`;
+Available categories: ${CATEGORIES.join(', ')}
+Select 1-3 categories that are clearly relevant.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -673,15 +682,35 @@ Return only the summary, nothing else.`;
   return completion.choices[0].message.content.trim();
 }
 
-async function generateVisionTagline(summary) {
-  const prompt = `Create a personal tagline (8-12 words) from this vision summary:
+async function generateVisionTagline(responses, summary) {
+  const responseSummary = responses.map((r, i) => `${i + 1}. [${r.category || r.stage}] ${r.question}\n   Answer: ${r.answer}`).join('\n\n');
 
+  const prompt = `Create a personal tagline based on this vision:
+
+**Original Responses:**
+${responseSummary}
+
+**Vision Summary:**
 "${summary}"
 
-Guidelines:
-- Write in first person, beginning with "I"
-- Capture the essence of their vision
-- Make it inspiring and empowering
+Instructions:
+1. Identify the CORE SUBJECT - what specific thing are they working on?
+   (e.g., "Lucid Vision", "my coaching business", "this app", "financial independence")
+
+2. Create a tagline (8-12 words) that:
+   - Starts with "I" (first person)
+   - MENTIONS the specific subject/project by name or clear reference
+   - Captures their purpose or impact with that subject
+   - Uses concrete details from their responses, not abstract language
+
+Good examples:
+- "I build Lucid Vision to help people manifest their dreams"
+- "I create transformative coaching experiences through my practice"
+- "I achieve financial freedom while inspiring my family"
+
+Bad examples (too vague):
+- "I empower transformation and healing" ❌ (no subject)
+- "I inspire lives to realize their potential" ❌ (what are you doing?)
 
 Return only the tagline, starting with "I".`;
 
@@ -689,7 +718,7 @@ Return only the tagline, starting with "I".`;
     model: 'gpt-4o-mini',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.8,
-    max_tokens: 30
+    max_tokens: 40
   });
 
   return completion.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
@@ -798,7 +827,7 @@ ${responseHistory}
 - Coverage: ${coverageHits.length}/${coverageRequired} slots covered
 
 **CRITICAL CONSTRAINTS:**
-- Maximum 15 words total
+- Maximum 20 words total
 - Single question only (no "and", no follow-ups, no multi-part)
 - Direct and concise
 
@@ -809,7 +838,7 @@ Generate ONE brief question that:
 3. Feels personal and responsive
 4. Stays focused on ${category}
 
-Return only the question. Maximum 15 words.`;
+Return only the question. Maximum 20 words.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -818,7 +847,7 @@ Return only the question. Maximum 15 words.`;
       { role: 'user', content: prompt }
     ],
     temperature: 0.9,
-    max_tokens: 35
+    max_tokens: 50
   });
 
   return completion.choices[0].message.content.trim();

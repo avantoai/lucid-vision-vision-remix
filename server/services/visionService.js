@@ -279,7 +279,7 @@ async function generateSummaryAndTaglineInBackground(visionId, responses) {
     const summary = await aiService.generateVisionSummaryNew(responses);
     console.log(`   ✓ Summary generated (${summary.length} chars)`);
     
-    const tagline = await aiService.generateVisionTagline(summary);
+    const tagline = await aiService.generateVisionTagline(responses, summary);
     console.log(`   ✓ Tagline: "${tagline}"`);
 
     const { error: updateError } = await supabaseAdmin
@@ -310,7 +310,7 @@ async function processVisionInBackground(visionId, responses) {
     console.log(`   ✓ Summary generated (${summary.length} chars)`);
     
     console.log(`   Generating tagline...`);
-    const tagline = await aiService.generateVisionTagline(summary);
+    const tagline = await aiService.generateVisionTagline(allResponses, summary);
     console.log(`   ✓ Tagline: "${tagline}"`);
 
     const { error: updateError } = await supabaseAdmin
