@@ -20,7 +20,7 @@ function stripBreakTags(script) {
   return script.replace(/<break\s+time=['"][\d.]+s['"]\s*\/>/g, '');
 }
 
-async function createMeditationPlaceholder({ userId, category, duration, voiceId, background, visionId, isGift }) {
+async function createMeditationPlaceholder({ userId, category, duration, voiceId, meditationType, background, visionId, isGift }) {
   console.log(`🎨 Creating meditation placeholder for user: ${userId}`);
   
   const { data: meditation, error } = await supabaseAdmin
@@ -32,6 +32,7 @@ async function createMeditationPlaceholder({ userId, category, duration, voiceId
       duration,
       voice_id: voiceId,
       voice_name: getVoiceName(voiceId),
+      meditation_type: meditationType || 'embodied_future',
       background,
       script: '',
       audio_url: '',
@@ -68,16 +69,23 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     let finalResponses = responses;
     if (visionId) {
       console.log(`⏳ [${meditationId}] Fetching vision responses from vision: ${visionId}...`);
-      const { data: visionResponses } = await supabaseAdmin
+      const { data: visionResponses, error: responsesError } = await supabaseAdmin
         .from('vision_responses')
         .select('question, answer, category')
         .eq('vision_id', visionId)
         .order('created_at', { ascending: true });
       
-      if (visionResponses && visionResponses.length > 0) {
+      if (responsesError) {
+        console.error(`❌ [${meditationId}] Error fetching vision responses:`, responsesError);
+      } else if (visionResponses && visionResponses.length > 0) {
         finalResponses = visionResponses;
         console.log(`✓ [${meditationId}] Loaded ${visionResponses.length} responses from vision`);
+        console.log(`   First response preview: "${visionResponses[0].answer.substring(0, 100)}..."`);
+      } else {
+        console.log(`⚠️ [${meditationId}] No responses found for vision ${visionId}`);
       }
+    } else {
+      console.log(`ℹ️ [${meditationId}] No visionId provided, using ${finalResponses.length} direct responses`);
     }
 
     console.log(`⏳ [${meditationId}] Step 2/5: Generating AI script (110 WPM, ~${duration * 110} words)...`);

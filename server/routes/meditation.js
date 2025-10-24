@@ -26,6 +26,7 @@ router.post('/generate', authenticateUser, async (req, res) => {
       category,
       duration,
       voiceId,
+      meditationType,
       background,
       visionId,
       isGift

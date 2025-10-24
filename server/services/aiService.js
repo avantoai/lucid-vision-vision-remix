@@ -291,14 +291,24 @@ User: ${userName}
 ${responseSummary}
 ${visionContext}
 
-**Requirements:**
-- Target: ${minWords}-${maxWords} words (at ~110 WPM)
+**STRICT WORD COUNT REQUIREMENT:**
+You MUST generate exactly ${targetWords} words (±5% = ${minWords}-${maxWords} words).
+- For ${duration} minutes at 110 WPM, this means ${targetWords} words of spoken content (excluding break tags)
+- This is NON-NEGOTIABLE. Scripts under ${minWords} words are incomplete and unacceptable.
+- Write fully developed content that fills the entire ${duration}-minute duration
 ${meditationType && meditationType !== 'default' ? '' : `- Follow THAR principles: embodiment over description, identity encoding, somatic sequencing
 - Speak in **second person** ("you..."), except Neural Loop (if ${duration} >= 10 min) uses **first person** ("I am...")
 ${arcGuide}
 `}
 **Your Task:**
-Create a ${meditationTypeDescription} that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey.
+Create a ${meditationTypeDescription} that helps ${userName} *see, feel, and become* their vision for ${category}. 
+
+**PERSONALIZATION MANDATE:**
+You have detailed responses from ${userName} about their ${category} vision above. You MUST:
+- Weave in specific details, names, places, and elements they mentioned
+- Reference their actual words and phrases throughout
+- Make this meditation unmistakably about THEIR specific vision, not a generic meditation
+- If they mentioned specific people, projects, goals, or outcomes - USE THEM in the script
 
 **CRITICAL: Add a 1.5-2.5 second pause after EVERY SINGLE SENTENCE** using <break time="X.Xs" /> tags (max 3s). This is non-negotiable - the meditation must feel VERY spacious and breathable with generous breathing room.
 
@@ -315,7 +325,7 @@ Example: "Feel your breath moving through you. <break time='2s' /> Notice the sp
 Without these generous pauses between every sentence, the meditation feels rushed and loses its transformative power. Make it breathe.`;
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     messages: [
       { role: 'system', content: selectedSystemPrompt },
       { role: 'user', content: prompt }
