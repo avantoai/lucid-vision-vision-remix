@@ -182,6 +182,40 @@ export default function MeditationSetupScreen() {
         <Text style={styles.title}>Create Meditation</Text>
         <Text style={styles.subtitle}>Customize your {category} meditation</Text>
 
+        <Text style={styles.label}>Meditation Type</Text>
+        {MEDITATION_TYPES.map((type) => (
+          <TouchableOpacity
+            key={type.id}
+            style={[
+              styles.typeOption,
+              selectedMeditationType === type.id && styles.typeOptionSelected,
+            ]}
+            onPress={() => setSelectedMeditationType(type.id)}
+          >
+            <View style={styles.typeOptionContent}>
+              <Text
+                style={[
+                  styles.typeOptionName,
+                  selectedMeditationType === type.id && styles.typeOptionNameSelected,
+                ]}
+              >
+                {type.name}
+              </Text>
+              <Text style={styles.typeOptionDescription}>{type.description}</Text>
+            </View>
+            <View
+              style={[
+                styles.radioButton,
+                selectedMeditationType === type.id && styles.radioButtonSelected,
+              ]}
+            >
+              {selectedMeditationType === type.id && (
+                <View style={styles.radioButtonInner} />
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
+
         <Text style={styles.label}>Duration</Text>
         <View style={styles.optionsGrid}>
           {DURATION_OPTIONS.map((dur) => (
@@ -234,40 +268,6 @@ export default function MeditationSetupScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
-        <Text style={styles.label}>Meditation Type</Text>
-        {MEDITATION_TYPES.map((type) => (
-          <TouchableOpacity
-            key={type.id}
-            style={[
-              styles.typeOption,
-              selectedMeditationType === type.id && styles.typeOptionSelected,
-            ]}
-            onPress={() => setSelectedMeditationType(type.id)}
-          >
-            <View style={styles.typeOptionContent}>
-              <Text
-                style={[
-                  styles.typeOptionName,
-                  selectedMeditationType === type.id && styles.typeOptionNameSelected,
-                ]}
-              >
-                {type.name}
-              </Text>
-              <Text style={styles.typeOptionDescription}>{type.description}</Text>
-            </View>
-            <View
-              style={[
-                styles.radioButton,
-                selectedMeditationType === type.id && styles.radioButtonSelected,
-              ]}
-            >
-              {selectedMeditationType === type.id && (
-                <View style={styles.radioButtonInner} />
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
 
         <Text style={styles.label}>Background</Text>
         <View style={styles.optionsGrid}>
