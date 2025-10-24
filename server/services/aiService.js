@@ -49,12 +49,14 @@ Language Style
 • Tight, punchy questions over flowery ones.
 • Specific and concrete beats inspirational and abstract.
 • For Emotion questions: never pre-load emotions; ask "what" not "what joy/freedom/peace".
+• Single focus only — avoid dual subjects (NOT "home and community" OR "roommates or guests"). Pick one clear subject per question.
 
 Output Rules
 • Return only one question (single-question format, no "and" or follow-ups).
 • No preamble, commentary, or explanation.
 • Maximum 15 words. No exceptions.
 • Cut all unnecessary modifiers.
+• One subject per question — no compound subjects joined by "and" or "or".
 • Reference their specific details to make questions feel responsive and personal.
 
 Prime Directive
