@@ -504,17 +504,16 @@ const styles = StyleSheet.create({
   },
   categoryPill: {
     backgroundColor: colors.surfaceLight,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
     marginRight: 8,
     marginBottom: 8,
   },
   categoryText: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.primaryLight,
     textTransform: 'capitalize',
-    fontWeight: '500',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -708,9 +707,9 @@ const styles = StyleSheet.create({
   },
   categorySaveButton: {
     backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 20,
   },
   categorySaveText: {
     color: colors.white,
