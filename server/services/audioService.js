@@ -82,18 +82,42 @@ async function mixAudioWithBackground(voiceBuffer, backgroundType, duration) {
   });
 }
 
+async function getAudioDuration(audioBuffer) {
+  const tempDir = path.join(__dirname, '../../temp');
+  await fs.mkdir(tempDir, { recursive: true });
+  
+  const tempPath = path.join(tempDir, `probe-${Date.now()}.mp3`);
+  await fs.writeFile(tempPath, audioBuffer);
+
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(tempPath, async (err, metadata) => {
+      await fs.unlink(tempPath).catch(() => {}); // Clean up temp file
+      
+      if (err) {
+        console.error('Error probing audio duration:', err);
+        reject(err);
+        return;
+      }
+      
+      const durationSeconds = metadata.format.duration || 0;
+      resolve(durationSeconds);
+    });
+  });
+}
+
 async function generateMeditationAudio({ script, voiceId, background, duration }) {
   // Keep ElevenLabs <break> tags, only remove old [pause] markers if present
   const scriptForTTS = script.replace(/\[pause\]/gi, '');
   
-  // Track TTS generation time for QA
-  const ttsStartTime = Date.now();
   const voiceBuffer = await generateSpeech(scriptForTTS, voiceId);
-  const ttsGenerationMs = Date.now() - ttsStartTime;
   
   if (!voiceBuffer) {
-    return { fileName: 'mock-audio-url', ttsGenerationMs: 0 };
+    return { fileName: 'mock-audio-url', ttsAudioDuration: null };
   }
+
+  // Get the duration of the raw TTS audio (before mixing) for QA
+  const ttsAudioDuration = await getAudioDuration(voiceBuffer);
+  console.log(`🎙️ Raw TTS audio duration: ${Math.floor(ttsAudioDuration / 60)}:${String(Math.floor(ttsAudioDuration % 60)).padStart(2, '0')}`);
 
   const mixedBuffer = await mixAudioWithBackground(voiceBuffer, background, duration);
 
@@ -109,11 +133,12 @@ async function generateMeditationAudio({ script, voiceId, background, duration }
     throw new Error('Failed to upload audio: ' + error.message);
   }
 
-  return { fileName, ttsGenerationMs };
+  return { fileName, ttsAudioDuration };
 }
 
 module.exports = {
   generateSpeech,
   mixAudioWithBackground,
-  generateMeditationAudio
+  generateMeditationAudio,
+  getAudioDuration
 };

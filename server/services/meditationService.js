@@ -94,14 +94,13 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
 
     console.log(`⏳ [${meditationId}] Step 3/5: Converting to speech (ElevenLabs) and mixing audio (FFmpeg)...`);
     const audioStart = Date.now();
-    const { fileName: audioUrl, ttsGenerationMs } = await audioService.generateMeditationAudio({
+    const { fileName: audioUrl, ttsAudioDuration } = await audioService.generateMeditationAudio({
       script,
       voiceId,
       background,
       duration
     });
-    const totalAudioMs = Date.now() - audioStart;
-    console.log(`✓ [${meditationId}] Audio generated in ${(totalAudioMs / 1000).toFixed(1)}s (TTS: ${(ttsGenerationMs / 1000).toFixed(1)}s, FFmpeg+Upload: ${((totalAudioMs - ttsGenerationMs) / 1000).toFixed(1)}s)`);
+    console.log(`✓ [${meditationId}] Audio generated in ${((Date.now() - audioStart) / 1000).toFixed(1)}s`);
 
     console.log(`⏳ [${meditationId}] Step 4/5: Generating title...`);
     const title = await aiService.generateTitle(script, category, finalResponses);
@@ -116,7 +115,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
         audio_url: audioUrl,
         title_auto: title,
         title: title,
-        tts_generation_ms: ttsGenerationMs,
+        tts_audio_duration_seconds: ttsAudioDuration,
         status: 'completed'
       })
       .eq('id', meditationId);
@@ -167,7 +166,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
     visionStatements: visionStatements || []
   });
 
-  const { fileName: audioUrl, ttsGenerationMs } = await audioService.generateMeditationAudio({
+  const { fileName: audioUrl, ttsAudioDuration } = await audioService.generateMeditationAudio({
     script,
     voiceId,
     background,
@@ -189,7 +188,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
       audio_url: audioUrl,
       title_auto: title,
       title: title,
-      tts_generation_ms: ttsGenerationMs,
+      tts_audio_duration_seconds: ttsAudioDuration,
       status: 'completed',
       is_gift: isGift || false,
       created_at: new Date().toISOString()
