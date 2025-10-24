@@ -165,7 +165,10 @@ export default function MeditationSetupScreen() {
     }
   };
 
-  const allVoices = [...VOICE_OPTIONS.basic, ...VOICE_OPTIONS.advanced];
+  // For QA: Only show Jen and Nathaniel voices
+  const allVoices = [...VOICE_OPTIONS.basic, ...VOICE_OPTIONS.advanced].filter(
+    voice => voice.name === 'Jen' || voice.name === 'Nathaniel'
+  );
 
   return (
     <ScrollView style={styles.container}>
