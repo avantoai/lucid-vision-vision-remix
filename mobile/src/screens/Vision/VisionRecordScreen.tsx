@@ -195,25 +195,9 @@ export default function VisionRecordScreen() {
         
         navigation.navigate('MainTabs', { screen: 'Vision' });
       } else {
-        // Has responses - show confirmation then go to vision detail
-        console.log('VisionRecord - Showing exit confirmation (has responses)');
-        Alert.alert(
-          'Finish Later?',
-          'Your responses have been saved. You can continue deepening this vision anytime.',
-          [
-            {
-              text: 'Keep Going',
-              style: 'cancel',
-            },
-            {
-              text: 'Finish Later',
-              onPress: () => {
-                console.log('VisionRecord - User confirmed exit, going to detail');
-                navigation.navigate('VisionDetail', { visionId });
-              },
-            },
-          ]
-        );
+        // Has responses - go directly to vision detail (user has already submitted context)
+        console.log('VisionRecord - User has submitted responses, navigating to detail');
+        navigation.navigate('VisionDetail', { visionId });
       }
     } catch (error) {
       console.error('Error in handleClose:', error);
