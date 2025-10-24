@@ -707,7 +707,12 @@ Select 1-3 categories that are clearly relevant.`;
   });
 
   try {
-    const result = JSON.parse(completion.choices[0].message.content.trim());
+    let content = completion.choices[0].message.content.trim();
+    
+    // Remove markdown code blocks if present
+    content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    const result = JSON.parse(content);
     return {
       title: result.title || 'Untitled Vision',
       categories: Array.isArray(result.categories) ? result.categories.filter(cat => CATEGORIES.includes(cat)) : []

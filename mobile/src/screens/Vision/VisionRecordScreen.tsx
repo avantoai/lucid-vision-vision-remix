@@ -177,11 +177,11 @@ export default function VisionRecordScreen() {
       const data = await response.json();
       const hasResponses = data.vision?.responses?.length > 0;
       
-      console.log('Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
+      console.log('VisionRecord - Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
       
       if (!hasResponses) {
-        // No responses yet - delete the vision and go back to My Vision
-        console.log('Deleting empty vision:', visionId);
+        // No responses yet - delete silently and go back to My Vision
+        console.log('VisionRecord - No responses, deleting vision silently:', visionId);
         const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
           method: 'DELETE',
           headers: {
@@ -193,12 +193,27 @@ export default function VisionRecordScreen() {
           console.error('Failed to delete vision:', deleteResponse.status);
         }
         
-        // Always navigate back to My Vision, even if delete fails
         navigation.navigate('MainTabs', { screen: 'Vision' });
       } else {
-        // Has responses - go to vision detail
-        console.log('Vision has responses, navigating to detail');
-        navigation.navigate('VisionDetail', { visionId });
+        // Has responses - show confirmation then go to vision detail
+        console.log('VisionRecord - Showing exit confirmation (has responses)');
+        Alert.alert(
+          'Finish Later?',
+          'Your responses have been saved. You can continue deepening this vision anytime.',
+          [
+            {
+              text: 'Keep Going',
+              style: 'cancel',
+            },
+            {
+              text: 'Finish Later',
+              onPress: () => {
+                console.log('VisionRecord - User confirmed exit, going to detail');
+                navigation.navigate('VisionDetail', { visionId });
+              },
+            },
+          ]
+        );
       }
     } catch (error) {
       console.error('Error in handleClose:', error);

@@ -101,43 +101,40 @@ export default function VisionEditScreen() {
       console.log('VisionEdit - Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
       
       if (!hasResponses) {
-        // No responses yet - show confirmation dialog
-        console.log('VisionEdit - Showing discard confirmation');
+        // No responses yet - delete silently and go back to My Vision
+        console.log('VisionEdit - No responses, deleting vision silently:', visionId);
+        const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!deleteResponse.ok) {
+          console.error('Failed to delete vision:', deleteResponse.status);
+        }
+        
+        navigation.navigate('MainTabs', { screen: 'Vision' });
+      } else {
+        // Has responses - show confirmation then go to vision detail
+        console.log('VisionEdit - Showing exit confirmation (has responses)');
         Alert.alert(
-          'Discard Vision?',
-          'This will permanently delete this vision. This action cannot be undone.',
+          'Finish Later?',
+          'Your responses have been saved. You can continue deepening this vision anytime.',
           [
             {
-              text: 'Cancel',
+              text: 'Keep Going',
               style: 'cancel',
             },
             {
-              text: 'Discard',
-              style: 'destructive',
-              onPress: async () => {
-                console.log('VisionEdit - User confirmed delete, deleting vision:', visionId);
-                // Delete the vision
-                const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
-                  method: 'DELETE',
-                  headers: {
-                    'Authorization': `Bearer ${token}`,
-                  },
-                });
-                
-                if (!deleteResponse.ok) {
-                  console.error('Failed to delete vision:', deleteResponse.status);
-                }
-                
-                // Navigate back to My Vision
-                navigation.navigate('MainTabs', { screen: 'Vision' });
+              text: 'Finish Later',
+              onPress: () => {
+                console.log('VisionEdit - User confirmed exit, going to detail');
+                navigation.navigate('VisionDetail', { visionId });
               },
             },
           ]
         );
-      } else {
-        // Has responses - go to vision detail
-        console.log('VisionEdit - Vision has responses, navigating to detail');
-        navigation.navigate('VisionDetail', { visionId });
       }
     } catch (error) {
       console.error('Error in handleClose:', error);

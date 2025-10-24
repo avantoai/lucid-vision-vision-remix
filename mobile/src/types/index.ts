@@ -75,7 +75,7 @@ export type RootStackParamList = {
   Auth: undefined;
   EmailInput: undefined;
   Onboarding: { isNewUser: boolean };
-  MainTabs: undefined;
+  MainTabs: { screen?: keyof TabParamList } | undefined;
   MyVisions: undefined;
   CategorySelection: undefined;
   VisionFlow: { visionId: string; isNewVision: boolean };
