@@ -7,7 +7,7 @@ const { supabaseAdmin } = require('../config/supabase');
 
 router.post('/generate', authenticateUser, async (req, res) => {
   try {
-    const { category, duration, voiceId, background, responses, visionId, isGift } = req.body;
+    const { category, duration, voiceId, meditationType, background, responses, visionId, isGift } = req.body;
 
     if (!isGift) {
       const canCreate = await quotaService.canCreatePersonalMeditation(req.user.id);
@@ -36,6 +36,7 @@ router.post('/generate', authenticateUser, async (req, res) => {
       userId: req.user.id,
       category,
       duration,
+      meditationType,
       voiceId,
       background,
       responses,

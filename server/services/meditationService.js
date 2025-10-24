@@ -52,9 +52,9 @@ async function createMeditationPlaceholder({ userId, category, duration, voiceId
   return meditation;
 }
 
-async function completeMeditationGeneration({ meditationId, userId, category, duration, voiceId, background, responses, visionId, isGift }) {
+async function completeMeditationGeneration({ meditationId, userId, category, duration, meditationType, voiceId, background, responses, visionId, isGift }) {
   console.log(`🎵 Starting background generation for meditation: ${meditationId}`);
-  console.log(`   Category: ${category}, Duration: ${duration}min, Voice: ${voiceId}, Background: ${background}`);
+  console.log(`   Category: ${category}, Duration: ${duration}min, Type: ${meditationType || 'default'}, Voice: ${voiceId}, Background: ${background}`);
   
   try {
     console.log(`⏳ [${meditationId}] Step 1/5: Fetching user info...`);
@@ -99,6 +99,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
     const script = await aiService.generateScript({
       category,
       duration,
+      meditationType,
       background,
       responses: finalResponses,
       userName: user?.full_name || 'friend',
