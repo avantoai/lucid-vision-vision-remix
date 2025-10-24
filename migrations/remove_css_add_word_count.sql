@@ -21,7 +21,12 @@ DROP COLUMN IF EXISTS is_complete_embodiment,
 DROP COLUMN IF EXISTS last_scored_at,
 DROP COLUMN IF EXISTS micro_tags;
 
--- Add word count tracking column
+-- Step 3: Remove category columns from vision_responses table
+ALTER TABLE vision_responses
+DROP COLUMN IF EXISTS category,
+DROP COLUMN IF EXISTS categories_addressed;
+
+-- Step 4: Add word count tracking column
 ALTER TABLE visions 
 ADD COLUMN IF NOT EXISTS total_word_count INTEGER DEFAULT 0;
 
