@@ -47,11 +47,10 @@ router.post('/visions/:visionId/next-question', authenticateUser, async (req, re
 
 router.post('/visions/:visionId/response', authenticateUser, async (req, res) => {
   try {
-    const { category, question, answer } = req.body;
+    const { question, answer } = req.body;
     const result = await visionService.submitResponse(
       req.params.visionId,
       req.user.id,
-      category,
       question,
       answer
     );
