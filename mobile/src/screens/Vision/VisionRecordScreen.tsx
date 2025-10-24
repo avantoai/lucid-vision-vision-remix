@@ -161,11 +161,6 @@ export default function VisionRecordScreen() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const centerY = height / 2;
-  const micButtonTop = centerY - 70;
-  const textTop = centerY - 130;
-  const writeButtonTop = centerY + 94;
-
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={() => navigation.navigate('VisionDetail', { visionId })}>
@@ -173,64 +168,72 @@ export default function VisionRecordScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <View style={styles.topContent}>
+        {/* Top spacer for close button area */}
+        <View style={styles.headerSpacer} />
+
+        {/* Centered question area */}
+        <View style={styles.questionArea}>
           <Text style={styles.prompt}>{question}</Text>
         </View>
 
-        <View style={{ position: 'absolute', top: micButtonTop, left: '50%', transform: [{ translateX: -70 }] }}>
-          {isRecording && (
-            <>
-              <Animated.View 
-                style={[
-                  styles.pulseRing,
-                  {
-                    opacity: opacityAnim,
-                    transform: [{ scale: pulseAnim }]
-                  }
-                ]} 
-              />
-              <Animated.View 
-                style={[
-                  styles.pulseRing,
-                  styles.pulseRingOuter,
-                  {
-                    opacity: Animated.multiply(opacityAnim, 0.6),
-                    transform: [{ scale: Animated.multiply(pulseAnim, 1.15) }]
-                  }
-                ]} 
-              />
-            </>
-          )}
-          
-          <TouchableOpacity
-            style={[styles.micButton, isRecording && styles.micButtonRecording]}
-            onPress={isRecording ? stopRecording : startRecording}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="large" color={colors.white} />
-            ) : isRecording ? (
-              <View style={styles.stopIcon} />
-            ) : (
-              <Ionicons name="mic" size={64} color={colors.white} />
+        {/* Bottom controls area */}
+        <View style={styles.controlsArea}>
+          {/* Help text or timer above microphone */}
+          {isRecording ? (
+            <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
+          ) : !isLoading ? (
+            <Text style={styles.helpText}>Tap to Record</Text>
+          ) : null}
+
+          {/* Microphone button with pulse rings */}
+          <View style={styles.micContainer}>
+            {isRecording && (
+              <>
+                <Animated.View 
+                  style={[
+                    styles.pulseRing,
+                    {
+                      opacity: opacityAnim,
+                      transform: [{ scale: pulseAnim }]
+                    }
+                  ]} 
+                />
+                <Animated.View 
+                  style={[
+                    styles.pulseRing,
+                    styles.pulseRingOuter,
+                    {
+                      opacity: Animated.multiply(opacityAnim, 0.6),
+                      transform: [{ scale: Animated.multiply(pulseAnim, 1.15) }]
+                    }
+                  ]} 
+                />
+              </>
             )}
-          </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.micButton, isRecording && styles.micButtonRecording]}
+              onPress={isRecording ? stopRecording : startRecording}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="large" color={colors.white} />
+              ) : isRecording ? (
+                <View style={styles.stopIcon} />
+              ) : (
+                <Ionicons name="mic" size={64} color={colors.white} />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Write button below microphone */}
+          {!isRecording && !isLoading && (
+            <TouchableOpacity style={styles.writeButton} onPress={handleWriteMode}>
+              <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
+              <Text style={styles.writeButtonText}>Write</Text>
+            </TouchableOpacity>
+          )}
         </View>
-
-        {isRecording && (
-          <Text style={[styles.timer, { top: textTop }]}>{formatTime(recordingTime)}</Text>
-        )}
-
-        {!isRecording && !isLoading && (
-          <Text style={[styles.helpText, { top: textTop }]}>Tap to Record</Text>
-        )}
-
-        {!isRecording && !isLoading && (
-          <TouchableOpacity style={[styles.writeButton, { top: writeButtonTop }]} onPress={handleWriteMode}>
-            <Ionicons name="create-outline" size={20} color={colors.text} style={{ marginRight: 8 }} />
-            <Text style={styles.writeButtonText}>Write</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
@@ -256,19 +259,31 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  topContent: {
-    position: 'absolute',
-    top: layout.screenTopBase + layout.headerButtonSize,
-    left: 0,
-    right: 0,
-    paddingHorizontal: layout.screenHorizontal,
+  headerSpacer: {
+    height: layout.screenTopBase + layout.headerButtonSize,
+  },
+  questionArea: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: layout.screenHorizontal,
   },
   prompt: {
     fontSize: 28,
     fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
+  },
+  controlsArea: {
+    alignItems: 'center',
+    paddingBottom: 60,
+  },
+  micContainer: {
+    width: 140,
+    height: 140,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 24,
   },
   micButton: {
     width: 140,
@@ -299,21 +314,17 @@ const styles = StyleSheet.create({
     left: 27.5,
   },
   helpText: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
+    marginBottom: 16,
   },
   timer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
     fontSize: 22,
     fontWeight: '400',
     color: '#EF4444',
     textAlign: 'center',
+    marginBottom: 16,
   },
   micButtonRecording: {
     backgroundColor: '#EF4444',
@@ -325,17 +336,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   writeButton: {
-    position: 'absolute',
-    left: '50%',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 999,
     backgroundColor: colors.surfaceLight,
-    transform: [
-      { translateX: -60 },
-    ],
+    marginTop: 8,
   },
   writeButtonText: {
     fontSize: 16,
