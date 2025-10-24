@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { RootStackParamList } from '../../types';
-import { VOICE_OPTIONS, BACKGROUND_OPTIONS } from '../../constants/config';
+import { VOICE_OPTIONS, BACKGROUND_OPTIONS, MEDITATION_TYPES } from '../../constants/config';
 import api from '../../services/api';
 import { colors, layout } from '../../theme';
 
@@ -21,6 +21,7 @@ export default function MeditationSetupScreen() {
 
   const [duration, setDuration] = useState(10);
   const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS.basic[0].id);
+  const [selectedMeditationType, setSelectedMeditationType] = useState(MEDITATION_TYPES[0].id);
   const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_OPTIONS[0].id);
   const [isLoading, setIsLoading] = useState(false);
   const [previewSound, setPreviewSound] = useState<Audio.Sound | null>(null);
@@ -129,6 +130,7 @@ export default function MeditationSetupScreen() {
         category,
         duration,
         voiceId: selectedVoice,
+        meditationType: selectedMeditationType,
         background: selectedBackground,
         responses,
         visionId,
@@ -232,6 +234,40 @@ export default function MeditationSetupScreen() {
             </TouchableOpacity>
           ))}
         </View>
+
+        <Text style={styles.label}>Meditation Type</Text>
+        {MEDITATION_TYPES.map((type) => (
+          <TouchableOpacity
+            key={type.id}
+            style={[
+              styles.typeOption,
+              selectedMeditationType === type.id && styles.typeOptionSelected,
+            ]}
+            onPress={() => setSelectedMeditationType(type.id)}
+          >
+            <View style={styles.typeOptionContent}>
+              <Text
+                style={[
+                  styles.typeOptionName,
+                  selectedMeditationType === type.id && styles.typeOptionNameSelected,
+                ]}
+              >
+                {type.name}
+              </Text>
+              <Text style={styles.typeOptionDescription}>{type.description}</Text>
+            </View>
+            <View
+              style={[
+                styles.radioButton,
+                selectedMeditationType === type.id && styles.radioButtonSelected,
+              ]}
+            >
+              {selectedMeditationType === type.id && (
+                <View style={styles.radioButtonInner} />
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
 
         <Text style={styles.label}>Background</Text>
         <View style={styles.optionsGrid}>
@@ -365,5 +401,56 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 18,
     fontWeight: '600',
+  },
+  typeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  typeOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
+  },
+  typeOptionContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  typeOptionName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  typeOptionNameSelected: {
+    color: colors.primary,
+  },
+  typeOptionDescription: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 20,
+  },
+  radioButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: colors.primary,
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.primary,
   },
 });

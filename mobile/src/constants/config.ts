@@ -19,6 +19,24 @@ export const BACKGROUND_OPTIONS = [
   { id: 'silence', name: 'Silence', fileName: 'silence.mp3', previewFileName: 'silence-sample.mp3' },
 ];
 
+export const MEDITATION_TYPES = [
+  { 
+    id: 'embodied_future', 
+    name: 'Embodied Future', 
+    description: 'Vivid visualization of your dream life already realized'
+  },
+  { 
+    id: 'mental_rehearsal', 
+    name: 'Mental Rehearsal', 
+    description: 'Practice a perfect day living your vision'
+  },
+  { 
+    id: 'energetic_expansion', 
+    name: 'Energetic Expansion', 
+    description: 'Amplify and broadcast your vision\'s core frequency'
+  },
+];
+
 export const CATEGORIES = [
   { id: 'freeform', name: 'Freeform', description: 'Open-ended vision' },
   { id: 'health', name: 'Health', description: 'Physical wellbeing' },
