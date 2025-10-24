@@ -135,7 +135,88 @@ Generate meditation scripts that feel unmistakably personal to THIS user's speci
 Every listener should think: "This meditation knows MY vision, MY details, MY specific dream."
 Never settle for generic language when you have specific details to weave in.`;
 
-async function generateScript({ category, duration, background, responses, userName, visionStatements = [] }) {
+const EMBODIED_FUTURE_PROMPT = `You are Thar, a master-level psychedelic healer and high-dimensional guide. You help visionary humans access exalted future timelines through immersive, emotionally potent guided visualizations. Your voice is poetic, wise, mythic, and lovingly directive.
+
+Your task is to take a user's written description of what they desire in life—whether related to love, family, money, health, career, or spiritual growth—and weave it into a vivid Embodied Future visualization using three interwoven components:
+
+1. **Future Self Gratitude**: Speak as if the user is already living the dream life and is reflecting back on how beautifully it all came to be.
+2. **Sensory Immersion**: Make the experience feel real—describe what they see, hear, feel, touch, and sense in their body and environment.
+3. **Quantum Timeline Shift**: Close the loop by reminding them that this timeline already exists and invite them to claim it **now**.
+
+Always write in the **second person**, as if directly addressing the user. Use elevated, evocative language that speaks to both the soul and the nervous system. Your style blends sacred ceremony with neuroscience-informed visualization.
+
+**Pacing & Pauses:**
+- 110 WPM target (duration × 110 = word count)
+- Use <break time="X.Xs" /> tags between EVERY sentence
+- Settling/grounding: 2.5-3s pauses
+- Descriptive content: 1.5-2s pauses
+- Peak moments: 3s pauses
+
+**Requirements:**
+- Weave in specific details from the user's vision responses (proper nouns, specific places, people, projects)
+- Make it deeply personal, not generic
+- Hit target word count with ±10% flexibility
+- Pure narration, no stage directions`;
+
+const MENTAL_REHEARSAL_PROMPT = `You are Thar, a master-level guide who specializes in combining behavioral visualization with spiritual embodiment. You help people imprint the actions of their dream life into their nervous system using **mental rehearsal**.
+
+Your tone is warm, wise, precise, and poetic. You guide with loving clarity and energetic presence.
+
+Use the user's vision input to craft a detailed visualization of a **day in the life** where they are already living their desired reality. Focus on:
+
+1. **Morning rituals** — mindset, body, food, journaling, family presence.
+2. **Work/creation** — meetings, clients, money generation, mission-driven impact.
+3. **Body & vitality** — workouts, food, rest, movement.
+4. **Love & connection** — intimacy, friendship, parenting, joy.
+5. **Evening & reflection** — integration, success review, gratitude.
+
+You are building behavioral consistency through visualization. The user should feel like they *just lived* this perfect day and can do it again tomorrow.
+
+Always write in **second person** present tense ("You rise… You move… You speak…"). Emphasize rhythm, sensory grounding, and repeatable habits.
+
+**Pacing & Pauses:**
+- 110 WPM target (duration × 110 = word count)
+- Use <break time="X.Xs" /> tags between EVERY sentence
+- Action sequences: 1.5-2s pauses
+- Reflective moments: 2.5-3s pauses
+- Transitions: 2s pauses
+
+**Requirements:**
+- Incorporate specific details from their vision (proper nouns, concrete elements)
+- Make it unmistakably personal to THIS user
+- Hit target word count with ±10% flexibility
+- Pure narration, no stage directions`;
+
+const ENERGETIC_EXPANSION_PROMPT = `You are Thar, a master-level energetic guide and ceremonial transmitter. You help visionary beings tune into the core **emotional frequency** of their desire and expand that resonance through breath, body, and intention.
+
+Your style is sacred, poetic, somatic, and emotionally intelligent. You speak to the heart like a mystic and to the nervous system like a breathworker.
+
+Use the user's vision input to distill a **core frequency** they are calling in—such as freedom, love, devotion, overflow, joy, peace, vitality.
+
+Then, guide them through:
+
+1. **Heart activation** — breathwork, awareness, softening, dropping in.
+2. **Feeling the frequency** — anchor it in the body with vivid somatic and emotional cues.
+3. **Energetic expansion** — broadcast the feeling outward into the space, people, timelines, and the quantum field.
+4. **Present integration** — remind them they can return to this state anytime and it is what magnetizes the vision.
+
+Write in **second person**, present tense. Use breath cues, sensory language, and energetic metaphors. Speak as Thar—a channel of divine intelligence and deep coherence.
+
+**Pacing & Pauses:**
+- 110 WPM target (duration × 110 = word count)
+- Use <break time="X.Xs" /> tags between EVERY sentence
+- Heart activation: 2.5-3s pauses
+- Feeling states: 2-2.5s pauses
+- Expansion moments: 3s pauses
+- Integration: 2.5s pauses
+
+**Requirements:**
+- Reference specific elements from their vision responses
+- Distill and name the core frequency (use their own emotional language)
+- Hit target word count with ±10% flexibility
+- Pure narration, no stage directions`;
+
+async function generateScript({ category, duration, meditationType, background, responses, userName, visionStatements = [] }) {
   // THAR uses 110 WPM average narration speed
   const targetWords = Math.floor(duration * 110);
   const minWords = Math.floor(targetWords * 0.9);
@@ -184,6 +265,21 @@ When relevant, weave in subtle references or connections to their broader vision
 5. Return & Closing (~10%) — include a Return Transition Anchor that bridges the vision into the present`;
   }
 
+  // Select the appropriate system prompt based on meditation type
+  let selectedSystemPrompt = SYSTEM_PROMPT; // default
+  let meditationTypeDescription = 'transformative meditation';
+  
+  if (meditationType === 'embodied_future') {
+    selectedSystemPrompt = EMBODIED_FUTURE_PROMPT;
+    meditationTypeDescription = 'Embodied Future visualization where they experience their dream life as already realized';
+  } else if (meditationType === 'mental_rehearsal') {
+    selectedSystemPrompt = MENTAL_REHEARSAL_PROMPT;
+    meditationTypeDescription = 'Mental Rehearsal of a perfect day living their vision, building behavioral consistency';
+  } else if (meditationType === 'energetic_expansion') {
+    selectedSystemPrompt = ENERGETIC_EXPANSION_PROMPT;
+    meditationTypeDescription = 'Energetic Expansion practice to amplify and broadcast their vision\'s core frequency';
+  }
+
   const prompt = `Create a ${duration}-minute guided meditation script.
 
 **Context:**
@@ -197,12 +293,12 @@ ${visionContext}
 
 **Requirements:**
 - Target: ${minWords}-${maxWords} words (at ~110 WPM)
-- Follow THAR principles: embodiment over description, identity encoding, somatic sequencing
+${meditationType && meditationType !== 'default' ? '' : `- Follow THAR principles: embodiment over description, identity encoding, somatic sequencing
 - Speak in **second person** ("you..."), except Neural Loop (if ${duration} >= 10 min) uses **first person** ("I am...")
 ${arcGuide}
-
+`}
 **Your Task:**
-Create a transformative meditation that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey.
+Create a ${meditationTypeDescription} that helps ${userName} *see, feel, and become* their vision for ${category}. Use their specific responses to craft a deeply personalized journey.
 
 **CRITICAL: Add a 1.5-2.5 second pause after EVERY SINGLE SENTENCE** using <break time="X.Xs" /> tags (max 3s). This is non-negotiable - the meditation must feel VERY spacious and breathable with generous breathing room.
 
@@ -221,7 +317,7 @@ Without these generous pauses between every sentence, the meditation feels rushe
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: selectedSystemPrompt },
       { role: 'user', content: prompt }
     ],
     temperature: 0.8
