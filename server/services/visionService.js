@@ -102,6 +102,13 @@ async function createVision(userId) {
 async function generateNextQuestion(visionId, userId) {
   const vision = await getVision(visionId, userId);
   
+  console.log(`📦 Vision data fetched:`, {
+    id: vision.id,
+    title: vision.title,
+    responseCount: vision.responses?.length || 0,
+    responses: vision.responses?.map(r => ({ q: r.question?.substring(0, 30), a: r.answer?.substring(0, 30) }))
+  });
+  
   // Get vision category from the vision's categories array (use first or 'general')
   const visionCategory = (vision.categories && vision.categories.length > 0) 
     ? vision.categories[0] 
