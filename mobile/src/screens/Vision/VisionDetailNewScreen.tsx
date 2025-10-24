@@ -29,13 +29,10 @@ interface Vision {
 
 interface Response {
   id: string;
-  stage: string;
   question: string;
   answer: string;
   created_at: string;
 }
-
-const STAGES = ['Vision', 'Belief', 'Identity', 'Embodiment', 'Action'];
 
 function getProgressColor(completeness: number): string {
   if (completeness === 0) return '#6b7280';
@@ -147,12 +144,6 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
     );
   }
 
-  const responsesByStage = responses.reduce((acc, response) => {
-    if (!acc[response.stage]) acc[response.stage] = [];
-    acc[response.stage].push(response);
-    return acc;
-  }, {} as Record<string, Response[]>);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -252,22 +243,18 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
             </View>
           )}
 
-          {STAGES.map((stage) => {
-            const stageResponses = responsesByStage[stage];
-            if (!stageResponses || stageResponses.length === 0) return null;
-
-            return (
-              <View key={stage} style={styles.stageSection}>
-                <Text style={styles.stageTitle}>{stage}</Text>
-                {stageResponses.map((response) => (
-                  <View key={response.id} style={styles.qaCard}>
-                    <Text style={styles.question}>{response.question}</Text>
-                    <Text style={styles.answer}>{response.answer}</Text>
-                  </View>
-                ))}
-              </View>
-            );
-          })}
+          {/* Q&A History */}
+          {responses.length > 0 && (
+            <View style={styles.qaHistorySection}>
+              <Text style={styles.qaHistoryTitle}>Your Vision Journey</Text>
+              {responses.map((response) => (
+                <View key={response.id} style={styles.qaCard}>
+                  <Text style={styles.question}>{response.question}</Text>
+                  <Text style={styles.answer}>{response.answer}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -484,10 +471,10 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: '500',
   },
-  stageSection: {
+  qaHistorySection: {
     marginBottom: 32,
   },
-  stageTitle: {
+  qaHistoryTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: colors.text,
