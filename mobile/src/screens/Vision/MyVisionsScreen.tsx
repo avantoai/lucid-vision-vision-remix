@@ -265,20 +265,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryFilterPill: {
-    backgroundColor: colors.surface,
+    paddingVertical: 8,
     paddingHorizontal: 16,
-    paddingVertical: 10,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    backgroundColor: colors.surfaceLight,
   },
   categoryFilterPillActive: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   categoryFilterText: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textSecondary,
   },
   categoryFilterTextActive: {
