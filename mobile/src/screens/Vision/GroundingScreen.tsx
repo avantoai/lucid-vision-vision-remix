@@ -43,6 +43,18 @@ const styles = StyleSheet.create({
     paddingTop: layout.screenTopBase + 40,
     paddingBottom: 60,
   },
+  closeButton: {
+    position: 'absolute',
+    top: layout.headerTop,
+    right: layout.headerSide,
+    zIndex: 10,
+    width: layout.headerButtonSize,
+    height: layout.headerButtonSize,
+    borderRadius: layout.headerButtonSize / 2,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   content: {
     flex: 1,
     justifyContent: 'center',

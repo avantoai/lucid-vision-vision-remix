@@ -158,41 +158,61 @@ export default function VisionRecordScreen() {
 
   const handleClose = async () => {
     try {
+      const token = await AsyncStorage.getItem('session_token');
+      
       // Check if this vision has any responses
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
         headers: {
-          'Authorization': `Bearer ${await AsyncStorage.getItem('session_token')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        const hasResponses = data.vision?.responses?.length > 0;
+      if (!response.ok) {
+        console.error('Failed to fetch vision:', response.status);
+        // If vision doesn't exist or error, go back to My Vision
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
+        return;
+      }
+      
+      const data = await response.json();
+      const hasResponses = data.vision?.responses?.length > 0;
+      
+      console.log('Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
+      
+      if (!hasResponses) {
+        // No responses yet - delete the vision and go back to My Vision
+        console.log('Deleting empty vision:', visionId);
+        const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         
-        if (!hasResponses) {
-          // No responses yet - delete the vision and go back to My Vision
-          await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${await AsyncStorage.getItem('session_token')}`,
-            },
-          });
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'MainTabs' }],
-          });
-        } else {
-          // Has responses - go to vision detail
-          navigation.navigate('VisionDetail', { visionId });
+        if (!deleteResponse.ok) {
+          console.error('Failed to delete vision:', deleteResponse.status);
         }
+        
+        // Always navigate back to My Vision, even if delete fails
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
       } else {
-        // Fallback to vision detail if check fails
+        // Has responses - go to vision detail
+        console.log('Vision has responses, navigating to detail');
         navigation.navigate('VisionDetail', { visionId });
       }
     } catch (error) {
-      console.error('Error checking vision:', error);
-      // Fallback to vision detail on error
-      navigation.navigate('VisionDetail', { visionId });
+      console.error('Error in handleClose:', error);
+      // On error, go back to My Vision (safer than showing empty detail)
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
     }
   };
 
