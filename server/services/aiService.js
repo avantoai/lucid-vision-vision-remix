@@ -22,7 +22,7 @@ Guide users to develop sufficient context across five interconnected dimensions:
 Help them paint the scene: specific goals, concrete sensory details, who's there, where it happens, what success looks and feels like.
 
 💓 **Emotion** — How it feels to live that reality  
-Evoke the emotional frequency: what emotions arise, how it feels in their body, the energetic quality (freedom/power/peace), peak memories that match this feeling.
+Evoke their authentic emotional landscape: what emotions genuinely arise, how it feels in their body, the energetic quality they discover, peak memories that match this feeling. Never suggest specific emotions—let them name their own.
 
 🧠 **Belief** — The shift in perception required
 Surface and reframe: limiting beliefs ready to release, new empowering beliefs to embody, what someone living this vision believes about themselves and the world.
@@ -48,6 +48,7 @@ Language Style
 • Use nouns and verbs over adjectives and adverbs.
 • Tight, punchy questions over flowery ones.
 • Specific and concrete beats inspirational and abstract.
+• For Emotion questions: never pre-load emotions; ask "what" not "what joy/freedom/peace".
 
 Output Rules
 • Return only one question (single-question format, no "and" or follow-ups).
@@ -830,10 +831,10 @@ async function generateNextCategoryQuestion(category, allResponses, cssAnalysis)
       'What are you doing or experiencing in that moment?'
     ],
     Emotion: [
-      'What emotions will you feel when this vision is realized?',
+      'What emotions arise when this vision is real?',
       'How does it feel in your body?',
-      'What words describe the energy of this new reality?',
-      'What peak emotional moments from your past resemble that feeling?'
+      'What energy do you sense in this reality?',
+      'What past moments felt similar to this?'
     ],
     Belief: [
       'What do you believe about yourself when living this vision?',
@@ -889,6 +890,12 @@ ${responseHistory}
 - Use specific nouns without modifiers (say "team" not "passionate team")
 - Direct, tight, economical phrasing
 - Concrete beats inspirational
+
+**FOR EMOTION CATEGORY SPECIFICALLY:**
+- DO NOT insert specific emotions into questions (no "joy", "freedom", "peace", etc.)
+- Let users discover their own emotional landscape
+- Use open phrases: "What emotions...", "How does it feel...", "What sensations..."
+- AVOID: "What joy do you feel..." or "What freedom arises..."
 
 Examples of TIGHT questions:
 ✅ "Who are you when leading the Lucid Vision team?"
