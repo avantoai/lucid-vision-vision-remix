@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -22,6 +21,19 @@ interface Vision {
   tagline: string | null;
   updated_at: string;
 }
+
+const CATEGORIES = [
+  'All',
+  'Freeform',
+  'Health',
+  'Wealth',
+  'Relationships',
+  'Play',
+  'Love',
+  'Purpose',
+  'Spirit',
+  'Healing'
+];
 
 function getProgressColor(completeness: number): string {
   if (completeness === 0) return '#6b7280';
@@ -46,7 +58,7 @@ function formatDate(dateString: string): string {
 export default function MyVisionsScreen({ navigation }: any) {
   const [visions, setVisions] = useState<Vision[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const loadVisions = useCallback(async () => {
     try {
@@ -78,10 +90,10 @@ export default function MyVisionsScreen({ navigation }: any) {
     navigation.navigate('VisionDetail', { visionId });
   };
 
-  const filteredVisions = visions.filter(v =>
-    v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.categories.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredVisions = visions.filter(v => {
+    if (selectedCategory === 'All') return true;
+    return v.categories.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
+  });
 
   if (loading) {
     return (
@@ -100,23 +112,40 @@ export default function MyVisionsScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color={colors.textSecondary} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search visions..."
-          placeholderTextColor={colors.textSecondary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoriesScroll}
+        contentContainerStyle={styles.categoriesContent}
+      >
+        {CATEGORIES.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryFilterPill,
+              selectedCategory === category && styles.categoryFilterPillActive
+            ]}
+            onPress={() => setSelectedCategory(category)}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.categoryFilterText,
+                selectedCategory === category && styles.categoryFilterTextActive
+              ]}
+            >
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {filteredVisions.length === 0 && !searchQuery && (
+        {filteredVisions.length === 0 && selectedCategory === 'All' && (
           <View style={styles.emptyState}>
             <Ionicons name="flower-outline" size={64} color={colors.textTertiary} />
             <Text style={styles.emptyTitle}>Start Your First Vision</Text>
@@ -129,9 +158,9 @@ export default function MyVisionsScreen({ navigation }: any) {
           </View>
         )}
 
-        {filteredVisions.length === 0 && searchQuery && (
+        {filteredVisions.length === 0 && selectedCategory !== 'All' && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No visions found matching "{searchQuery}"</Text>
+            <Text style={styles.emptyText}>No visions in {selectedCategory}</Text>
           </View>
         )}
 
@@ -220,23 +249,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginHorizontal: layout.screenHorizontal,
+  categoriesScroll: {
+    flexGrow: 0,
     marginBottom: 20,
-    height: 48,
   },
-  searchIcon: {
-    marginRight: 8,
+  categoriesContent: {
+    paddingHorizontal: layout.screenHorizontal,
+    gap: 8,
   },
-  searchInput: {
-    flex: 1,
-    color: colors.text,
-    fontSize: 16,
+  categoryFilterPill: {
+    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  categoryFilterPillActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  categoryFilterText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  categoryFilterTextActive: {
+    color: colors.white,
   },
   scrollView: {
     flex: 1,
