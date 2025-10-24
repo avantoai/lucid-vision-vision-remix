@@ -78,68 +78,98 @@ export default function VisionEditScreen() {
   };
 
   const handleClose = async () => {
-    try {
-      const token = await AsyncStorage.getItem('session_token');
-      
-      // Check if this vision has any responses
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (!response.ok) {
-        console.error('Failed to fetch vision:', response.status);
-        // If vision doesn't exist or error, go back to My Vision
-        navigation.navigate('MainTabs', { screen: 'Vision' });
-        return;
-      }
-      
-      const data = await response.json();
-      const hasResponses = data.vision?.responses?.length > 0;
-      
-      console.log('VisionEdit - Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
-      
-      if (!hasResponses) {
-        // No responses yet - delete silently and go back to My Vision
-        console.log('VisionEdit - No responses, deleting vision silently:', visionId);
-        const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
-          method: 'DELETE',
+    // On the edit screen, the user has typed/recorded something but hasn't submitted yet
+    // Always show confirmation if they have unsaved content
+    console.log('VisionEdit - Close button clicked, checking if user has content');
+    
+    if (currentAnswer.trim()) {
+      // User has typed/recorded something - show confirmation
+      console.log('VisionEdit - User has unsaved content, showing discard warning');
+      Alert.alert(
+        'Discard Your Response?',
+        'Your answer hasn\'t been saved yet. Are you sure you want to discard it?',
+        [
+          {
+            text: 'Keep Editing',
+            style: 'cancel',
+          },
+          {
+            text: 'Discard',
+            style: 'destructive',
+            onPress: async () => {
+              // Check if there are any saved responses
+              try {
+                const token = await AsyncStorage.getItem('session_token');
+                const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                  },
+                });
+                
+                if (!response.ok) {
+                  navigation.navigate('MainTabs', { screen: 'Vision' });
+                  return;
+                }
+                
+                const data = await response.json();
+                const hasResponses = data.vision?.responses?.length > 0;
+                
+                if (hasResponses) {
+                  // Go to vision detail
+                  navigation.navigate('VisionDetail', { visionId });
+                } else {
+                  // No saved responses - delete vision and go to My Vision
+                  await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                    },
+                  });
+                  navigation.navigate('MainTabs', { screen: 'Vision' });
+                }
+              } catch (error) {
+                console.error('Error in handleClose:', error);
+                navigation.navigate('MainTabs', { screen: 'Vision' });
+              }
+            },
+          },
+        ]
+      );
+    } else {
+      // No unsaved content - check if there are saved responses
+      try {
+        const token = await AsyncStorage.getItem('session_token');
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
         
-        if (!deleteResponse.ok) {
-          console.error('Failed to delete vision:', deleteResponse.status);
+        if (!response.ok) {
+          navigation.navigate('MainTabs', { screen: 'Vision' });
+          return;
         }
         
+        const data = await response.json();
+        const hasResponses = data.vision?.responses?.length > 0;
+        
+        if (hasResponses) {
+          // Go to vision detail (no confirmation needed since no unsaved content)
+          navigation.navigate('VisionDetail', { visionId });
+        } else {
+          // No saved responses and no unsaved content - delete silently
+          await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          navigation.navigate('MainTabs', { screen: 'Vision' });
+        }
+      } catch (error) {
+        console.error('Error in handleClose:', error);
         navigation.navigate('MainTabs', { screen: 'Vision' });
-      } else {
-        // Has responses - show confirmation then go to vision detail
-        console.log('VisionEdit - Showing exit confirmation (has responses)');
-        Alert.alert(
-          'Finish Later?',
-          'Your responses have been saved. You can continue deepening this vision anytime.',
-          [
-            {
-              text: 'Keep Going',
-              style: 'cancel',
-            },
-            {
-              text: 'Finish Later',
-              onPress: () => {
-                console.log('VisionEdit - User confirmed exit, going to detail');
-                navigation.navigate('VisionDetail', { visionId });
-              },
-            },
-          ]
-        );
       }
-    } catch (error) {
-      console.error('Error in handleClose:', error);
-      // On error, go back to My Vision
-      navigation.navigate('MainTabs', { screen: 'Vision' });
     }
   };
 

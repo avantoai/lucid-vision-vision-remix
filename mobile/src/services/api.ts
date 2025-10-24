@@ -358,6 +358,13 @@ class ApiService {
       body: JSON.stringify({ title }),
     });
   }
+
+  async updateVisionCategories(visionId: string, categories: string[]): Promise<void> {
+    await this.request(`/vision/visions/${visionId}/categories`, {
+      method: 'PATCH',
+      body: JSON.stringify({ categories }),
+    });
+  }
 }
 
 export default new ApiService();

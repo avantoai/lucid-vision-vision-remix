@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
 import api from '../../services/api';
+import { CATEGORIES } from '../../constants/config';
 
 interface Vision {
   id: string;
@@ -49,6 +50,8 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
+  const [editingCategories, setEditingCategories] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const loadVisionData = useCallback(async () => {
     try {
@@ -58,6 +61,7 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
       setVision(visionFields);
       setResponses(responses || []);
       setTitleInput(visionFields.title);
+      setSelectedCategories(visionFields.categories || []);
     } catch (error) {
       console.error('Failed to load vision:', error);
       Alert.alert('Error', 'Failed to load vision details');
@@ -102,6 +106,30 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
   const handleEditTitle = () => {
     setMenuVisible(false);
     setEditingTitle(true);
+  };
+
+  const handleEditCategories = () => {
+    setMenuVisible(false);
+    setEditingCategories(true);
+  };
+
+  const handleSaveCategories = async () => {
+    try {
+      await api.updateVisionCategories(visionId, selectedCategories);
+      setVision(prev => prev ? { ...prev, categories: selectedCategories } : null);
+      setEditingCategories(false);
+    } catch (error) {
+      console.error('Failed to update categories:', error);
+      Alert.alert('Error', 'Failed to update categories');
+    }
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(c => c !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
   const handleDelete = () => {
@@ -172,12 +200,74 @@ export default function VisionDetailNewScreen({ route, navigation }: any) {
               <Text style={styles.menuItemText}>Edit Title</Text>
             </TouchableOpacity>
             <View style={styles.menuDivider} />
+            <TouchableOpacity style={styles.menuItem} onPress={handleEditCategories}>
+              <Ionicons name="pricetags-outline" size={20} color={colors.text} />
+              <Text style={styles.menuItemText}>Edit Categories</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
             <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
               <Ionicons name="trash-outline" size={20} color={colors.error} />
               <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Delete Vision</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
+      </Modal>
+
+      <Modal
+        visible={editingCategories}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setEditingCategories(false)}
+      >
+        <View style={styles.categoryModalOverlay}>
+          <View style={styles.categoryModalContainer}>
+            <View style={styles.categoryModalHeader}>
+              <Text style={styles.categoryModalTitle}>Edit Categories</Text>
+              <TouchableOpacity onPress={() => setEditingCategories(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
+              {CATEGORIES.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={styles.categoryOption}
+                  onPress={() => toggleCategory(category.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.categoryOptionContent}>
+                    <Text style={styles.categoryOptionName}>{category.name}</Text>
+                    <Text style={styles.categoryOptionDescription}>{category.description}</Text>
+                  </View>
+                  <View style={[
+                    styles.categoryCheckbox,
+                    selectedCategories.includes(category.id) && styles.categoryCheckboxSelected
+                  ]}>
+                    {selectedCategories.includes(category.id) && (
+                      <Ionicons name="checkmark" size={18} color={colors.white} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            
+            <View style={styles.categoryModalActions}>
+              <TouchableOpacity
+                onPress={() => {
+                  setEditingCategories(false);
+                  setSelectedCategories(vision?.categories || []);
+                }}
+                style={styles.categoryCancelButton}
+              >
+                <Text style={styles.categoryCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSaveCategories} style={styles.categorySaveButton}>
+                <Text style={styles.categorySaveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -536,5 +626,95 @@ const styles = StyleSheet.create({
   },
   secondaryButtonTextDisabled: {
     color: colors.textTertiary,
+  },
+  categoryModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  categoryModalContainer: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+    paddingBottom: 40,
+  },
+  categoryModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  categoryModalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  categoryList: {
+    maxHeight: 400,
+    paddingHorizontal: 20,
+  },
+  categoryOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  categoryOptionContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  categoryOptionName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  categoryOptionDescription: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  categoryCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryCheckboxSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  categoryModalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
+    gap: 12,
+  },
+  categoryCancelButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  categoryCancelText: {
+    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  categorySaveButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  categorySaveText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

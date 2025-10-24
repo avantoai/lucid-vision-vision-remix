@@ -349,6 +349,23 @@ async function updateVisionTitle(visionId, userId, newTitle) {
   return { success: true };
 }
 
+async function updateVisionCategories(visionId, userId, categories) {
+  const { error } = await supabaseAdmin
+    .from('visions')
+    .update({
+      categories: categories,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', visionId)
+    .eq('user_id', userId);
+
+  if (error) {
+    throw new Error('Failed to update vision categories: ' + error.message);
+  }
+
+  return { success: true };
+}
+
 module.exports = {
   getAllVisions,
   getVision,
@@ -357,5 +374,6 @@ module.exports = {
   submitResponse,
   processVisionSummary,
   deleteVision,
-  updateVisionTitle
+  updateVisionTitle,
+  updateVisionCategories
 };

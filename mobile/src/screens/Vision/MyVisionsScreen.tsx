@@ -143,7 +143,7 @@ export default function MyVisionsScreen({ navigation }: any) {
             activeOpacity={0.7}
           >
             <View style={styles.cardHeader}>
-              <Text style={styles.visionTitle} numberOfLines={1}>
+              <Text style={styles.visionTitle}>
                 {vision.title}
               </Text>
               <Text style={styles.updatedDate}>{formatDate(vision.updated_at)}</Text>

@@ -92,4 +92,15 @@ router.patch('/visions/:visionId/title', authenticateUser, async (req, res) => {
   }
 });
 
+router.patch('/visions/:visionId/categories', authenticateUser, async (req, res) => {
+  try {
+    const { categories } = req.body;
+    await visionService.updateVisionCategories(req.params.visionId, req.user.id, categories);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update categories error:', error);
+    res.status(500).json({ error: 'Failed to update vision categories' });
+  }
+});
+
 module.exports = router;
