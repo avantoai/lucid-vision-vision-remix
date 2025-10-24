@@ -170,10 +170,7 @@ export default function VisionRecordScreen() {
       if (!response.ok) {
         console.error('Failed to fetch vision:', response.status);
         // If vision doesn't exist or error, go back to My Vision
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
+        navigation.navigate('MainTabs', { screen: 'Vision' });
         return;
       }
       
@@ -197,10 +194,7 @@ export default function VisionRecordScreen() {
         }
         
         // Always navigate back to My Vision, even if delete fails
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
+        navigation.navigate('MainTabs', { screen: 'Vision' });
       } else {
         // Has responses - go to vision detail
         console.log('Vision has responses, navigating to detail');
@@ -209,10 +203,7 @@ export default function VisionRecordScreen() {
     } catch (error) {
       console.error('Error in handleClose:', error);
       // On error, go back to My Vision (safer than showing empty detail)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
+      navigation.navigate('MainTabs', { screen: 'Vision' });
     }
   };
 

@@ -89,19 +89,20 @@ export default function VisionEditScreen() {
       });
       
       if (!response.ok) {
+        console.error('Failed to fetch vision:', response.status);
         // If vision doesn't exist or error, go back to My Vision
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
+        navigation.navigate('MainTabs', { screen: 'Vision' });
         return;
       }
       
       const data = await response.json();
       const hasResponses = data.vision?.responses?.length > 0;
       
+      console.log('VisionEdit - Vision check:', { visionId, hasResponses, responseCount: data.vision?.responses?.length });
+      
       if (!hasResponses) {
         // No responses yet - show confirmation dialog
+        console.log('VisionEdit - Showing discard confirmation');
         Alert.alert(
           'Discard Vision?',
           'This will permanently delete this vision. This action cannot be undone.',
@@ -114,6 +115,7 @@ export default function VisionEditScreen() {
               text: 'Discard',
               style: 'destructive',
               onPress: async () => {
+                console.log('VisionEdit - User confirmed delete, deleting vision:', visionId);
                 // Delete the vision
                 const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
                   method: 'DELETE',
@@ -127,25 +129,20 @@ export default function VisionEditScreen() {
                 }
                 
                 // Navigate back to My Vision
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'MainTabs' }],
-                });
+                navigation.navigate('MainTabs', { screen: 'Vision' });
               },
             },
           ]
         );
       } else {
         // Has responses - go to vision detail
+        console.log('VisionEdit - Vision has responses, navigating to detail');
         navigation.navigate('VisionDetail', { visionId });
       }
     } catch (error) {
       console.error('Error in handleClose:', error);
       // On error, go back to My Vision
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
+      navigation.navigate('MainTabs', { screen: 'Vision' });
     }
   };
 
