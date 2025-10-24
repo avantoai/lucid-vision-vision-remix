@@ -184,11 +184,9 @@ export default function VisionRecordScreen() {
       </View>
 
       {/* Microphone controls - absolutely positioned at screen center */}
-      {isRecording ? (
-        <Text style={[styles.timer, { top: helpTextTop }]}>{formatTime(recordingTime)}</Text>
-      ) : !isLoading ? (
+      {!isRecording && !isLoading && (
         <Text style={[styles.helpText, { top: helpTextTop }]}>Tap to Record</Text>
-      ) : null}
+      )}
 
       <View style={[styles.micContainer, { top: micButtonTop }]}>
         {isRecording && (
