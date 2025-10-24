@@ -1,8 +1,7 @@
 const { supabase, supabaseAdmin } = require('../config/supabase');
 const aiService = require('./aiService');
-const cssCalculator = require('./cssCalculator');
 
-const CATEGORIES = ['Vision', 'Emotion', 'Belief', 'Identity', 'Embodiment'];
+const TARGET_WORD_COUNT = 600; // 100% completeness at 600 words
 
 async function getAllVisions(userId) {
   const { data: visions, error } = await supabaseAdmin
@@ -82,19 +81,7 @@ async function createVision(userId) {
       user_id: userId,
       title: 'Untitled Vision',
       categories: [],
-      micro_tags: [],
-      context_depth: {
-        Vision: { css: 0, coverage: {}, subscores: {}, last_scored: null },
-        Emotion: { css: 0, coverage: {}, subscores: {}, last_scored: null },
-        Belief: { css: 0, coverage: {}, subscores: {}, last_scored: null },
-        Identity: { css: 0, coverage: {}, subscores: {}, last_scored: null },
-        Embodiment: { css: 0, coverage: {}, subscores: {}, last_scored: null }
-      },
-      css_vision: 0,
-      css_emotion: 0,
-      css_belief: 0,
-      css_identity: 0,
-      css_embodiment: 0,
+      total_word_count: 0,
       overall_completeness: 0,
       summary: null,
       tagline: null,
@@ -115,118 +102,77 @@ async function createVision(userId) {
 async function generateNextQuestion(visionId, userId) {
   const vision = await getVision(visionId, userId);
   
+  // Get vision category from the vision's categories array (use first or 'general')
+  const visionCategory = (vision.categories && vision.categories.length > 0) 
+    ? vision.categories[0] 
+    : vision.title || 'your vision';
+  
   const responses = vision.responses.map(r => ({
-    category: r.category,
     question: r.question,
     answer: r.answer
   }));
 
-  // Determine which category needs work based on CSS scores
-  const contextDepth = vision.context_depth || {};
-  const nextCategory = aiService.determineNextCategory(contextDepth);
+  console.log(`🎯 Generating next question for vision: ${vision.title} (${responses.length} previous responses)`);
+  console.log(`📊 Progress: ${vision.total_word_count || 0}/${TARGET_WORD_COUNT} words (${vision.overall_completeness || 0}%)`);
   
-  console.log(`📊 CSS Scores: Vision=${contextDepth.Vision?.css || 0}, Emotion=${contextDepth.Emotion?.css || 0}, Belief=${contextDepth.Belief?.css || 0}, Identity=${contextDepth.Identity?.css || 0}, Embodiment=${contextDepth.Embodiment?.css || 0}`);
-  console.log(`🎯 Next category: ${nextCategory}`);
-  
-  // Get CSS analysis for this category
-  const categoryCSS = contextDepth[nextCategory] || { css: 0, coverage: {}, weakest_signal: 'specificity' };
-  
-  // Generate question using CSS context
-  const question = await aiService.generateNextCategoryQuestion(nextCategory, responses, categoryCSS);
+  // Generate question using AI (no CSS, just conversation flow)
+  const question = await aiService.generateNextVisionQuestion(visionCategory, responses);
   
   return {
-    question,
-    category: nextCategory
+    question
   };
 }
 
-async function submitResponse(visionId, userId, category, question, answer) {
+async function submitResponse(visionId, userId, question, answer) {
   const vision = await getVision(visionId, userId);
   const isFirstResponse = vision.responses.length === 0;
   const wasFirstFlow = !vision.title || vision.title === 'Untitled Vision';
 
-  // Step 1: Calculate CSS for this response
-  console.log(`🧮 Calculating CSS for ${category} response...`);
-  const categoryResponses = vision.responses.filter(r => r.category === category);
-  const cssResult = await cssCalculator.calculateResponseCSS(category, question, answer, categoryResponses);
-  
-  console.log(`   ✓ CSS: ${cssResult.css} (${cssResult.decisionBand})`);
-  console.log(`   ✓ Categories addressed: ${cssResult.categoriesAddressed.join(', ')}`);
-  console.log(`   ✓ Weakest signal: ${cssResult.weakestSignal}`);
+  // Step 1: Count words in this answer
+  const wordCount = answer.trim().split(/\s+/).length;
+  console.log(`📝 New response: ${wordCount} words`);
 
-  // Step 2: Insert the response with category tagging
+  // Step 2: Insert the response (no category tagging needed)
   await supabaseAdmin
     .from('vision_responses')
     .insert({
       user_id: userId,
       vision_id: visionId,
-      category: category,
-      categories_addressed: cssResult.categoriesAddressed,
       question,
       answer,
       created_at: new Date().toISOString()
     });
 
-  // Step 3: Update context_depth for all addressed categories
-  const updatedContextDepth = { ...(vision.context_depth || {}) };
-  const cssUpdates = {};
-  
-  // Reuse the CSS we already calculated instead of recalculating for each category
-  const cssData = {
-    css: cssResult.css,
-    coverage: {
-      hits: cssResult.coverageHits,
-      required: cssCalculator.COVERAGE_SLOTS[category]?.required || 0,
-      met: cssResult.coverageHits.length >= (cssCalculator.COVERAGE_SLOTS[category]?.required || 0)
-    },
-    subscores: cssResult.subscores,
-    decision_band: cssResult.decisionBand,
-    weakest_signal: cssResult.weakestSignal,
-    last_scored: new Date().toISOString()
-  };
-  
-  console.log(`🔄 Processing categories addressed: ${JSON.stringify(cssResult.categoriesAddressed)}`);
-  
-  for (const cat of cssResult.categoriesAddressed) {
-    console.log(`   Updating category: ${cat} with CSS ${cssData.css}`);
-    updatedContextDepth[cat] = cssData;
-    cssUpdates[`css_${cat.toLowerCase()}`] = cssData.css;
-  }
-  
-  console.log(`🔄 After loop - cssUpdates keys: ${Object.keys(cssUpdates).join(', ')}`);
+  // Step 3: Calculate total word count and completeness
+  const previousWordCount = vision.total_word_count || 0;
+  const newTotalWordCount = previousWordCount + wordCount;
+  const overallCompleteness = Math.min(100, Math.round((newTotalWordCount / TARGET_WORD_COUNT) * 100));
 
-  // Calculate overall completeness (average CSS * 100)
-  const avgCSS = CATEGORIES.reduce((sum, cat) => sum + (updatedContextDepth[cat]?.css || 0), 0) / 5;
-  const overallCompleteness = Math.round(avgCSS * 100);
+  console.log(`📊 Updated stats:`);
+  console.log(`   Total words: ${newTotalWordCount}/${TARGET_WORD_COUNT}`);
+  console.log(`   Completeness: ${overallCompleteness}%`);
 
-  // Step 4: Update vision with new CSS data
-  console.log(`📝 Updating vision ${visionId}:`);
-  console.log(`   Overall completeness: ${overallCompleteness}%`);
-  console.log(`   CSS updates:`, cssUpdates);
-  console.log(`   Categories in context_depth:`, Object.keys(updatedContextDepth));
-  
-  const { data: updateData, error: updateError } = await supabaseAdmin
+  // Step 4: Update vision with new word count
+  const { error: updateError } = await supabaseAdmin
     .from('visions')
     .update({
-      context_depth: updatedContextDepth,
-      ...cssUpdates,
+      total_word_count: newTotalWordCount,
       overall_completeness: overallCompleteness,
-      last_scored_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
     .eq('id', visionId);
   
   if (updateError) {
-    console.error(`❌ Failed to update vision CSS:`, updateError);
-    throw new Error(`Failed to update vision CSS: ${updateError.message}`);
+    console.error(`❌ Failed to update vision:`, updateError);
+    throw new Error(`Failed to update vision: ${updateError.message}`);
   }
   
   console.log(`✅ Vision updated successfully`);
 
   // Step 5: Auto-generate content based on flow detection
   const allResponses = [
-    ...vision.responses.map(r => ({ category: r.category, question: r.question, answer: r.answer })),
-    { category, question, answer }
+    ...vision.responses.map(r => ({ question: r.question, answer: r.answer })),
+    { question, answer }
   ];
   
   // Generate title only on first flow (after first response)
@@ -245,13 +191,7 @@ async function submitResponse(visionId, userId, category, question, answer) {
 
   return { 
     overall_completeness: overallCompleteness,
-    css_scores: {
-      vision: updatedContextDepth.Vision?.css || 0,
-      emotion: updatedContextDepth.Emotion?.css || 0,
-      belief: updatedContextDepth.Belief?.css || 0,
-      identity: updatedContextDepth.Identity?.css || 0,
-      embodiment: updatedContextDepth.Embodiment?.css || 0
-    }
+    total_word_count: newTotalWordCount
   };
 }
 
