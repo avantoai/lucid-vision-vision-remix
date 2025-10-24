@@ -1,14 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, layout } from '../../theme';
 
 interface GroundingScreenProps {
   onContinue: () => void;
+  onClose?: () => void;
 }
 
-export default function GroundingScreen({ onContinue }: GroundingScreenProps) {
+export default function GroundingScreen({ onContinue, onClose }: GroundingScreenProps) {
   return (
     <View style={styles.container}>
+      {onClose && (
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Ionicons name="close" size={24} color={colors.textSecondary} />
+        </TouchableOpacity>
+      )}
+
       <View style={styles.content}>
         <Text style={styles.title}>Take a moment</Text>
         <Text style={styles.subtitle}>
