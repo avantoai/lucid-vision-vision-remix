@@ -970,6 +970,57 @@ Return ONLY the category name (one word: Vision, Emotion, Belief, Identity, or E
   return STAGES.includes(stage) ? stage : STAGES[0];
 }
 
+/**
+ * SIMPLIFIED VISION QUESTION GENERATOR
+ * Generates next question using Coach Cal AI - no CSS framework, just conversation flow
+ */
+async function generateNextVisionQuestion(visionCategory, allResponses) {
+  // For very first question, use simple starter
+  if (allResponses.length === 0) {
+    const STARTERS = [
+      'What do you want?',
+      'What\'s your vision?',
+      'What are you calling in?',
+      'What do you want to create?'
+    ];
+    return STARTERS[Math.floor(Math.random() * STARTERS.length)];
+  }
+
+  // Build conversation history
+  const responseHistory = allResponses
+    .map((r, i) => `Q${i + 1}: ${r.question}\nA${i + 1}: ${r.answer}`)
+    .join('\n\n');
+
+  const prompt = `You are Coach Cal, helping a user clarify their vision for ${visionCategory}.
+
+**Conversation so far:**
+${responseHistory}
+
+**Your task:**
+Generate the next best question to help them deepen and clarify this vision. 
+
+**Guidelines:**
+- Reference specific details from their previous answers
+- Ask what naturally flows from the conversation
+- Help them get more concrete, vivid, and embodied
+- Maximum 15 words, single question only
+- No pre-loading emotions - let them discover their own feelings
+
+Return ONLY the question.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: COACH_CAL_PROMPT },
+      { role: 'user', content: prompt }
+    ],
+    temperature: 0.9,
+    max_tokens: 50
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
 module.exports = {
   generateScript,
   generateTitle,
@@ -983,7 +1034,9 @@ module.exports = {
   generateVisionSummaryNew,
   generateVisionTagline,
   determineStageToDeepen,
-  // New CSS-aware functions
+  // Legacy CSS functions (kept for backwards compatibility during migration)
   determineNextCategory,
-  generateNextCategoryQuestion
+  generateNextCategoryQuestion,
+  // New simplified function
+  generateNextVisionQuestion
 };
