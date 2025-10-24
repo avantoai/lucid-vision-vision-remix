@@ -185,37 +185,39 @@ export default function MyVisionsScreen({ navigation }: any) {
               <Text style={styles.updatedDate}>{formatDate(vision.updated_at)}</Text>
             </View>
 
-            {vision.categories.length > 0 && (
-              <View style={styles.categoryContainer}>
-                {vision.categories.slice(0, 3).map((category, index) => (
-                  <View key={index} style={styles.categoryPill}>
-                    <Text style={styles.categoryText}>{category}</Text>
-                  </View>
-                ))}
-                {vision.categories.length > 3 && (
-                  <Text style={styles.moreCategoriesText}>+{vision.categories.length - 3}</Text>
-                )}
-              </View>
-            )}
-
             {vision.tagline && (
               <Text style={styles.tagline} numberOfLines={2}>
                 {vision.tagline}
               </Text>
             )}
 
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      width: `${vision.overall_completeness}%`,
-                      backgroundColor: getProgressColor(vision.overall_completeness)
-                    }
-                  ]}
-                />
+            <View style={styles.bottomRow}>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      {
+                        width: `${vision.overall_completeness}%`,
+                        backgroundColor: getProgressColor(vision.overall_completeness)
+                      }
+                    ]}
+                  />
+                </View>
               </View>
+
+              {vision.categories.length > 0 && (
+                <View style={styles.categoryContainer}>
+                  {vision.categories.slice(0, 3).map((category, index) => (
+                    <View key={index} style={styles.categoryPill}>
+                      <Text style={styles.categoryText}>{category}</Text>
+                    </View>
+                  ))}
+                  {vision.categories.length > 3 && (
+                    <Text style={styles.moreCategoriesText}>+{vision.categories.length - 3}</Text>
+                  )}
+                </View>
+              )}
             </View>
           </TouchableOpacity>
         ))}
@@ -312,19 +314,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
   },
+  tagline: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 12,
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
   },
   categoryPill: {
     backgroundColor: colors.surfaceLight,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 6,
+    marginLeft: 8,
   },
   categoryText: {
     fontSize: 12,
@@ -334,17 +353,7 @@ const styles = StyleSheet.create({
   moreCategoriesText: {
     fontSize: 12,
     color: colors.textTertiary,
-  },
-  tagline: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontStyle: 'italic',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginLeft: 8,
   },
   progressBar: {
     width: 30,
