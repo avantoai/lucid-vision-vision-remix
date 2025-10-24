@@ -1,7 +1,11 @@
 -- Migration: Remove CSS framework and add word count tracking
 -- Run this on your Supabase database via SQL Editor
 
--- Remove all CSS-related columns from visions table
+-- Step 1: Drop the trigger and function that depend on CSS columns
+DROP TRIGGER IF EXISTS trigger_update_vision_completeness ON visions;
+DROP FUNCTION IF EXISTS update_vision_completeness();
+
+-- Step 2: Now we can safely remove all CSS-related columns from visions table
 ALTER TABLE visions 
 DROP COLUMN IF EXISTS context_depth,
 DROP COLUMN IF EXISTS css_vision,
@@ -13,7 +17,9 @@ DROP COLUMN IF EXISTS is_complete_vision,
 DROP COLUMN IF EXISTS is_complete_emotion,
 DROP COLUMN IF EXISTS is_complete_belief,
 DROP COLUMN IF EXISTS is_complete_identity,
-DROP COLUMN IF EXISTS is_complete_embodiment;
+DROP COLUMN IF EXISTS is_complete_embodiment,
+DROP COLUMN IF EXISTS last_scored_at,
+DROP COLUMN IF EXISTS micro_tags;
 
 -- Add word count tracking column
 ALTER TABLE visions 
