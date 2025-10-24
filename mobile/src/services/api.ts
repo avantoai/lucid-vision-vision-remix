@@ -105,6 +105,7 @@ class ApiService {
     category: string;
     duration: number;
     voiceId: string;
+    meditationType?: string;
     background: string;
     responses: Array<{ question: string; answer: string }>;
     visionId?: string;
