@@ -123,6 +123,12 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
 
     console.log(`⏳ [${meditationId}] Step 5/5: Saving to database...`);
     const cleanScript = stripBreakTags(script);
+    
+    // Calculate word count (remove break tags and count words)
+    const scriptWithoutBreaks = script.replace(/<break[^>]*>/g, '');
+    const wordCount = scriptWithoutBreaks.trim().split(/\s+/).length;
+    console.log(`✓ [${meditationId}] Script word count: ${wordCount} words`);
+    
     const { error } = await supabaseAdmin
       .from('meditations')
       .update({
@@ -132,6 +138,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
         title: title,
         voice_name: getVoiceName(voiceId),
         tts_audio_duration_seconds: ttsAudioDuration,
+        script_word_count: wordCount,
         status: 'completed'
       })
       .eq('id', meditationId);
