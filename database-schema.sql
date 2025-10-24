@@ -36,38 +36,17 @@ CREATE TABLE IF NOT EXISTS meditations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Visions table with context depth tracking
+-- Visions table with word count-based progress tracking
 CREATE TABLE IF NOT EXISTS visions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   categories TEXT[] DEFAULT '{}',
-  micro_tags TEXT[] DEFAULT '{}',
   
-  -- Context depth tracking (JSONB for flexibility + denormalized for performance)
-  context_depth JSONB DEFAULT '{
-    "Vision": {"css": 0, "coverage": {}, "subscores": {}, "last_scored": null},
-    "Emotion": {"css": 0, "coverage": {}, "subscores": {}, "last_scored": null},
-    "Belief": {"css": 0, "coverage": {}, "subscores": {}, "last_scored": null},
-    "Identity": {"css": 0, "coverage": {}, "subscores": {}, "last_scored": null},
-    "Embodiment": {"css": 0, "coverage": {}, "subscores": {}, "last_scored": null}
-  }'::jsonb,
+  -- Word count progress tracking (600 words = 100% complete)
+  total_word_count INTEGER DEFAULT 0,
   
-  -- Denormalized CSS columns for fast queries (0.00 to 1.00)
-  css_vision DECIMAL(3,2) DEFAULT 0 CHECK (css_vision >= 0 AND css_vision <= 1),
-  css_emotion DECIMAL(3,2) DEFAULT 0 CHECK (css_emotion >= 0 AND css_emotion <= 1),
-  css_belief DECIMAL(3,2) DEFAULT 0 CHECK (css_belief >= 0 AND css_belief <= 1),
-  css_identity DECIMAL(3,2) DEFAULT 0 CHECK (css_identity >= 0 AND css_identity <= 1),
-  css_embodiment DECIMAL(3,2) DEFAULT 0 CHECK (css_embodiment >= 0 AND css_embodiment <= 1),
-  
-  -- Boolean completeness flags (threshold: CSS >= 0.70)
-  is_complete_vision BOOLEAN DEFAULT FALSE,
-  is_complete_emotion BOOLEAN DEFAULT FALSE,
-  is_complete_belief BOOLEAN DEFAULT FALSE,
-  is_complete_identity BOOLEAN DEFAULT FALSE,
-  is_complete_embodiment BOOLEAN DEFAULT FALSE,
-  
-  -- Overall completeness percentage (0-100)
+  -- Overall completeness percentage (0-100) based on word count
   overall_completeness INTEGER DEFAULT 0 CHECK (overall_completeness >= 0 AND overall_completeness <= 100),
   
   -- Auto-generated content
@@ -76,7 +55,6 @@ CREATE TABLE IF NOT EXISTS visions (
   
   -- Metadata
   status TEXT DEFAULT 'completed' CHECK (status IN ('processing', 'completed', 'failed')),
-  last_scored_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -86,13 +64,6 @@ CREATE TABLE IF NOT EXISTS vision_responses (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   vision_id UUID NOT NULL REFERENCES visions(id) ON DELETE CASCADE,
-  
-  -- Primary category this question was targeting
-  category TEXT NOT NULL CHECK (category IN ('Vision', 'Emotion', 'Belief', 'Identity', 'Embodiment')),
-  
-  -- Additional categories this response addressed (for cross-domain answers)
-  categories_addressed TEXT[] DEFAULT '{}',
-  
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -117,35 +88,6 @@ CREATE TABLE IF NOT EXISTS quota_tracking (
   UNIQUE(user_id, week_start)
 );
 
--- Function to auto-update overall completeness and boolean flags
-CREATE OR REPLACE FUNCTION update_vision_completeness()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Calculate overall completeness percentage (average CSS * 100)
-  NEW.overall_completeness := ROUND(
-    (NEW.css_vision + NEW.css_emotion + NEW.css_belief + NEW.css_identity + NEW.css_embodiment) / 5.0 * 100
-  );
-  
-  -- Update boolean flags (threshold: CSS >= 0.70)
-  NEW.is_complete_vision := NEW.css_vision >= 0.70;
-  NEW.is_complete_emotion := NEW.css_emotion >= 0.70;
-  NEW.is_complete_belief := NEW.css_belief >= 0.70;
-  NEW.is_complete_identity := NEW.css_identity >= 0.70;
-  NEW.is_complete_embodiment := NEW.css_embodiment >= 0.70;
-  
-  -- Update timestamp
-  NEW.updated_at := NOW();
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger to auto-calculate completeness on CSS updates
-CREATE TRIGGER trigger_update_vision_completeness
-  BEFORE INSERT OR UPDATE OF css_vision, css_emotion, css_belief, css_identity, css_embodiment
-  ON visions
-  FOR EACH ROW
-  EXECUTE FUNCTION update_vision_completeness();
 
 -- Row Level Security (RLS) Policies
 
@@ -245,10 +187,8 @@ CREATE INDEX IF NOT EXISTS idx_visions_user_id ON visions(user_id);
 CREATE INDEX IF NOT EXISTS idx_visions_categories ON visions USING GIN(categories);
 CREATE INDEX IF NOT EXISTS idx_visions_updated_at ON visions(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_visions_overall_completeness ON visions(overall_completeness);
-CREATE INDEX IF NOT EXISTS idx_visions_last_scored_at ON visions(last_scored_at);
+CREATE INDEX IF NOT EXISTS idx_visions_total_word_count ON visions(total_word_count);
 
 CREATE INDEX IF NOT EXISTS idx_vision_responses_vision_id ON vision_responses(vision_id);
-CREATE INDEX IF NOT EXISTS idx_vision_responses_category ON vision_responses(category);
-CREATE INDEX IF NOT EXISTS idx_vision_responses_categories_addressed ON vision_responses USING GIN(categories_addressed);
 
 CREATE INDEX IF NOT EXISTS idx_quota_tracking_user_week ON quota_tracking(user_id, week_start);
