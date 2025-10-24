@@ -95,6 +95,11 @@ export default function MyVisionsScreen({ navigation }: any) {
     return v.categories.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
   });
 
+  // Get categories that have at least one vision
+  const availableCategories = ['All', ...CATEGORIES.slice(1).filter(category => 
+    visions.some(v => v.categories.some(c => c.toLowerCase() === category.toLowerCase()))
+  )];
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -112,33 +117,35 @@ export default function MyVisionsScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
-        contentContainerStyle={styles.categoriesContent}
-      >
-        {CATEGORIES.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryFilterPill,
-              selectedCategory === category && styles.categoryFilterPillActive
-            ]}
-            onPress={() => setSelectedCategory(category)}
-            activeOpacity={0.7}
-          >
-            <Text
+      {availableCategories.length > 1 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+          contentContainerStyle={styles.categoriesContent}
+        >
+          {availableCategories.map((category) => (
+            <TouchableOpacity
+              key={category}
               style={[
-                styles.categoryFilterText,
-                selectedCategory === category && styles.categoryFilterTextActive
+                styles.categoryFilterPill,
+                selectedCategory === category && styles.categoryFilterPillActive
               ]}
+              onPress={() => setSelectedCategory(category)}
+              activeOpacity={0.7}
             >
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              <Text
+                style={[
+                  styles.categoryFilterText,
+                  selectedCategory === category && styles.categoryFilterTextActive
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       <ScrollView
         style={styles.scrollView}
