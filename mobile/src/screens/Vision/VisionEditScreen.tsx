@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import api from '../../services/api';
@@ -76,6 +77,78 @@ export default function VisionEditScreen() {
     }
   };
 
+  const handleClose = async () => {
+    try {
+      const token = await AsyncStorage.getItem('session_token');
+      
+      // Check if this vision has any responses
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        // If vision doesn't exist or error, go back to My Vision
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
+        return;
+      }
+      
+      const data = await response.json();
+      const hasResponses = data.vision?.responses?.length > 0;
+      
+      if (!hasResponses) {
+        // No responses yet - show confirmation dialog
+        Alert.alert(
+          'Discard Vision?',
+          'This will permanently delete this vision. This action cannot be undone.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Discard',
+              style: 'destructive',
+              onPress: async () => {
+                // Delete the vision
+                const deleteResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                  },
+                });
+                
+                if (!deleteResponse.ok) {
+                  console.error('Failed to delete vision:', deleteResponse.status);
+                }
+                
+                // Navigate back to My Vision
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'MainTabs' }],
+                });
+              },
+            },
+          ]
+        );
+      } else {
+        // Has responses - go to vision detail
+        navigation.navigate('VisionDetail', { visionId });
+      }
+    } catch (error) {
+      console.error('Error in handleClose:', error);
+      // On error, go back to My Vision
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
+    }
+  };
+
 
   if (isTranscribing) {
     return (
@@ -88,7 +161,7 @@ export default function VisionEditScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.navigate('VisionDetail', { visionId })}>
+      <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
         <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
