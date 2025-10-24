@@ -86,10 +86,13 @@ async function generateMeditationAudio({ script, voiceId, background, duration }
   // Keep ElevenLabs <break> tags, only remove old [pause] markers if present
   const scriptForTTS = script.replace(/\[pause\]/gi, '');
   
+  // Track TTS generation time for QA
+  const ttsStartTime = Date.now();
   const voiceBuffer = await generateSpeech(scriptForTTS, voiceId);
+  const ttsGenerationMs = Date.now() - ttsStartTime;
   
   if (!voiceBuffer) {
-    return 'mock-audio-url';
+    return { fileName: 'mock-audio-url', ttsGenerationMs: 0 };
   }
 
   const mixedBuffer = await mixAudioWithBackground(voiceBuffer, background, duration);
@@ -106,7 +109,7 @@ async function generateMeditationAudio({ script, voiceId, background, duration }
     throw new Error('Failed to upload audio: ' + error.message);
   }
 
-  return fileName;
+  return { fileName, ttsGenerationMs };
 }
 
 module.exports = {

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS meditations (
   is_favorite BOOLEAN DEFAULT FALSE,
   is_downloaded BOOLEAN DEFAULT FALSE,
   received_from TEXT,
+  tts_generation_ms INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
