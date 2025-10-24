@@ -3,6 +3,19 @@ const aiService = require('./aiService');
 const audioService = require('./audioService');
 const quotaService = require('./quotaService');
 
+// Voice ID to name mapping
+const VOICE_NAMES = {
+  'HzVnxqtdk9eqrcwfxD57': 'Jen',
+  'AeRdCCKzvd23BpJoofzx': 'Nathaniel',
+  'RxDql9IVj8LjC1obxK7z': 'Nora',
+  'ItH39nl7BrnB34569EL1': 'Ella',
+  '1TmWQEtqNZdO4bVt9Xo1': 'Grant'
+};
+
+function getVoiceName(voiceId) {
+  return VOICE_NAMES[voiceId] || 'Unknown';
+}
+
 function stripBreakTags(script) {
   return script.replace(/<break\s+time=['"][\d.]+s['"]\s*\/>/g, '');
 }
@@ -18,6 +31,7 @@ async function createMeditationPlaceholder({ userId, category, duration, voiceId
       category,
       duration,
       voice_id: voiceId,
+      voice_name: getVoiceName(voiceId),
       background,
       script: '',
       audio_url: '',
@@ -115,6 +129,7 @@ async function completeMeditationGeneration({ meditationId, userId, category, du
         audio_url: audioUrl,
         title_auto: title,
         title: title,
+        voice_name: getVoiceName(voiceId),
         tts_audio_duration_seconds: ttsAudioDuration,
         status: 'completed'
       })
@@ -183,6 +198,7 @@ async function generateMeditation({ userId, category, duration, voiceId, backgro
       category,
       duration,
       voice_id: voiceId,
+      voice_name: getVoiceName(voiceId),
       background,
       script: cleanScript,
       audio_url: audioUrl,

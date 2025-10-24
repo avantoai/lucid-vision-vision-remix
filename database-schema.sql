@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS meditations (
   category TEXT NOT NULL,
   duration INTEGER NOT NULL,
   voice_id TEXT NOT NULL,
+  voice_name TEXT,
   background TEXT NOT NULL,
   script TEXT NOT NULL,
   audio_url TEXT NOT NULL,
