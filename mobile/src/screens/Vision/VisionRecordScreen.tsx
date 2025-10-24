@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions, Animated } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
@@ -155,6 +156,46 @@ export default function VisionRecordScreen() {
     });
   };
 
+  const handleClose = async () => {
+    try {
+      // Check if this vision has any responses
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+        headers: {
+          'Authorization': `Bearer ${await AsyncStorage.getItem('session_token')}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const hasResponses = data.vision?.responses?.length > 0;
+        
+        if (!hasResponses) {
+          // No responses yet - delete the vision and go back to My Vision
+          await fetch(`${process.env.EXPO_PUBLIC_API_URL}/vision/visions/${visionId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${await AsyncStorage.getItem('session_token')}`,
+            },
+          });
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainTabs' }],
+          });
+        } else {
+          // Has responses - go to vision detail
+          navigation.navigate('VisionDetail', { visionId });
+        }
+      } else {
+        // Fallback to vision detail if check fails
+        navigation.navigate('VisionDetail', { visionId });
+      }
+    } catch (error) {
+      console.error('Error checking vision:', error);
+      // Fallback to vision detail on error
+      navigation.navigate('VisionDetail', { visionId });
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -169,7 +210,7 @@ export default function VisionRecordScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.navigate('VisionDetail', { visionId })}>
+      <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
         <Ionicons name="close" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
